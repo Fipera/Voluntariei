@@ -3,7 +3,12 @@ import gluestackPlugin from '@gluestack-ui/nativewind-utils/tailwind-plugin';
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: "media",
-  content: ["app/**/*.{tsx,jsx,ts,js}", "components/**/*.{tsx,jsx,ts,js}"],
+  content: [
+    "./App.{js,jsx,ts,tsx}",
+    "./app/**/*.{js,jsx,ts,tsx}",
+    "./screens/**/*.{js,jsx,ts,tsx}",
+    "./components/**/*.{js,jsx,ts,tsx}",
+  ],
   presets: [require('nativewind/preset')],
   safelist: [
     {
@@ -14,6 +19,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        'input-bg': 'var(--color-input-bg)',
+        'input-border': 'var(--color-input-border)',
+        'button-bg': 'var(--color-button-bg)',
+
         primary: {
           0: 'rgb(var(--color-primary-0)/<alpha-value>)',
           50: 'rgb(var(--color-primary-50)/<alpha-value>)',
@@ -174,6 +183,9 @@ module.exports = {
         body: undefined,
         mono: undefined,
         roboto: ['Roboto', 'sans-serif'],
+        NunitoBold: ["Nunito-Bold"],
+        NunitoRegular: ["Nunito-Regular"],
+        NunitoItalic: ["Nunito-Italic"],
       },
       fontWeight: {
         extrablack: '950',
@@ -182,15 +194,7 @@ module.exports = {
         '2xs': '10px',
       },
       boxShadow: {
-        'hard-1': '-2px 2px 8px 0px rgba(38, 38, 38, 0.20)',
-        'hard-2': '0px 3px 10px 0px rgba(38, 38, 38, 0.20)',
-        'hard-3': '2px 2px 8px 0px rgba(38, 38, 38, 0.20)',
-        'hard-4': '0px -3px 10px 0px rgba(38, 38, 38, 0.20)',
-        'hard-5': '0px 2px 10px 0px rgba(38, 38, 38, 0.10)',
-        'soft-1': '0px 0px 10px rgba(38, 38, 38, 0.1)',
-        'soft-2': '0px 0px 20px rgba(38, 38, 38, 0.2)',
-        'soft-3': '0px 0px 30px rgba(38, 38, 38, 0.1)',
-        'soft-4': '0px 0px 40px rgba(38, 38, 38, 0.1)',
+        'shadow': 'var(--shadow-input)',
       },
     },
   },

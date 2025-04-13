@@ -3,6 +3,12 @@ import { vars } from 'nativewind';
 
 export const config = {
   light: vars({
+    '--color-input-bg': '#F2F2F2',
+    '--color-input-border': 'rgba(198,194,194,0.5)',
+    '--shadow': '0px 2px 2px rgba(0, 0, 0, 0.25)',
+
+    '--color-button-bg': '#2D543F',
+
     '--color-primary-0': '179 179 179',
     '--color-primary-50': '153 153 153',
     '--color-primary-100': '128 128 128',
@@ -155,6 +161,10 @@ export const config = {
     '--color-indicator-error': '185 28 28',
   }),
   dark: vars({
+    '--color-input-bg': '#F2F2F2',
+    '--color-input-border': 'rgba(198,194,194,0.5)',
+    '--shadow-input': '0px 2px 2px rgba(0, 0, 0, 0.25)',
+    
     '--color-primary-0': '166 166 166',
     '--color-primary-50': '175 175 175',
     '--color-primary-100': '186 186 186',
