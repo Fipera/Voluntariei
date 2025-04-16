@@ -4,12 +4,12 @@ import {buildJsonSchemas} from 'fastify-zod'
 const InstitutionCore = {
     email: z
         .string({
-            required_error: "email é obrigatório",
+            required_error: "email obrigatório",
             invalid_type_error: "email inválido",
         })
         .email(),
     name: z.string({
-        required_error: "nome é obrigatório",
+        required_error: "nome obrigatório",
         invalid_type_error: "nome inválido",
     }),
     cnpj: z.string({
@@ -86,4 +86,6 @@ export const {schemas: institutionSchemas, $ref} = buildJsonSchemas({
     createInstitutionResponseSchema,
     loginInstitutionSchema,
     loginInstitutionResponseSchema
+}, {
+    $id: "institutionSchemas"
 })

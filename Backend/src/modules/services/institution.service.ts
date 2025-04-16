@@ -25,6 +25,10 @@ export async function findInstitutionByEmail(email: string) {
     })
 }
 
+export async function findInstitutionByPhone(phoneNumber: string) {
+    return prisma.institution.findUnique({ where: { phoneNumber } });
+}
+
 
 export async function findInstitutions(){
     return prisma.institution.findMany({

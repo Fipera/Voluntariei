@@ -3,6 +3,8 @@ import institutionRoutes from "./modules/routes/institution.route";
 import { institutionSchemas } from "./modules/schemas/institution.schema";
 import fjwt from "fastify-jwt";
 import authenticate from "./plugins/authenticate";
+import voluntaryRoutes from "./modules/routes/voluntary.route";
+import { voluntarySchemas } from "./modules/schemas/voluntary.schema";
 export const server = Fastify();
 
 
@@ -20,7 +22,12 @@ async function main() {
         server.addSchema(schema);
     }
 
+    for (const schema of voluntarySchemas) {
+        server.addSchema(schema);
+    }
+
     server.register(institutionRoutes, { prefix: "/institution" });
+    server.register(voluntaryRoutes, { prefix: "/voluntary" });
 
     try {
         await server.listen({ port: 3000, host: "0.0.0.0" });

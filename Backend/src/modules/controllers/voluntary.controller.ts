@@ -1,27 +1,24 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import {
-    createInstitution,
-    findInstitutionByEmail,
-    findInstitutionByPhone,
-    findInstitutions,
-} from "../services/institution.service";
-import {
-    createInstitutionInput,
-    LoginInstitutionInput,
-} from "../schemas/institution.schema";
-import { verifyPassword } from "../../utils/hash";
-import { server } from "../../app";
-import { AccountAlreadyExistsError } from "../../errors/email.already.exists";
-import { PrismaClientKnownRequestError } from "../../generated/prisma/runtime/library";
-import {
+    createVoluntary,
     findVoluntaryByEmail,
     findVoluntaryByPhone,
 } from "../services/voluntary.service";
+import {
+    createVoluntaryInput,
+    loginVoluntaryInput,
+} from "../schemas/voluntary.schema";
+import { PrismaClientKnownRequestError } from "../../generated/prisma/runtime/library";
+import { AccountAlreadyExistsError } from "../../errors/email.already.exists";
+import {
+    findInstitutionByEmail,
+    findInstitutionByPhone,
+} from "../services/institution.service";
+import { verifyPassword } from "../../utils/hash";
+import { server } from "../../app";
 
-export async function registerInstitutionHandler(
-    request: FastifyRequest<{
-        Body: createInstitutionInput;
-    }>,
+export async function registerVoluntaryHandler(
+    request: FastifyRequest<{ Body: createVoluntaryInput }>,
     reply: FastifyReply
 ) {
     const body = request.body;
@@ -49,9 +46,9 @@ export async function registerInstitutionHandler(
                 .send({ message: "Telefone já está em uso" });
         }
 
-        const institution = await createInstitution(body);
+        const voluntary = await createVoluntary(body);
 
-        return reply.code(201).send(institution);
+        return reply.code(201).send(voluntary);
     } catch (err) {
         if (
             err instanceof PrismaClientKnownRequestError &&
@@ -66,9 +63,9 @@ export async function registerInstitutionHandler(
     }
 }
 
-export async function loginInstitutionHandler(
+export async function loginVoluntaryHandler(
     request: FastifyRequest<{
-        Body: LoginInstitutionInput;
+        Body: loginVoluntaryInput;
     }>,
     reply: FastifyReply
 ) {
@@ -118,10 +115,4 @@ export async function loginInstitutionHandler(
 
     // Se não encontrou nenhum
     return reply.code(401).send({ message: "E-mail ou senha incorreta" });
-}
-
-export async function getInstitutionsHandler() {
-    const institutions = await findInstitutions();
-
-    return institutions;
 }

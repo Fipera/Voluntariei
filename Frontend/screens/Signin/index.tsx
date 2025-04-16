@@ -54,6 +54,8 @@ export default () => {
             setIsLoading(true);
             const response = await api.post("/institution/login", data);
             const token = response.data.accessToken;
+            const type = response.data.type;
+            console.log(type    )
 
             
             setIsLoading(false);

@@ -1,4 +1,4 @@
-export class InstitutionAlreadyExistsError extends Error {
+export class AccountAlreadyExistsError extends Error {
   public statusCode: number;
   public error: string;
 
