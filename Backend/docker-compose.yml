@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: bitnami/postgresql:latest
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=fipera
+      - POSTGRES_PASSWORD=senha
+      - POSTGRES_DB=voluntariei
+    volumes:
+      - voluntariei_pg_data:/bitnami/postgresql
+
+  redis:
+    image: bitnami/redis:latest
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'voluntariei_redis_data:/bitnami/redis/data'
+
+
+volumes:
+  voluntariei_pg_data:
+  voluntariei_redis_data:
