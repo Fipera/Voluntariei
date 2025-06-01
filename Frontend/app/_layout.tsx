@@ -12,7 +12,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import { AuthProvider } from "@/providers/AuthProvider";
-
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -26,8 +26,6 @@ export default function RootLayout() {
         "Nunito-Italic": require("../assets/fonts/Nunito-Italic.ttf"),
     });
 
-    
-
     useEffect(() => {
         if (loaded) {
             SplashScreen.hideAsync();
@@ -39,20 +37,22 @@ export default function RootLayout() {
     }
 
     return (
-        <GluestackUIProvider mode="light">
-            <AuthProvider>
-                <Stack initialRouteName="(auth)">
-                    <Stack.Screen
-                        name="(tabs)"
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="(auth)"
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen name="+not-found" />
-                </Stack>
-            </AuthProvider>
-        </GluestackUIProvider>
+        <SafeAreaProvider>
+            <GluestackUIProvider mode="light">
+                <AuthProvider>
+                    <Stack initialRouteName="(auth)">
+                        <Stack.Screen
+                            name="(tabs)"
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                            name="(auth)"
+                            options={{ headerShown: false }}
+                        />
+                        <Stack.Screen name="+not-found" />
+                    </Stack>
+                </AuthProvider>
+            </GluestackUIProvider>
+        </SafeAreaProvider>
     );
 }
