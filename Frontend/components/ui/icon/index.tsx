@@ -24,6 +24,7 @@ const iconStyle = tva({
       'md': 'h-[18px] w-[18px]',
       'lg': 'h-5 w-5',
       'xl': 'h-6 w-6',
+      'xl2': 'h-10 w-10',
     },
   },
 });

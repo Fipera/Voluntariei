@@ -21,7 +21,7 @@ module.exports = {
       colors: {
         'input-bg': 'var(--color-input-bg)',
         'input-border': 'var(--color-input-border)',
-        'blue-light': 'var(--color-blue-light)',
+        'blue-dark': 'var(--color-blue-dark)',
         'grey-dark': 'var(--color-grey-dark)',
         'grey-light': 'var(--color-grey-light)',
 
@@ -136,7 +136,7 @@ module.exports = {
           900: 'rgb(var(--color-typography-900)/<alpha-value>)',
           950: 'rgb(var(--color-typography-950)/<alpha-value>)',
           white: '#FFFFFF',
-          gray: '#D4D4D4',
+          gray: '#B7B7B7',
           black: '#181718',
         },
         outline: {
@@ -186,9 +186,11 @@ module.exports = {
         mono: undefined,
         RobotoRegular: ["Roboto-Regular"],
         roboto: ['Roboto', 'sans-serif'],
-        NunitoBold: ["Nunito-Bold"],
-        NunitoRegular: ["Nunito-Regular"],
-        NunitoItalic: ["Nunito-Italic"],
+        InterBold: ["Inter-Bold"],
+        PoppinsBold: ["Poppins-Bold"],
+        PoppinsRegular: ["Poppins-Regular"],
+        PoppinsMedium: ["Poppins-Medium"],
+        PoppinsItalic: ["Poppins-Italic"],
       },
       fontWeight: {
         extrablack: '950',

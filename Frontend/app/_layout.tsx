@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import SplashScreenCustom from "@/screens/SplashScreenCustom";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -21,9 +22,11 @@ export default function RootLayout() {
     const [loaded] = useFonts({
         SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
         "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
-        "Nunito-Bold": require("../assets/fonts/Nunito-Bold.ttf"),
-        "Nunito-Regular": require("../assets/fonts/Nunito-Regular.ttf"),
-        "Nunito-Italic": require("../assets/fonts/Nunito-Italic.ttf"),
+        "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
+        "Poppins-Medium": require("../assets/fonts/Poppins-Medium.ttf"),
+        "Inter-Bold": require("../assets/fonts/Inter_18pt-Bold.ttf"),
+        "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
+        "Poppins-Italic": require("../assets/fonts/Poppins-Italic.ttf"),
     });
 
     useEffect(() => {
@@ -33,7 +36,16 @@ export default function RootLayout() {
     }, [loaded]);
 
     if (!loaded) {
-        return null;
+        return (
+        <SafeAreaProvider>
+            <StatusBar style="dark" />
+            <GluestackUIProvider mode="light">
+                <AuthProvider>
+                    <SplashScreenCustom />
+                </AuthProvider>
+            </GluestackUIProvider>
+        </SafeAreaProvider>
+    );
     }
 
     return (

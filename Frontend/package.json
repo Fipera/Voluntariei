@@ -19,6 +19,7 @@
     "@emotion/styled": "^11.14.0",
     "@expo-google-fonts/nunito": "^0.3.0",
     "@expo/vector-icons": "^14.0.2",
+    "@gluestack-ui/avatar": "^0.1.18",
     "@gluestack-ui/button": "^1.0.14",
     "@gluestack-ui/checkbox": "^0.1.39",
     "@gluestack-ui/form-control": "^0.1.19",
@@ -57,6 +58,7 @@
     "react-native": "0.79.2",
     "react-native-css-interop": "^0.1.22",
     "react-native-gesture-handler": "~2.24.0",
+    "react-native-mask-text": "^0.14.2",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.10.0",
@@ -64,7 +66,8 @@
     "react-native-web": "^0.20.0",
     "react-native-webview": "13.13.5",
     "tailwindcss": "^3.4.17",
-    "zod": "^3.24.2"
+    "zod": "^3.24.2",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

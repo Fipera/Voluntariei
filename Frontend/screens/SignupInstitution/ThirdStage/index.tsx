@@ -1,69 +1,60 @@
-import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import Stepper from "@/components/custom/stepper";
 import {
-    Checkbox,
-    CheckboxIcon,
-    CheckboxIndicator,
-    CheckboxLabel,
-} from "@/components/ui/checkbox";
-import { HStack } from "@/components/ui/hstack";
-import { CheckIcon } from "@/components/ui/icon";
-import { Image } from "@/components/ui/image";
-import { Input, InputField, InputIcon } from "@/components/ui/input";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
-import { useRouter } from "expo-router";
-import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react-native";
-import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
-import api from "@/services/api";
-import { AppError } from "@/utils/AppError";
+    Avatar,
+    AvatarBadge,
+    AvatarFallbackText,
+    AvatarGroup,
+} from "@/components/ui/avatar";
+import { Button, ButtonIcon } from "@/components/ui/button";
 import {
     FormControl,
     FormControlError,
     FormControlErrorIcon,
     FormControlErrorText,
 } from "@/components/ui/form-control";
-
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { signinSchema, SigninFormData } from "@/utils/schemas/signinSchema";
+import { HStack } from "@/components/ui/hstack";
+import { AddIcon, Icon } from "@/components/ui/icon";
+import { Image } from "@/components/ui/image";
+import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
+import { useSignupInstitutionStore } from "@/store/useSignupInstitutionStore";
+import { SigninFormData, signinSchema } from "@/utils/schemas/signinSchema";
+import {
+    SignupInstitutionThirdStageData,
+    signupInstitutionThirdStageSchema,
+} from "@/utils/schemas/signupInstitutionSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "expo-router";
+import { AlertCircle, Eye, EyeOff, Lock, Mail } from "lucide-react-native";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default () => {
+export function SignupInstitutionThirdStage() {
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const { data, updateData, clearData } = useSignupInstitutionStore();
 
     const {
         control,
         handleSubmit,
         formState: { errors },
-    } = useForm<SigninFormData>({
-        resolver: zodResolver(signinSchema),
+    } = useForm<SignupInstitutionThirdStageData>({
+        resolver: zodResolver(signupInstitutionThirdStageSchema),
     });
 
-    const handleLogin = async (data: SigninFormData) => {
-        try {
-            setIsLoading(true);
-            const response = await api.post("/institution/login", data);
-            const token = response.data.accessToken;
-            const type = response.data.type;
-            console.log(type);
+    const onSubmit = (formData: SignupInstitutionThirdStageData) => {
+        const fullData = { ...data, ...formData };
+        console.log("Dados completos para envio:", fullData);
 
-            setIsLoading(false);
-            router.push("/(tabs)");
-        } catch (error) {
-            setIsLoading(false);
-
-            const isAppError = error instanceof AppError;
-            const messageError = isAppError
-                ? error.message
-                : "Não foi possível fazer login. Tente novamente mais tarde.";
-
-            setErrorMessage(messageError);
-        }
+        clearData();
+        router.push("/home");
     };
 
     return (
@@ -80,24 +71,42 @@ export default () => {
                     contentContainerStyle={{ flexGrow: 1 }}
                     keyboardShouldPersistTaps="handled"
                 >
-                    <VStack className="flex-1 items-center justify-between px-4 pb-8">
-                        <VStack className="flex-1 items-center justify-center">
-                            <Image
-                                size="xl"
-                                source={require("/assets/images/signin/logo-voluntariei.png")}
-                                alt="Logo"
-                            />
+                    <VStack className="flex-1 items-center justify-between px-4 pb-6">
+                        <VStack className="flex-1 items-center justify-start">
+                            <Stepper etapaAtual={3} />
 
                             <Text
-                                size="2xl"
+                                size="xl"
                                 className="font-PoppinsBold text-blue-dark text-center mt-6"
                             >
-                                Acesse sua Conta
+                                Etapa 3 de 3
+                            </Text>
+
+                            <Avatar size="2xl" className="bg-black mt-16">
+                                <Icon
+                                    as={AddIcon}
+                                    size="xl2"
+                                    className="stroke-white"
+                                />
+                            </Avatar>
+
+                            <Text
+                                size="md"
+                                className="font-PoppinsBold text-blue-dark text-center mt-6"
+                            >
+                                Nome da Instituição
+                            </Text>
+
+                            <Text
+                                size="xl"
+                                className="font-PoppinsBold text-blue-dark text-center mt-6"
+                            >
+                                Acesso
                             </Text>
 
                             <FormControl isInvalid={!!errors.email}>
                                 <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
-                                    Email
+                                    E-mail
                                 </Text>
 
                                 <Controller
@@ -138,7 +147,7 @@ export default () => {
                             </FormControl>
 
                             <FormControl
-                                isInvalid={!!errors.password}
+                                isInvalid={!!errors.senha}
                                 className="mt-3"
                             >
                                 <Text className="text-sm text-blue-dark font-PoppinsBold mt- ml-1">
@@ -146,7 +155,7 @@ export default () => {
                                 </Text>
                                 <Controller
                                     control={control}
-                                    name="password"
+                                    name="senha"
                                     render={({
                                         field: { onChange, value },
                                     }) => (
@@ -194,85 +203,99 @@ export default () => {
                                         </Input>
                                     )}
                                 />
-                                {errors.password && (
+                                {errors.senha && (
                                     <FormControlError>
                                         <FormControlErrorIcon
                                             as={AlertCircle}
                                         />
                                         <FormControlErrorText>
-                                            {errors.password.message}
+                                            {errors.senha.message}
                                         </FormControlErrorText>
                                     </FormControlError>
                                 )}
                             </FormControl>
 
-                            <HStack className="w-full max-w-[280px] items-center">
-                                <HStack className="flex-1 items-center justify-start">
-                                    <Checkbox value="invison">
-                                        <CheckboxIndicator className="w-[12px] h-[12px]">
-                                            <CheckboxIcon
-                                                as={CheckIcon}
-                                                size="sm"
-                                            />
-                                        </CheckboxIndicator>
-                                        <CheckboxLabel className="text-sm font-PoppinsRegular">
-                                            Lembrar de mim
-                                        </CheckboxLabel>
-                                    </Checkbox>
-                                </HStack>
-
-                                <Button
-                                    variant="link"
-                                    action="default"
-                                    className="ml-auto p-0"
-                                >
-                                    <ButtonText className="text-blue-dark text-sm font-PoppinsRegular">
-                                        Esqueci minha senha
-                                    </ButtonText>
-                                </Button>
-                            </HStack>
-
-                            {errorMessage !== "" && (
-                                <Text style={{ color: "red", marginBottom: 8 }}>
-                                    {errorMessage}
+                            <FormControl
+                                isInvalid={!!errors.confirmarSenha}
+                                className="mt-3"
+                            >
+                                <Text className="text-sm text-blue-dark font-PoppinsBold mt- ml-1">
+                                    Confirmar Senha
                                 </Text>
-                            )}
+                                <Controller
+                                    control={control}
+                                    name="confirmarSenha"
+                                    render={({
+                                        field: { onChange, value },
+                                    }) => (
+                                        <Input
+                                            variant="rounded"
+                                            size="sm"
+                                            className="w-full max-w-[280px] h-12 bg-white border border-input-border shadow-shadow rounded-[12px] mt-2"
+                                        >
+                                            <HStack className="items-center justify-start ml-3">
+                                                <InputField
+                                                    secureTextEntry={
+                                                        !showConfirmPassword
+                                                    }
+                                                    className=""
+                                                    value={value}
+                                                    onChangeText={(text) => {
+                                                        onChange(text);
+                                                        setErrorMessage("");
+                                                    }}
+                                                />
+                                                <Button
+                                                    variant="link"
+                                                    action="default"
+                                                    className="bg-transparent p-0 mr-2"
+                                                    onPress={() =>
+                                                        setShowConfirmPassword(
+                                                            !showConfirmPassword
+                                                        )
+                                                    }
+                                                >
+                                                    <ButtonIcon
+                                                        as={
+                                                            showConfirmPassword
+                                                                ? EyeOff
+                                                                : Eye
+                                                        }
+                                                        className={`w-6 h-6 ${
+                                                            showConfirmPassword
+                                                                ? "text-blue-dark"
+                                                                : "text-grey-dark"
+                                                        }`}
+                                                    />
+                                                </Button>
+                                            </HStack>
+                                        </Input>
+                                    )}
+                                />
+                                {errors.confirmarSenha && (
+                                    <FormControlError>
+                                        <FormControlErrorIcon
+                                            as={AlertCircle}
+                                        />
+                                        <FormControlErrorText>
+                                            {errors.confirmarSenha.message}
+                                        </FormControlErrorText>
+                                    </FormControlError>
+                                )}
+                            </FormControl>
 
                             <Button
-                                onPress={handleSubmit(handleLogin)}
+                                onPress={handleSubmit(onSubmit)}
                                 disabled={isLoading}
-                                className="min-w-[300px] max-w-[350px] h-[44px] bg-blue-dark rounded-[12px] shadow-shadow flex-row items-center justify-center mt-4"
+                                className="min-w-[300px] max-w-[350px] h-[44px] bg-blue-dark rounded-[12px] shadow-shadow flex-row items-center justify-center mt-12"
                             >
                                 {isLoading ? (
                                     <Spinner />
                                 ) : (
                                     <Text className="text-white font-InterBold">
-                                        Entrar
+                                        Cadastrar
                                     </Text>
                                 )}
-                            </Button>
-                        </VStack>
-
-                        <VStack className="items-center mt-2">
-                            <Text
-                                size="sm"
-                                className="text-grey-light font-PoppinsRegular"
-                            >
-                                Não possui uma conta?
-                            </Text>
-
-                            <Button
-                                variant="link"
-                                action="default"
-                                className="p-2 m-0"
-                                onPress={() => router.push("/home")}
-                            >
-                                <ButtonText
-                                    size="sm"
-                                    className="text-blue-dark font-PoppinsMedium"
-                                >
-                                    Cadastre-se
-                                </ButtonText>
                             </Button>
                         </VStack>
                     </VStack>
@@ -280,4 +303,4 @@ export default () => {
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
-};
+}
