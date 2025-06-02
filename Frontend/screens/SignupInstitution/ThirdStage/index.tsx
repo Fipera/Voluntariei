@@ -19,7 +19,9 @@ import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import api from "@/services/api";
 import { useSignupInstitutionStore } from "@/store/useSignupInstitutionStore";
+import { AppError } from "@/utils/AppError";
 import { SigninFormData, signinSchema } from "@/utils/schemas/signinSchema";
 import {
     SignupInstitutionThirdStageData,
@@ -44,17 +46,69 @@ export function SignupInstitutionThirdStage() {
     const {
         control,
         handleSubmit,
+        setError,
         formState: { errors },
     } = useForm<SignupInstitutionThirdStageData>({
         resolver: zodResolver(signupInstitutionThirdStageSchema),
     });
 
-    const onSubmit = (formData: SignupInstitutionThirdStageData) => {
+    const checkUniqueness = async (
+        formData: SignupInstitutionThirdStageData
+    ) => {
+        try {
+            const response = await api.post("/institution/check-uniqueness", {
+                email: formData.email,
+            });
+
+            return response.data;
+        } catch (error) {
+            setErrorMessage("Erro ao verificar dados. Tente novamente.");
+            return null;
+        }
+    };
+
+    const onSubmit = async (formData: SignupInstitutionThirdStageData) => {
+        setIsLoading(true);
+        setErrorMessage("");
+
+        const result = await checkUniqueness(formData);
+
+        if (!result) {
+            setIsLoading(false);
+            return;
+        }
+        const { email } = result;
+        if (email) {
+            setError("email", {
+                type: "manual",
+                message: "Email já cadastrado",
+            });
+
+            setIsLoading(false);
+            return;
+        }
+
         const fullData = { ...data, ...formData };
         console.log("Dados completos para envio:", fullData);
 
-        clearData();
-        router.push("/home");
+        try {
+            setIsLoading(true);
+            const response = await api.post("/institution", fullData);
+            console.log(response);
+
+            setIsLoading(false);
+            clearData();
+            router.push("/home");
+        } catch (error) {
+            setIsLoading(false);
+
+            const isAppError = error instanceof AppError;
+            const messageError = isAppError
+                ? error.message
+                : "Não foi possível fazer cadastro. Tente novamente mais tarde.";
+
+            setErrorMessage(messageError);
+        }
     };
 
     return (
@@ -147,7 +201,7 @@ export function SignupInstitutionThirdStage() {
                             </FormControl>
 
                             <FormControl
-                                isInvalid={!!errors.senha}
+                                isInvalid={!!errors.password}
                                 className="mt-3"
                             >
                                 <Text className="text-sm text-blue-dark font-PoppinsBold mt- ml-1">
@@ -155,7 +209,7 @@ export function SignupInstitutionThirdStage() {
                                 </Text>
                                 <Controller
                                     control={control}
-                                    name="senha"
+                                    name="password"
                                     render={({
                                         field: { onChange, value },
                                     }) => (
@@ -203,20 +257,20 @@ export function SignupInstitutionThirdStage() {
                                         </Input>
                                     )}
                                 />
-                                {errors.senha && (
+                                {errors.password && (
                                     <FormControlError>
                                         <FormControlErrorIcon
                                             as={AlertCircle}
                                         />
                                         <FormControlErrorText>
-                                            {errors.senha.message}
+                                            {errors.password.message}
                                         </FormControlErrorText>
                                     </FormControlError>
                                 )}
                             </FormControl>
 
                             <FormControl
-                                isInvalid={!!errors.confirmarSenha}
+                                isInvalid={!!errors.passwordConfirm}
                                 className="mt-3"
                             >
                                 <Text className="text-sm text-blue-dark font-PoppinsBold mt- ml-1">
@@ -224,7 +278,7 @@ export function SignupInstitutionThirdStage() {
                                 </Text>
                                 <Controller
                                     control={control}
-                                    name="confirmarSenha"
+                                    name="passwordConfirm"
                                     render={({
                                         field: { onChange, value },
                                     }) => (
@@ -272,13 +326,13 @@ export function SignupInstitutionThirdStage() {
                                         </Input>
                                     )}
                                 />
-                                {errors.confirmarSenha && (
+                                {errors.passwordConfirm && (
                                     <FormControlError>
                                         <FormControlErrorIcon
                                             as={AlertCircle}
                                         />
                                         <FormControlErrorText>
-                                            {errors.confirmarSenha.message}
+                                            {errors.passwordConfirm.message}
                                         </FormControlErrorText>
                                     </FormControlError>
                                 )}

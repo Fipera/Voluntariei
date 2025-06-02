@@ -1,11 +1,13 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import {
     createInstitution,
+    findInstitutionByCnpj,
     findInstitutionByEmail,
     findInstitutionByPhone,
     findInstitutions,
 } from "../services/institution.service";
 import {
+    checkUniquenessInstitutionInput,
     createInstitutionInput,
     LoginInstitutionInput,
 } from "../schemas/institution.schema";
@@ -38,6 +40,7 @@ export async function registerInstitutionHandler(
         const institutionWithSamePhone = await findInstitutionByPhone(
             body.phoneNumber
         );
+        const institutionWithSameCnpj = await findInstitutionByCnpj(body.cnpj);
 
         if (voluntaryWithSameEmail || institutionWithSameEmail) {
             return reply.status(400).send({ message: "Email já está em uso" });
@@ -47,6 +50,10 @@ export async function registerInstitutionHandler(
             return reply
                 .status(400)
                 .send({ message: "Telefone já está em uso" });
+        }
+
+        if (institutionWithSameCnpj) {
+            return reply.status(400).send({ message: "CNPJ já está em uso" });
         }
 
         const institution = await createInstitution(body);
@@ -124,4 +131,25 @@ export async function getInstitutionsHandler() {
     const institutions = await findInstitutions();
 
     return institutions;
+}
+
+export async function checkInstitutionUniquenessHandler(
+    request: FastifyRequest<{
+        Body: checkUniquenessInstitutionInput;
+    }>,
+    reply: FastifyReply
+) {
+    const { email, phoneNumber, cnpj } = request.body;
+
+    const [emailExists, phoneExists, cnpjExists] = await Promise.all([
+        email ? findInstitutionByEmail(email) : null,
+        phoneNumber ? findInstitutionByPhone(phoneNumber) : null,
+        cnpj ? findInstitutionByCnpj(cnpj) : null,
+    ]);
+
+    return reply.code(200).send({
+        email: !!emailExists,
+        phoneNumber: !!phoneExists,
+        cnpj: !!cnpjExists,
+    });
 }

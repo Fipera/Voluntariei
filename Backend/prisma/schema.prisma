@@ -19,9 +19,21 @@ model Institution {
   email String @unique
   cnpj String @unique
   name String
+  reason String
+  socialReason String
   password String
   phoneNumber String @unique
-  address Json
+
+  cep String
+  neighborhood String
+  city String
+  state String
+  numberHouse String
+  street String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   cards Card[]
 }
 

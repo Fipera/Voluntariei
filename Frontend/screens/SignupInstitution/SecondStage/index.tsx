@@ -134,14 +134,14 @@ export function SignupInstitutionSecondStage() {
                                 )}
                             </FormControl>
 
-                            <FormControl isInvalid={!!errors.rua}>
+                            <FormControl isInvalid={!!errors.street}>
                                 <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
                                     Rua
                                 </Text>
 
                                 <Controller
                                     control={control}
-                                    name="rua"
+                                    name="street"
                                     render={({
                                         field: { onChange, value },
                                     }) => (
@@ -164,13 +164,13 @@ export function SignupInstitutionSecondStage() {
                                         </Input>
                                     )}
                                 />
-                                {errors.rua && (
+                                {errors.street && (
                                     <FormControlError>
                                         <FormControlErrorIcon
                                             as={AlertCircle}
                                         />
                                         <FormControlErrorText>
-                                            {errors.rua.message}
+                                            {errors.street.message}
                                         </FormControlErrorText>
                                     </FormControlError>
                                 )}
@@ -179,7 +179,7 @@ export function SignupInstitutionSecondStage() {
                             <HStack className="flex-row gap-x-4">
                                 {/* Bairro (maior) */}
                                 <FormControl
-                                    isInvalid={!!errors.bairro}
+                                    isInvalid={!!errors.neighborhood}
                                     className="w-[160px]"
                                 >
                                     <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
@@ -187,7 +187,7 @@ export function SignupInstitutionSecondStage() {
                                     </Text>
                                     <Controller
                                         control={control}
-                                        name="bairro"
+                                        name="neighborhood"
                                         render={({
                                             field: { onChange, value },
                                         }) => (
@@ -212,13 +212,13 @@ export function SignupInstitutionSecondStage() {
                                             </Input>
                                         )}
                                     />
-                                    {errors.bairro && (
+                                    {errors.neighborhood && (
                                         <FormControlError>
                                             <FormControlErrorIcon
                                                 as={AlertCircle}
                                             />
                                             <FormControlErrorText>
-                                                {errors.bairro.message}
+                                                {errors.neighborhood.message}
                                             </FormControlErrorText>
                                         </FormControlError>
                                     )}
@@ -226,7 +226,7 @@ export function SignupInstitutionSecondStage() {
 
                                 {/* Telefone (menor) */}
                                 <FormControl
-                                    isInvalid={!!errors.numero}
+                                    isInvalid={!!errors.numberHouse}
                                     className="w-[100px]"
                                 >
                                     <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
@@ -234,7 +234,7 @@ export function SignupInstitutionSecondStage() {
                                     </Text>
                                     <Controller
                                         control={control}
-                                        name="numero"
+                                        name="numberHouse"
                                         render={({
                                             field: { onChange, value },
                                         }) => (
@@ -259,27 +259,27 @@ export function SignupInstitutionSecondStage() {
                                             </Input>
                                         )}
                                     />
-                                    {errors.numero && (
+                                    {errors.numberHouse && (
                                         <FormControlError>
                                             <FormControlErrorIcon
                                                 as={AlertCircle}
                                             />
                                             <FormControlErrorText>
-                                                {errors.numero.message}
+                                                {errors.numberHouse.message}
                                             </FormControlErrorText>
                                         </FormControlError>
                                     )}
                                 </FormControl>
                             </HStack>
 
-                            <FormControl isInvalid={!!errors.cidade}>
+                            <FormControl isInvalid={!!errors.city}>
                                 <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
                                     Cidade
                                 </Text>
 
                                 <Controller
                                     control={control}
-                                    name="cidade"
+                                    name="city"
                                     render={({
                                         field: { onChange, value },
                                     }) => (
@@ -302,26 +302,26 @@ export function SignupInstitutionSecondStage() {
                                         </Input>
                                     )}
                                 />
-                                {errors.cidade && (
+                                {errors.city && (
                                     <FormControlError>
                                         <FormControlErrorIcon
                                             as={AlertCircle}
                                         />
                                         <FormControlErrorText>
-                                            {errors.cidade.message}
+                                            {errors.city.message}
                                         </FormControlErrorText>
                                     </FormControlError>
                                 )}
                             </FormControl>
 
-                            <FormControl isInvalid={!!errors.estado}>
+                            <FormControl isInvalid={!!errors.state}>
                                 <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
                                     Estado
                                 </Text>
 
                                 <Controller
                                     control={control}
-                                    name="estado"
+                                    name="state"
                                     render={({
                                         field: { onChange, value },
                                     }) => (
@@ -344,13 +344,13 @@ export function SignupInstitutionSecondStage() {
                                         </Input>
                                     )}
                                 />
-                                {errors.estado && (
+                                {errors.state && (
                                     <FormControlError>
                                         <FormControlErrorIcon
                                             as={AlertCircle}
                                         />
                                         <FormControlErrorText>
-                                            {errors.estado.message}
+                                            {errors.state.message}
                                         </FormControlErrorText>
                                     </FormControlError>
                                 )}

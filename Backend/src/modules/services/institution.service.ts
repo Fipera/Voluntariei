@@ -30,6 +30,12 @@ export async function findInstitutionByPhone(phoneNumber: string) {
 }
 
 
+export async function findInstitutionByCnpj(cnpj: string) {
+    return prisma.institution.findUnique({ where: { cnpj } });
+}
+
+
+
 export async function findInstitutions(){
     return prisma.institution.findMany({
         select:{

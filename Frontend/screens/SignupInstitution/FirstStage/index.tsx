@@ -25,6 +25,7 @@ import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { formatarCNPJ, formatarTelefone } from "@/utils/formatters/format";
+import api from "@/services/api";
 
 export function SignupInstitutionFirstStage() {
     const router = useRouter();
@@ -37,14 +38,62 @@ export function SignupInstitutionFirstStage() {
     const {
         control,
         handleSubmit,
+        setError,
         formState: { errors },
     } = useForm<SignupInstitutionFirstStageData>({
         resolver: zodResolver(signupInstitutionFirstStageSchema),
     });
 
-    const onSubmit = (formData: SignupInstitutionFirstStageData) => {
+    const checkUniqueness = async (
+        formData: SignupInstitutionFirstStageData
+    ) => {
+        try {
+            const response = await api.post("/institution/check-uniqueness", {
+                cnpj: formData.cnpj,
+                phoneNumber: formData.phoneNumber,
+            });
+
+            return response.data;
+        } catch (error) {
+            setErrorMessage("Erro ao verificar dados. Tente novamente.");
+            return null;
+        }
+    };
+
+    const onSubmit = async (formData: SignupInstitutionFirstStageData) => {
+        setIsLoading(true);
+        setErrorMessage("");
+
+        const result = await checkUniqueness(formData);
+
+        if (!result) {
+            setIsLoading(false);
+            return;
+        }
+
+        const { cnpj, phoneNumber } = result;
+
+        if (cnpj || phoneNumber) {
+            if (cnpj) {
+                setError("cnpj", {
+                    type: "manual",
+                    message: "CNPJ já cadastrado",
+                });
+            }
+
+            if (phoneNumber) {
+                setError("phoneNumber", {
+                    type: "manual",
+                    message: "Telefone já cadastrado",
+                });
+            }
+
+            setIsLoading(false);
+            return;
+        }
         console.log("Form válido:", formData);
         updateData(formData);
+        setIsLoading(false);
         router.push("/signupInstitutionSecondStage");
     };
 
@@ -130,14 +179,14 @@ export function SignupInstitutionFirstStage() {
                                 )}
                             </FormControl>
 
-                            <FormControl isInvalid={!!errors.razaoSocial}>
+                            <FormControl isInvalid={!!errors.socialReason}>
                                 <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
                                     Razão Social
                                 </Text>
 
                                 <Controller
                                     control={control}
-                                    name="razaoSocial"
+                                    name="socialReason"
                                     render={({
                                         field: { onChange, value },
                                     }) => (
@@ -160,26 +209,26 @@ export function SignupInstitutionFirstStage() {
                                         </Input>
                                     )}
                                 />
-                                {errors.razaoSocial && (
+                                {errors.socialReason && (
                                     <FormControlError>
                                         <FormControlErrorIcon
                                             as={AlertCircle}
                                         />
                                         <FormControlErrorText>
-                                            {errors.razaoSocial.message}
+                                            {errors.socialReason.message}
                                         </FormControlErrorText>
                                     </FormControlError>
                                 )}
                             </FormControl>
 
-                            <FormControl isInvalid={!!errors.nome}>
+                            <FormControl isInvalid={!!errors.name}>
                                 <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
                                     Nome
                                 </Text>
 
                                 <Controller
                                     control={control}
-                                    name="nome"
+                                    name="name"
                                     render={({
                                         field: { onChange, value },
                                     }) => (
@@ -202,26 +251,26 @@ export function SignupInstitutionFirstStage() {
                                         </Input>
                                     )}
                                 />
-                                {errors.nome && (
+                                {errors.name && (
                                     <FormControlError>
                                         <FormControlErrorIcon
                                             as={AlertCircle}
                                         />
                                         <FormControlErrorText>
-                                            {errors.nome.message}
+                                            {errors.name.message}
                                         </FormControlErrorText>
                                     </FormControlError>
                                 )}
                             </FormControl>
 
-                            <FormControl isInvalid={!!errors.telefone}>
+                            <FormControl isInvalid={!!errors.phoneNumber}>
                                 <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
                                     Telefone
                                 </Text>
 
                                 <Controller
                                     control={control}
-                                    name="telefone"
+                                    name="phoneNumber"
                                     render={({
                                         field: { onChange, value },
                                     }) => (
@@ -237,7 +286,9 @@ export function SignupInstitutionFirstStage() {
                                                     value={formattedTelefone}
                                                     onChangeText={(text) => {
                                                         const formatado =
-                                                            formatarTelefone(text);
+                                                            formatarTelefone(
+                                                                text
+                                                            );
                                                         setFormattedTelefone(
                                                             formatado
                                                         );
@@ -254,26 +305,26 @@ export function SignupInstitutionFirstStage() {
                                         </Input>
                                     )}
                                 />
-                                {errors.telefone && (
+                                {errors.phoneNumber && (
                                     <FormControlError>
                                         <FormControlErrorIcon
                                             as={AlertCircle}
                                         />
                                         <FormControlErrorText>
-                                            {errors.telefone.message}
+                                            {errors.phoneNumber.message}
                                         </FormControlErrorText>
                                     </FormControlError>
                                 )}
                             </FormControl>
 
-                            <FormControl isInvalid={!!errors.causa}>
+                            <FormControl isInvalid={!!errors.reason}>
                                 <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
                                     Causa
                                 </Text>
 
                                 <Controller
                                     control={control}
-                                    name="causa"
+                                    name="reason"
                                     render={({
                                         field: { onChange, value },
                                     }) => (
@@ -296,13 +347,13 @@ export function SignupInstitutionFirstStage() {
                                         </Input>
                                     )}
                                 />
-                                {errors.causa && (
+                                {errors.reason && (
                                     <FormControlError>
                                         <FormControlErrorIcon
                                             as={AlertCircle}
                                         />
                                         <FormControlErrorText>
-                                            {errors.causa.message}
+                                            {errors.reason.message}
                                         </FormControlErrorText>
                                     </FormControlError>
                                 )}

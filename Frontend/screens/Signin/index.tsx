@@ -29,6 +29,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signinSchema, SigninFormData } from "@/utils/schemas/signinSchema";
 import { Spinner } from "@/components/ui/spinner";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { jwtDecode } from "jwt-decode";
+import * as SecureStore from "expo-secure-store";
 
 export default () => {
     const router = useRouter();
@@ -49,7 +51,24 @@ export default () => {
             setIsLoading(true);
             const response = await api.post("/institution/login", data);
             const token = response.data.accessToken;
-            const type = response.data.type;
+
+            const decoded = jwtDecode<{ type: "institution" | "voluntary" }>(
+                token
+            );
+            const type = decoded?.type;
+
+            // 🔐 Armazena o token e tipo com segurança
+            await SecureStore.setItemAsync("token", token);
+            await SecureStore.setItemAsync("type", type);
+
+            // 🔀 Redireciona com base no tipo
+            if (type === "institution") {
+                router.push("/(institution)");
+            } else if (type === "voluntary") {
+                router.push("/(voluntary)");
+            } else {
+                setErrorMessage("Tipo de conta desconhecido.");
+            }
             console.log(type);
 
             setIsLoading(false);
