@@ -44,6 +44,20 @@ A validação do sistema será feita com base nos **casos de uso modelados**, se
 
 ---
 
+## 🚀 Testar Projeto
+
+# Instalar dependências
+npm install
+
+# Iniciar o frontend com Expo
+npx expo start
+
+# Iniciar o backend (Fastify)
+npm run dev
+
+# Subir o banco de dados com Docker
+docker compose up -d
+
 > Projeto desenvolvido como parte do curso de Sistemas de Informação. Tema: Tecnologia Social para o engajamento filantrópico.
 
 
