@@ -15,43 +15,56 @@ datasource db {
 }
 
 model Institution {
-  id Int @id @default(autoincrement())
-  email String @unique
-  cnpj String @unique
-  name String
-  password String
-  phoneNumber String @unique
-  address Json
+  id           Int    @id @default(autoincrement())
+  email        String @unique
+  cnpj         String @unique
+  name         String
+  reason       String
+  socialReason String
+  password     String
+  phoneNumber  String @unique
+
+  cep          String
+  neighborhood String
+  city         String
+  state        String
+  numberHouse  String
+  street       String
+  logoUrl      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   cards Card[]
 }
 
 model Card {
-  id Int @id @default(autoincrement())
-  createAt DateTime @default(now())
-  updateAt DateTime @updatedAt
-  title String @db.VarChar(255)
-  description String?
-  owner Institution @relation(fields: [ownerId], references: [id])
-  ownerId Int
+  id           Int             @id @default(autoincrement())
+  createAt     DateTime        @default(now())
+  updateAt     DateTime        @updatedAt
+  title        String          @db.VarChar(255)
+  description  String?
+  owner        Institution     @relation(fields: [ownerId], references: [id])
+  ownerId      Int
   participants Participation[]
 }
 
 model Voluntary {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
-  name     String
-  password String
-  phoneNumber String @unique
-  address Json
+  id           Int             @id @default(autoincrement())
+  email        String          @unique
+  name         String
+  password     String
+  phoneNumber  String          @unique
+  address      Json
   participants Participation[]
 }
 
 model Participation {
-  id       Int    @id @default(autoincrement())
-  voluntary  Voluntary @relation(fields: [voluntaryId], references: [id])
+  id          Int       @id @default(autoincrement())
+  voluntary   Voluntary @relation(fields: [voluntaryId], references: [id])
   voluntaryId Int
-  card     Card   @relation(fields: [cardId], references: [id])
-  cardId   Int
+  card        Card      @relation(fields: [cardId], references: [id])
+  cardId      Int
 
   @@unique([voluntaryId, cardId])
 }

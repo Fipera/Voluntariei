@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import {
+    checkInstitutionUniquenessHandler,
     getInstitutionsHandler,
     loginInstitutionHandler,
     registerInstitutionHandler,
@@ -11,7 +12,6 @@ async function institutionRoutes(server: FastifyInstance) {
         "/",
         {
             schema: {
-                body: $ref("createInstitutionSchema"),
                 response: {
                     201: $ref("createInstitutionResponseSchema"),
                 },
@@ -24,7 +24,7 @@ async function institutionRoutes(server: FastifyInstance) {
         "/login",
         {
             schema: {
-               
+                body: $ref("loginInstitutionSchema"),
                 response: {
                     201: $ref("loginInstitutionResponseSchema"),
                 },
@@ -32,6 +32,20 @@ async function institutionRoutes(server: FastifyInstance) {
             attachValidation: false
         },
         loginInstitutionHandler
+    );
+
+    server.post(
+        "/check-uniqueness",
+        {
+            schema: {
+                body: $ref("checkUniquenessInstitutionSchema"),
+                response: {
+                    201: $ref("checkUniquenessInstitutionResponseSchema"),
+                },
+            },
+            attachValidation: false
+        },
+        checkInstitutionUniquenessHandler
     );
 
     server.get("/", {

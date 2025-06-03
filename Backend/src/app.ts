@@ -5,18 +5,21 @@ import fjwt from "fastify-jwt";
 import authenticate from "./plugins/authenticate";
 import voluntaryRoutes from "./modules/routes/voluntary.route";
 import { voluntarySchemas } from "./modules/schemas/voluntary.schema";
+import multipart from "@fastify/multipart";
 export const server = Fastify();
-
-
-
-
 
 server.get("/healthcheck", async function () {
     return { status: "OK" };
 });
 
 async function main() {
-    server.register(authenticate)
+    server.register(multipart, {
+        limits: {
+            fileSize: 5 * 1024 * 1024, // 5MB
+        },
+    });
+
+    server.register(authenticate);
 
     for (const schema of institutionSchemas) {
         server.addSchema(schema);

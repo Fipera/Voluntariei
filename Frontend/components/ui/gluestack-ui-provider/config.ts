@@ -7,9 +7,9 @@ export const config = {
     '--color-input-border': 'rgba(198,194,194,0.5)',
     '--shadow': '0px 2px 2px rgba(0, 0, 0, 0.25)',
 
-    '--color-blue-light': '#4F9BFF',
+    '--color-blue-dark': '#173663',
     '--color-grey-dark': '#6B7280',
-    '--color-grey-light': '#9CA3AF',
+    '--color-grey-light': '#B7B7B7',
 
     '--color-primary-0': '179 179 179',
     '--color-primary-50': '153 153 153',

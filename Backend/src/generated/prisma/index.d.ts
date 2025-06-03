@@ -1259,8 +1259,19 @@ export namespace Prisma {
     email: string | null
     cnpj: string | null
     name: string | null
+    reason: string | null
+    socialReason: string | null
     password: string | null
     phoneNumber: string | null
+    cep: string | null
+    neighborhood: string | null
+    city: string | null
+    state: string | null
+    numberHouse: string | null
+    street: string | null
+    logoUrl: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type InstitutionMaxAggregateOutputType = {
@@ -1268,8 +1279,19 @@ export namespace Prisma {
     email: string | null
     cnpj: string | null
     name: string | null
+    reason: string | null
+    socialReason: string | null
     password: string | null
     phoneNumber: string | null
+    cep: string | null
+    neighborhood: string | null
+    city: string | null
+    state: string | null
+    numberHouse: string | null
+    street: string | null
+    logoUrl: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type InstitutionCountAggregateOutputType = {
@@ -1277,9 +1299,19 @@ export namespace Prisma {
     email: number
     cnpj: number
     name: number
+    reason: number
+    socialReason: number
     password: number
     phoneNumber: number
-    address: number
+    cep: number
+    neighborhood: number
+    city: number
+    state: number
+    numberHouse: number
+    street: number
+    logoUrl: number
+    createdAt: number
+    updatedAt: number
     _all: number
   }
 
@@ -1297,8 +1329,19 @@ export namespace Prisma {
     email?: true
     cnpj?: true
     name?: true
+    reason?: true
+    socialReason?: true
     password?: true
     phoneNumber?: true
+    cep?: true
+    neighborhood?: true
+    city?: true
+    state?: true
+    numberHouse?: true
+    street?: true
+    logoUrl?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type InstitutionMaxAggregateInputType = {
@@ -1306,8 +1349,19 @@ export namespace Prisma {
     email?: true
     cnpj?: true
     name?: true
+    reason?: true
+    socialReason?: true
     password?: true
     phoneNumber?: true
+    cep?: true
+    neighborhood?: true
+    city?: true
+    state?: true
+    numberHouse?: true
+    street?: true
+    logoUrl?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type InstitutionCountAggregateInputType = {
@@ -1315,9 +1369,19 @@ export namespace Prisma {
     email?: true
     cnpj?: true
     name?: true
+    reason?: true
+    socialReason?: true
     password?: true
     phoneNumber?: true
-    address?: true
+    cep?: true
+    neighborhood?: true
+    city?: true
+    state?: true
+    numberHouse?: true
+    street?: true
+    logoUrl?: true
+    createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -1412,9 +1476,19 @@ export namespace Prisma {
     email: string
     cnpj: string
     name: string
+    reason: string
+    socialReason: string
     password: string
     phoneNumber: string
-    address: JsonValue
+    cep: string
+    neighborhood: string
+    city: string
+    state: string
+    numberHouse: string
+    street: string
+    logoUrl: string | null
+    createdAt: Date
+    updatedAt: Date
     _count: InstitutionCountAggregateOutputType | null
     _avg: InstitutionAvgAggregateOutputType | null
     _sum: InstitutionSumAggregateOutputType | null
@@ -1441,9 +1515,19 @@ export namespace Prisma {
     email?: boolean
     cnpj?: boolean
     name?: boolean
+    reason?: boolean
+    socialReason?: boolean
     password?: boolean
     phoneNumber?: boolean
-    address?: boolean
+    cep?: boolean
+    neighborhood?: boolean
+    city?: boolean
+    state?: boolean
+    numberHouse?: boolean
+    street?: boolean
+    logoUrl?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
     cards?: boolean | Institution$cardsArgs<ExtArgs>
     _count?: boolean | InstitutionCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["institution"]>
@@ -1453,9 +1537,19 @@ export namespace Prisma {
     email?: boolean
     cnpj?: boolean
     name?: boolean
+    reason?: boolean
+    socialReason?: boolean
     password?: boolean
     phoneNumber?: boolean
-    address?: boolean
+    cep?: boolean
+    neighborhood?: boolean
+    city?: boolean
+    state?: boolean
+    numberHouse?: boolean
+    street?: boolean
+    logoUrl?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["institution"]>
 
   export type InstitutionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1463,9 +1557,19 @@ export namespace Prisma {
     email?: boolean
     cnpj?: boolean
     name?: boolean
+    reason?: boolean
+    socialReason?: boolean
     password?: boolean
     phoneNumber?: boolean
-    address?: boolean
+    cep?: boolean
+    neighborhood?: boolean
+    city?: boolean
+    state?: boolean
+    numberHouse?: boolean
+    street?: boolean
+    logoUrl?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["institution"]>
 
   export type InstitutionSelectScalar = {
@@ -1473,12 +1577,22 @@ export namespace Prisma {
     email?: boolean
     cnpj?: boolean
     name?: boolean
+    reason?: boolean
+    socialReason?: boolean
     password?: boolean
     phoneNumber?: boolean
-    address?: boolean
+    cep?: boolean
+    neighborhood?: boolean
+    city?: boolean
+    state?: boolean
+    numberHouse?: boolean
+    street?: boolean
+    logoUrl?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type InstitutionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "cnpj" | "name" | "password" | "phoneNumber" | "address", ExtArgs["result"]["institution"]>
+  export type InstitutionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "cnpj" | "name" | "reason" | "socialReason" | "password" | "phoneNumber" | "cep" | "neighborhood" | "city" | "state" | "numberHouse" | "street" | "logoUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["institution"]>
   export type InstitutionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     cards?: boolean | Institution$cardsArgs<ExtArgs>
     _count?: boolean | InstitutionCountOutputTypeDefaultArgs<ExtArgs>
@@ -1496,9 +1610,19 @@ export namespace Prisma {
       email: string
       cnpj: string
       name: string
+      reason: string
+      socialReason: string
       password: string
       phoneNumber: string
-      address: Prisma.JsonValue
+      cep: string
+      neighborhood: string
+      city: string
+      state: string
+      numberHouse: string
+      street: string
+      logoUrl: string | null
+      createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["institution"]>
     composites: {}
   }
@@ -1927,9 +2051,19 @@ export namespace Prisma {
     readonly email: FieldRef<"Institution", 'String'>
     readonly cnpj: FieldRef<"Institution", 'String'>
     readonly name: FieldRef<"Institution", 'String'>
+    readonly reason: FieldRef<"Institution", 'String'>
+    readonly socialReason: FieldRef<"Institution", 'String'>
     readonly password: FieldRef<"Institution", 'String'>
     readonly phoneNumber: FieldRef<"Institution", 'String'>
-    readonly address: FieldRef<"Institution", 'Json'>
+    readonly cep: FieldRef<"Institution", 'String'>
+    readonly neighborhood: FieldRef<"Institution", 'String'>
+    readonly city: FieldRef<"Institution", 'String'>
+    readonly state: FieldRef<"Institution", 'String'>
+    readonly numberHouse: FieldRef<"Institution", 'String'>
+    readonly street: FieldRef<"Institution", 'String'>
+    readonly logoUrl: FieldRef<"Institution", 'String'>
+    readonly createdAt: FieldRef<"Institution", 'DateTime'>
+    readonly updatedAt: FieldRef<"Institution", 'DateTime'>
   }
     
 
@@ -5713,9 +5847,19 @@ export namespace Prisma {
     email: 'email',
     cnpj: 'cnpj',
     name: 'name',
+    reason: 'reason',
+    socialReason: 'socialReason',
     password: 'password',
     phoneNumber: 'phoneNumber',
-    address: 'address'
+    cep: 'cep',
+    neighborhood: 'neighborhood',
+    city: 'city',
+    state: 'state',
+    numberHouse: 'numberHouse',
+    street: 'street',
+    logoUrl: 'logoUrl',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type InstitutionScalarFieldEnum = (typeof InstitutionScalarFieldEnum)[keyof typeof InstitutionScalarFieldEnum]
@@ -5777,6 +5921,14 @@ export namespace Prisma {
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
   export const JsonNullValueFilter: {
     DbNull: typeof DbNull,
     JsonNull: typeof JsonNull,
@@ -5784,14 +5936,6 @@ export namespace Prisma {
   };
 
   export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-  export const NullsOrder: {
-    first: 'first',
-    last: 'last'
-  };
-
-  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
   /**
@@ -5828,20 +5972,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Json'
-   */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-  /**
-   * Reference to a field of type 'QueryMode'
-   */
-  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
-
-
-  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -5852,6 +5982,20 @@ export namespace Prisma {
    * Reference to a field of type 'DateTime[]'
    */
   export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -5880,9 +6024,19 @@ export namespace Prisma {
     email?: StringFilter<"Institution"> | string
     cnpj?: StringFilter<"Institution"> | string
     name?: StringFilter<"Institution"> | string
+    reason?: StringFilter<"Institution"> | string
+    socialReason?: StringFilter<"Institution"> | string
     password?: StringFilter<"Institution"> | string
     phoneNumber?: StringFilter<"Institution"> | string
-    address?: JsonFilter<"Institution">
+    cep?: StringFilter<"Institution"> | string
+    neighborhood?: StringFilter<"Institution"> | string
+    city?: StringFilter<"Institution"> | string
+    state?: StringFilter<"Institution"> | string
+    numberHouse?: StringFilter<"Institution"> | string
+    street?: StringFilter<"Institution"> | string
+    logoUrl?: StringNullableFilter<"Institution"> | string | null
+    createdAt?: DateTimeFilter<"Institution"> | Date | string
+    updatedAt?: DateTimeFilter<"Institution"> | Date | string
     cards?: CardListRelationFilter
   }
 
@@ -5891,9 +6045,19 @@ export namespace Prisma {
     email?: SortOrder
     cnpj?: SortOrder
     name?: SortOrder
+    reason?: SortOrder
+    socialReason?: SortOrder
     password?: SortOrder
     phoneNumber?: SortOrder
-    address?: SortOrder
+    cep?: SortOrder
+    neighborhood?: SortOrder
+    city?: SortOrder
+    state?: SortOrder
+    numberHouse?: SortOrder
+    street?: SortOrder
+    logoUrl?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     cards?: CardOrderByRelationAggregateInput
   }
 
@@ -5906,8 +6070,18 @@ export namespace Prisma {
     OR?: InstitutionWhereInput[]
     NOT?: InstitutionWhereInput | InstitutionWhereInput[]
     name?: StringFilter<"Institution"> | string
+    reason?: StringFilter<"Institution"> | string
+    socialReason?: StringFilter<"Institution"> | string
     password?: StringFilter<"Institution"> | string
-    address?: JsonFilter<"Institution">
+    cep?: StringFilter<"Institution"> | string
+    neighborhood?: StringFilter<"Institution"> | string
+    city?: StringFilter<"Institution"> | string
+    state?: StringFilter<"Institution"> | string
+    numberHouse?: StringFilter<"Institution"> | string
+    street?: StringFilter<"Institution"> | string
+    logoUrl?: StringNullableFilter<"Institution"> | string | null
+    createdAt?: DateTimeFilter<"Institution"> | Date | string
+    updatedAt?: DateTimeFilter<"Institution"> | Date | string
     cards?: CardListRelationFilter
   }, "id" | "email" | "cnpj" | "phoneNumber">
 
@@ -5916,9 +6090,19 @@ export namespace Prisma {
     email?: SortOrder
     cnpj?: SortOrder
     name?: SortOrder
+    reason?: SortOrder
+    socialReason?: SortOrder
     password?: SortOrder
     phoneNumber?: SortOrder
-    address?: SortOrder
+    cep?: SortOrder
+    neighborhood?: SortOrder
+    city?: SortOrder
+    state?: SortOrder
+    numberHouse?: SortOrder
+    street?: SortOrder
+    logoUrl?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: InstitutionCountOrderByAggregateInput
     _avg?: InstitutionAvgOrderByAggregateInput
     _max?: InstitutionMaxOrderByAggregateInput
@@ -5934,9 +6118,19 @@ export namespace Prisma {
     email?: StringWithAggregatesFilter<"Institution"> | string
     cnpj?: StringWithAggregatesFilter<"Institution"> | string
     name?: StringWithAggregatesFilter<"Institution"> | string
+    reason?: StringWithAggregatesFilter<"Institution"> | string
+    socialReason?: StringWithAggregatesFilter<"Institution"> | string
     password?: StringWithAggregatesFilter<"Institution"> | string
     phoneNumber?: StringWithAggregatesFilter<"Institution"> | string
-    address?: JsonWithAggregatesFilter<"Institution">
+    cep?: StringWithAggregatesFilter<"Institution"> | string
+    neighborhood?: StringWithAggregatesFilter<"Institution"> | string
+    city?: StringWithAggregatesFilter<"Institution"> | string
+    state?: StringWithAggregatesFilter<"Institution"> | string
+    numberHouse?: StringWithAggregatesFilter<"Institution"> | string
+    street?: StringWithAggregatesFilter<"Institution"> | string
+    logoUrl?: StringNullableWithAggregatesFilter<"Institution"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Institution"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Institution"> | Date | string
   }
 
   export type CardWhereInput = {
@@ -6121,9 +6315,19 @@ export namespace Prisma {
     email: string
     cnpj: string
     name: string
+    reason: string
+    socialReason: string
     password: string
     phoneNumber: string
-    address: JsonNullValueInput | InputJsonValue
+    cep: string
+    neighborhood: string
+    city: string
+    state: string
+    numberHouse: string
+    street: string
+    logoUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
     cards?: CardCreateNestedManyWithoutOwnerInput
   }
 
@@ -6132,9 +6336,19 @@ export namespace Prisma {
     email: string
     cnpj: string
     name: string
+    reason: string
+    socialReason: string
     password: string
     phoneNumber: string
-    address: JsonNullValueInput | InputJsonValue
+    cep: string
+    neighborhood: string
+    city: string
+    state: string
+    numberHouse: string
+    street: string
+    logoUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
     cards?: CardUncheckedCreateNestedManyWithoutOwnerInput
   }
 
@@ -6142,9 +6356,19 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     cnpj?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    socialReason?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
-    address?: JsonNullValueInput | InputJsonValue
+    cep?: StringFieldUpdateOperationsInput | string
+    neighborhood?: StringFieldUpdateOperationsInput | string
+    city?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
+    numberHouse?: StringFieldUpdateOperationsInput | string
+    street?: StringFieldUpdateOperationsInput | string
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cards?: CardUpdateManyWithoutOwnerNestedInput
   }
 
@@ -6153,9 +6377,19 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     cnpj?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    socialReason?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
-    address?: JsonNullValueInput | InputJsonValue
+    cep?: StringFieldUpdateOperationsInput | string
+    neighborhood?: StringFieldUpdateOperationsInput | string
+    city?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
+    numberHouse?: StringFieldUpdateOperationsInput | string
+    street?: StringFieldUpdateOperationsInput | string
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     cards?: CardUncheckedUpdateManyWithoutOwnerNestedInput
   }
 
@@ -6164,18 +6398,38 @@ export namespace Prisma {
     email: string
     cnpj: string
     name: string
+    reason: string
+    socialReason: string
     password: string
     phoneNumber: string
-    address: JsonNullValueInput | InputJsonValue
+    cep: string
+    neighborhood: string
+    city: string
+    state: string
+    numberHouse: string
+    street: string
+    logoUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type InstitutionUpdateManyMutationInput = {
     email?: StringFieldUpdateOperationsInput | string
     cnpj?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    socialReason?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
-    address?: JsonNullValueInput | InputJsonValue
+    cep?: StringFieldUpdateOperationsInput | string
+    neighborhood?: StringFieldUpdateOperationsInput | string
+    city?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
+    numberHouse?: StringFieldUpdateOperationsInput | string
+    street?: StringFieldUpdateOperationsInput | string
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type InstitutionUncheckedUpdateManyInput = {
@@ -6183,9 +6437,19 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     cnpj?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    socialReason?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
-    address?: JsonNullValueInput | InputJsonValue
+    cep?: StringFieldUpdateOperationsInput | string
+    neighborhood?: StringFieldUpdateOperationsInput | string
+    city?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
+    numberHouse?: StringFieldUpdateOperationsInput | string
+    street?: StringFieldUpdateOperationsInput | string
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type CardCreateInput = {
@@ -6378,34 +6642,42 @@ export namespace Prisma {
     mode?: QueryMode
     not?: NestedStringFilter<$PrismaModel> | string
   }
-  export type JsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
 
-  export type JsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
   export type CardListRelationFilter = {
     every?: CardWhereInput
     some?: CardWhereInput
     none?: CardWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
   }
 
   export type CardOrderByRelationAggregateInput = {
@@ -6417,9 +6689,19 @@ export namespace Prisma {
     email?: SortOrder
     cnpj?: SortOrder
     name?: SortOrder
+    reason?: SortOrder
+    socialReason?: SortOrder
     password?: SortOrder
     phoneNumber?: SortOrder
-    address?: SortOrder
+    cep?: SortOrder
+    neighborhood?: SortOrder
+    city?: SortOrder
+    state?: SortOrder
+    numberHouse?: SortOrder
+    street?: SortOrder
+    logoUrl?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type InstitutionAvgOrderByAggregateInput = {
@@ -6431,8 +6713,19 @@ export namespace Prisma {
     email?: SortOrder
     cnpj?: SortOrder
     name?: SortOrder
+    reason?: SortOrder
+    socialReason?: SortOrder
     password?: SortOrder
     phoneNumber?: SortOrder
+    cep?: SortOrder
+    neighborhood?: SortOrder
+    city?: SortOrder
+    state?: SortOrder
+    numberHouse?: SortOrder
+    street?: SortOrder
+    logoUrl?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type InstitutionMinOrderByAggregateInput = {
@@ -6440,8 +6733,19 @@ export namespace Prisma {
     email?: SortOrder
     cnpj?: SortOrder
     name?: SortOrder
+    reason?: SortOrder
+    socialReason?: SortOrder
     password?: SortOrder
     phoneNumber?: SortOrder
+    cep?: SortOrder
+    neighborhood?: SortOrder
+    city?: SortOrder
+    state?: SortOrder
+    numberHouse?: SortOrder
+    street?: SortOrder
+    logoUrl?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type InstitutionSumOrderByAggregateInput = {
@@ -6481,45 +6785,8 @@ export namespace Prisma {
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
   }
-  export type JsonWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
 
-  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedJsonFilter<$PrismaModel>
-    _max?: NestedJsonFilter<$PrismaModel>
-  }
-
-  export type DateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
-  export type StringNullableFilter<$PrismaModel = never> = {
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
     notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -6531,7 +6798,24 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type InstitutionScalarRelationFilter = {
@@ -6543,11 +6827,6 @@ export namespace Prisma {
     every?: ParticipationWhereInput
     some?: ParticipationWhereInput
     none?: ParticipationWhereInput
-  }
-
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
   }
 
   export type ParticipationOrderByRelationAggregateInput = {
@@ -6590,37 +6869,28 @@ export namespace Prisma {
     id?: SortOrder
     ownerId?: SortOrder
   }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
 
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
-  }
-
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type VoluntaryCountOrderByAggregateInput = {
@@ -6654,6 +6924,32 @@ export namespace Prisma {
 
   export type VoluntarySumOrderByAggregateInput = {
     id?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type VoluntaryScalarRelationFilter = {
@@ -6719,6 +7015,14 @@ export namespace Prisma {
     set?: string
   }
 
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
+  }
+
   export type CardUpdateManyWithoutOwnerNestedInput = {
     create?: XOR<CardCreateWithoutOwnerInput, CardUncheckedCreateWithoutOwnerInput> | CardCreateWithoutOwnerInput[] | CardUncheckedCreateWithoutOwnerInput[]
     connectOrCreate?: CardCreateOrConnectWithoutOwnerInput | CardCreateOrConnectWithoutOwnerInput[]
@@ -6773,14 +7077,6 @@ export namespace Prisma {
     connectOrCreate?: ParticipationCreateOrConnectWithoutCardInput | ParticipationCreateOrConnectWithoutCardInput[]
     createMany?: ParticipationCreateManyCardInputEnvelope
     connect?: ParticipationWhereUniqueInput | ParticipationWhereUniqueInput[]
-  }
-
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
-  }
-
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
   }
 
   export type InstitutionUpdateOneRequiredWithoutCardsNestedInput = {
@@ -6914,6 +7210,31 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedDateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -6957,68 +7278,6 @@ export namespace Prisma {
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
   }
-  export type NestedJsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
-  export type NestedDateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
-  }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
@@ -7046,6 +7305,43 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type CardCreateWithoutOwnerInput = {
@@ -7107,9 +7403,19 @@ export namespace Prisma {
     email: string
     cnpj: string
     name: string
+    reason: string
+    socialReason: string
     password: string
     phoneNumber: string
-    address: JsonNullValueInput | InputJsonValue
+    cep: string
+    neighborhood: string
+    city: string
+    state: string
+    numberHouse: string
+    street: string
+    logoUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type InstitutionUncheckedCreateWithoutCardsInput = {
@@ -7117,9 +7423,19 @@ export namespace Prisma {
     email: string
     cnpj: string
     name: string
+    reason: string
+    socialReason: string
     password: string
     phoneNumber: string
-    address: JsonNullValueInput | InputJsonValue
+    cep: string
+    neighborhood: string
+    city: string
+    state: string
+    numberHouse: string
+    street: string
+    logoUrl?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type InstitutionCreateOrConnectWithoutCardsInput = {
@@ -7161,9 +7477,19 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     cnpj?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    socialReason?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
-    address?: JsonNullValueInput | InputJsonValue
+    cep?: StringFieldUpdateOperationsInput | string
+    neighborhood?: StringFieldUpdateOperationsInput | string
+    city?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
+    numberHouse?: StringFieldUpdateOperationsInput | string
+    street?: StringFieldUpdateOperationsInput | string
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type InstitutionUncheckedUpdateWithoutCardsInput = {
@@ -7171,9 +7497,19 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     cnpj?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    reason?: StringFieldUpdateOperationsInput | string
+    socialReason?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     phoneNumber?: StringFieldUpdateOperationsInput | string
-    address?: JsonNullValueInput | InputJsonValue
+    cep?: StringFieldUpdateOperationsInput | string
+    neighborhood?: StringFieldUpdateOperationsInput | string
+    city?: StringFieldUpdateOperationsInput | string
+    state?: StringFieldUpdateOperationsInput | string
+    numberHouse?: StringFieldUpdateOperationsInput | string
+    street?: StringFieldUpdateOperationsInput | string
+    logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ParticipationUpsertWithWhereUniqueWithoutCardInput = {

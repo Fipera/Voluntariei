@@ -122,9 +122,19 @@ exports.Prisma.InstitutionScalarFieldEnum = {
   email: 'email',
   cnpj: 'cnpj',
   name: 'name',
+  reason: 'reason',
+  socialReason: 'socialReason',
   password: 'password',
   phoneNumber: 'phoneNumber',
-  address: 'address'
+  cep: 'cep',
+  neighborhood: 'neighborhood',
+  city: 'city',
+  state: 'state',
+  numberHouse: 'numberHouse',
+  street: 'street',
+  logoUrl: 'logoUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.CardScalarFieldEnum = {
@@ -165,15 +175,15 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
-};
-
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
 };
 
 
