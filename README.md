@@ -44,19 +44,29 @@ A validação do sistema será feita com base nos **casos de uso modelados**, se
 
 ---
 
-## 🚀 Testar Projeto
+# 🚀 TESTAR PROJETO – VOLUNTARI-EI
 
-# Instalar dependências
-npm install
+# 1) Clone o repositório e entre na pasta raiz
+- git clone https://github.com/<seu-usuario>/Voluntariei.git
+- cd Voluntariei
 
-# Iniciar o frontend com Expo
-npx expo start
+# 2) Suba PostgreSQL + Redis com Docker
+- docker compose up -d    # portas 5432 (Postgres) e 6379 (Redis)
 
-# Iniciar o backend (Fastify)
-npm run dev
+# 3) Instale dependências e rode o BACK-END
+- cd backend
+- npm install
+- cp .env.example .env    # edite se necessário
+- npx prisma migrate deploy
+- npm run dev             # Fastify em http://localhost:3333
 
-# Subir o banco de dados com Docker
-docker compose up -d
+
+# 4) Instale dependências e rode o FRONT-END (Expo)
+- cd frontend
+- npm install
+- npx expo start          # QR-code para Expo Go ou emulador
+
+
 
 > Projeto desenvolvido como parte do curso de Sistemas de Informação. Tema: Tecnologia Social para o engajamento filantrópico.
 
