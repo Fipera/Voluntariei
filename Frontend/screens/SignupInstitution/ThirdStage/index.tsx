@@ -32,8 +32,20 @@ import { useRouter } from "expo-router";
 import { AlertCircle, Eye, EyeOff, Lock, Mail } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import {
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
+type PhotoFile = {
+    uri: string;
+    name: string;
+    type: string;
+};
 
 export function SignupInstitutionThirdStage() {
     const router = useRouter();
@@ -42,6 +54,7 @@ export function SignupInstitutionThirdStage() {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const { data, updateData, clearData } = useSignupInstitutionStore();
+    const [userPhoto, setUserPhoto] = useState<PhotoFile | null>(null);
 
     const {
         control,
@@ -67,6 +80,41 @@ export function SignupInstitutionThirdStage() {
         }
     };
 
+    const selectUserPhoto = async () => {
+        const photoSelected = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ["images"],
+            quality: 1,
+            aspect: [4, 4],
+            allowsEditing: true,
+        });
+
+        if (photoSelected.canceled) {
+            return;
+        }
+
+        const photoURI = photoSelected.assets[0].uri;
+        const timestamp = new Date().getTime();
+
+        if (photoURI) {
+            const photoInfo = (await FileSystem.getInfoAsync(photoURI)) as {
+                size: number;
+            };
+
+            if (photoInfo.size && photoInfo.size / 1024 / 1024 > 5) {
+                return Alert.alert("Imagem muito grande.");
+            }
+
+            const fileExtension = photoURI.split(".").pop();
+
+            const photoFile = {
+                uri: photoURI,
+                name: `photo_${timestamp}.${fileExtension}`,
+                type: `image/${fileExtension}`,
+            };
+            setUserPhoto(photoFile);
+        }
+    };
+
     const onSubmit = async (formData: SignupInstitutionThirdStageData) => {
         setIsLoading(true);
         setErrorMessage("");
@@ -89,17 +137,33 @@ export function SignupInstitutionThirdStage() {
         }
 
         const fullData = { ...data, ...formData };
-        console.log("Dados completos para envio:", fullData);
+        const form = new FormData();
+        if (userPhoto) {
+            form.append("logo", userPhoto as any);
+        }
+
+        Object.entries(fullData).forEach(([key, value]) => {
+            if (value !== undefined) {
+                form.append(key, value);
+            }
+        });
+        console.log(form);
 
         try {
             setIsLoading(true);
-            const response = await api.post("/institution", fullData);
-            console.log(response);
+            const response = await api.post("/institution", form, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
+           
 
             setIsLoading(false);
             clearData();
-            router.push("/home");
+            router.push("/(institution)");
         } catch (error) {
+            console.log("Erro completo:", error);
             setIsLoading(false);
 
             const isAppError = error instanceof AppError;
@@ -136,19 +200,38 @@ export function SignupInstitutionThirdStage() {
                                 Etapa 3 de 3
                             </Text>
 
-                            <Avatar size="2xl" className="bg-black mt-16">
-                                <Icon
-                                    as={AddIcon}
-                                    size="xl2"
-                                    className="stroke-white"
-                                />
-                            </Avatar>
+                            <Button
+                                variant="link"
+                                action="default"
+                                className="bg-transparent p-0 mt-16 mb-16"
+                                onPress={selectUserPhoto}
+                            >
+                                <Avatar
+                                    size="2xl"
+                                    className="bg-black overflow-hidden"
+                                >
+                                    {userPhoto ? (
+                                        <Image
+                                            source={{ uri: userPhoto.uri }}
+                                            alt="Logo da instituição"
+                                            className="w-full h-full"
+                                            resizeMode="cover"
+                                        />
+                                    ) : (
+                                        <Icon
+                                            as={AddIcon}
+                                            size="xl2"
+                                            className="stroke-white"
+                                        />
+                                    )}
+                                </Avatar>
+                            </Button>
 
                             <Text
                                 size="md"
                                 className="font-PoppinsBold text-blue-dark text-center mt-6"
                             >
-                                Nome da Instituição
+                                {data.name}
                             </Text>
 
                             <Text

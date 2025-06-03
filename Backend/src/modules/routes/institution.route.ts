@@ -12,7 +12,6 @@ async function institutionRoutes(server: FastifyInstance) {
         "/",
         {
             schema: {
-                body: $ref("createInstitutionSchema"),
                 response: {
                     201: $ref("createInstitutionResponseSchema"),
                 },

@@ -132,6 +132,7 @@ exports.Prisma.InstitutionScalarFieldEnum = {
   state: 'state',
   numberHouse: 'numberHouse',
   street: 'street',
+  logoUrl: 'logoUrl',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

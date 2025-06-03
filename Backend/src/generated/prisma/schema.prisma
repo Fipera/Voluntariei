@@ -30,6 +30,7 @@ model Institution {
   state        String
   numberHouse  String
   street       String
+  logoUrl      String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

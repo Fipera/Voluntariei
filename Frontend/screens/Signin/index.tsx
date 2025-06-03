@@ -30,7 +30,7 @@ import { signinSchema, SigninFormData } from "@/utils/schemas/signinSchema";
 import { Spinner } from "@/components/ui/spinner";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { jwtDecode } from "jwt-decode";
-import * as SecureStore from "expo-secure-store";
+import { useAuth } from "@/providers/AuthProvider"; 
 
 export default () => {
     const router = useRouter();
@@ -46,9 +46,13 @@ export default () => {
         resolver: zodResolver(signinSchema),
     });
 
+    const { login } = useAuth();
+
     const handleLogin = async (data: SigninFormData) => {
         try {
             setIsLoading(true);
+            setErrorMessage("");
+
             const response = await api.post("/institution/login", data);
             const token = response.data.accessToken;
 
@@ -57,31 +61,21 @@ export default () => {
             );
             const type = decoded?.type;
 
-            // 🔐 Armazena o token e tipo com segurança
-            await SecureStore.setItemAsync("token", token);
-            await SecureStore.setItemAsync("type", type);
-
-            // 🔀 Redireciona com base no tipo
-            if (type === "institution") {
-                router.push("/(institution)");
-            } else if (type === "voluntary") {
-                router.push("/(voluntary)");
+            if (type === "institution" || type === "voluntary") {
+                await login(token, type);
             } else {
-                setErrorMessage("Tipo de conta desconhecido.");
+                throw new Error("Tipo de conta desconhecido.");
             }
-            console.log(type);
 
-            setIsLoading(false);
-            router.push("/(tabs)");
+            console.log("Tipo de usuário:", type);
         } catch (error) {
-            setIsLoading(false);
-
             const isAppError = error instanceof AppError;
             const messageError = isAppError
                 ? error.message
                 : "Não foi possível fazer login. Tente novamente mais tarde.";
-
             setErrorMessage(messageError);
+        } finally {
+            setIsLoading(false);
         }
     };
 

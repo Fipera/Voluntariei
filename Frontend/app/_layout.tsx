@@ -14,9 +14,41 @@ import "react-native-reanimated";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import SplashScreenCustom from "@/screens/SplashScreenCustom";
+import { useAuth } from "@/providers/AuthProvider";
+import { Redirect } from "expo-router";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+function AppRoutes() {
+    const { isLoading, type } = useAuth();
+
+    if (isLoading) {
+        return <SplashScreenCustom />;
+    }
+
+    return (
+        <Stack
+            initialRouteName={
+                type === "institution"
+                    ? "(institution)"
+                    : type === "voluntary"
+                    ? "(voluntary)"
+                    : "(auth)"
+            }
+        >
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen
+                name="(institution)"
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen name="(voluntary)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+        </Stack>
+    );
+}
+
+
 
 export default function RootLayout() {
     const [loaded] = useFonts({
@@ -36,33 +68,15 @@ export default function RootLayout() {
     }, [loaded]);
 
     if (!loaded) {
-        return (
-        <SafeAreaProvider>
-            <StatusBar style="dark" />
-            <GluestackUIProvider mode="light">
-                <AuthProvider>
-                    <SplashScreenCustom />
-                </AuthProvider>
-            </GluestackUIProvider>
-        </SafeAreaProvider>
-    );
+        return <SplashScreenCustom />;
     }
 
     return (
         <SafeAreaProvider>
             <GluestackUIProvider mode="light">
                 <AuthProvider>
-                    <Stack initialRouteName="(auth)">
-                        <Stack.Screen
-                            name="(tabs)"
-                            options={{ headerShown: false }}
-                        />
-                        <Stack.Screen
-                            name="(auth)"
-                            options={{ headerShown: false }}
-                        />
-                        <Stack.Screen name="+not-found" />
-                    </Stack>
+                    <StatusBar style="dark" />
+                    <AppRoutes />
                 </AuthProvider>
             </GluestackUIProvider>
         </SafeAreaProvider>

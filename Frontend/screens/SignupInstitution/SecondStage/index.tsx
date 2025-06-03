@@ -12,6 +12,7 @@ import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import api from "@/services/api";
 import { useSignupInstitutionStore } from "@/store/useSignupInstitutionStore";
 import { formatarCEP } from "@/utils/formatters/format";
 import { SigninFormData, signinSchema } from "@/utils/schemas/signinSchema";
@@ -37,6 +38,7 @@ export function SignupInstitutionSecondStage() {
     const {
         control,
         handleSubmit,
+        setValue,
         formState: { errors },
     } = useForm<SignupInstitutionSecondStageData>({
         resolver: zodResolver(signupInstitutionSecondStageSchema),
@@ -46,6 +48,26 @@ export function SignupInstitutionSecondStage() {
         console.log("Form válido:", formData);
         updateData(formData);
         router.push("/signupInstitutionThirdStage");
+    };
+
+    const buscarEnderecoPorCep = async (cep: string) => {
+        try {
+            const { data } = await api.get(
+                `https://viacep.com.br/ws/${cep}/json/`
+            );
+
+            if (data.erro) {
+                setErrorMessage("CEP não encontrado.");
+                return;
+            }
+
+            setValue("street", data.logradouro || "");
+            setValue("neighborhood", data.bairro || "");
+            setValue("city", data.localidade || "");
+            setValue("state", data.uf || "");
+        } catch (error) {
+            setErrorMessage("Erro ao buscar o CEP.");
+        }
     };
 
     return (
@@ -103,19 +125,27 @@ export function SignupInstitutionSecondStage() {
                                                     value={formattedCep}
                                                     onChangeText={(text) => {
                                                         const formatado =
-                                                            formatarCEP(
-                                                                text
-                                                            );
+                                                            formatarCEP(text);
                                                         setFormattedCep(
                                                             formatado
                                                         );
-                                                        onChange(
+                                                        const apenasNumeros =
                                                             formatado.replace(
                                                                 /\D/g,
                                                                 ""
-                                                            )
-                                                        );
+                                                            );
+
+                                                        onChange(apenasNumeros);
                                                         setErrorMessage("");
+
+                                                        if (
+                                                            apenasNumeros.length ===
+                                                            8
+                                                        ) {
+                                                            buscarEnderecoPorCep(
+                                                                apenasNumeros
+                                                            );
+                                                        }
                                                     }}
                                                 />
                                             </HStack>

@@ -9,7 +9,6 @@ const InstitutionCore = {
     reason: z.string({ required_error: "Reason is required" }),
     socialReason: z.string({ required_error: "Social reason is required" }),
     phoneNumber: z.string({ required_error: "Phone number is required" }),
-    password: z.string({ required_error: "Password is required" }),
 
     cep: z.string({ required_error: "Postal code is required" }),
     neighborhood: z.string({ required_error: "Neighborhood is required" }),
@@ -19,12 +18,13 @@ const InstitutionCore = {
     street: z.string({ required_error: "Street is required" }),
 };
 
-const createInstitutionSchema = z.object({
+export const createInstitutionSchema = z.object({
     ...InstitutionCore,
     password: z.string({
         required_error: "senha é obrigatória",
         invalid_type_error: "senha inválida",
     }),
+    logoUrl: z.string().optional(),
 });
 
 const createInstitutionResponseSchema = z.object({
