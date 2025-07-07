@@ -152,7 +152,17 @@ exports.Prisma.VoluntaryScalarFieldEnum = {
   name: 'name',
   password: 'password',
   phoneNumber: 'phoneNumber',
-  address: 'address'
+  cep: 'cep',
+  city: 'city',
+  state: 'state',
+  logoUrl: 'logoUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SkillScalarFieldEnum = {
+  id: 'id',
+  name: 'name'
 };
 
 exports.Prisma.ParticipationScalarFieldEnum = {
@@ -166,10 +176,6 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
-exports.Prisma.JsonNullValueInput = {
-  JsonNull: Prisma.JsonNull
-};
-
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -180,17 +186,12 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
-exports.Prisma.JsonNullValueFilter = {
-  DbNull: Prisma.DbNull,
-  JsonNull: Prisma.JsonNull,
-  AnyNull: Prisma.AnyNull
-};
-
 
 exports.Prisma.ModelName = {
   Institution: 'Institution',
   Card: 'Card',
   Voluntary: 'Voluntary',
+  Skill: 'Skill',
   Participation: 'Participation'
 };
 
