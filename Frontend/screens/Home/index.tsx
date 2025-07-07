@@ -43,7 +43,7 @@ export default () => {
                         </Text>
                     </Button>
                     <Button
-                        onPress={() => router.push("/signupInstitutionFirstStage")}
+                        onPress={() => router.push("/signupVoluntaryFirstStage")}
                         variant="outline"
                         className="border-blue-dark min-w-[300px] max-w-[350px] h-[44px] bg-white rounded-[12px] shadow-shadow flex-row items-center justify-center mt-4"
                     >

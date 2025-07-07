@@ -76,16 +76,32 @@ const loginVoluntaryResponseSchema = z.object({
    accessToken: z.string()
 })
 
+const checkUniquenessVoluntarySchema = z.object({
+  email: z.string().email().optional(),
+  phoneNumber: z.string().optional(),
+});
+
+
+const checkUniquenessVoluntaryResponseSchema = z.object({
+  email: z.boolean(),
+  phoneNumber: z.boolean(),
+
+});
+
+
 
 
 export type createVoluntaryInput = z.infer<typeof createVoluntarySchema>;
 export type loginVoluntaryInput = z.infer<typeof loginVoluntarySchema>;
+export type checkUniquenessVoluntaryInput = z.infer<typeof checkUniquenessVoluntarySchema>;
 
 export const {schemas: voluntarySchemas, $ref} = buildJsonSchemas({
     createVoluntarySchema,
     createVoluntaryResponseSchema,
     loginVoluntarySchema,
     loginVoluntaryResponseSchema,
+    checkUniquenessVoluntarySchema,
+    checkUniquenessVoluntaryResponseSchema
 
 }, {
      $id: "voluntarySchemas"

@@ -9,6 +9,9 @@ export default () => {
         <Stack.Screen name="signupInstitutionFirstStage" />
         <Stack.Screen name="signupInstitutionSecondStage" />
         <Stack.Screen name="signupInstitutionThirdStage" />
+        <Stack.Screen name="signupVoluntaryFirstStage" />
+        <Stack.Screen name="signupVoluntarySecondStage" />
+        <Stack.Screen name="signupVoluntaryThirdStage" />
 
     </Stack>
     )

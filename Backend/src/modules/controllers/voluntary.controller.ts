@@ -5,6 +5,7 @@ import {
     findVoluntaryByPhone,
 } from "../services/voluntary.service";
 import {
+    checkUniquenessVoluntaryInput,
     createVoluntaryInput,
     loginVoluntaryInput,
 } from "../schemas/voluntary.schema";
@@ -115,4 +116,23 @@ export async function loginVoluntaryHandler(
 
     // Se não encontrou nenhum
     return reply.code(401).send({ message: "E-mail ou senha incorreta" });
+}
+
+export async function checkVoluntaryUniquenessHandler(
+    request: FastifyRequest<{
+        Body: checkUniquenessVoluntaryInput;
+    }>,
+    reply: FastifyReply
+) {
+    const { email, phoneNumber } = request.body;
+
+    const [emailExists, phoneExists] = await Promise.all([
+        email ? findVoluntaryByEmail(email) : null,
+        phoneNumber ? findVoluntaryByPhone(phoneNumber) : null,
+    ]);
+
+    return reply.code(200).send({
+        email: !!emailExists,
+        phoneNumber: !!phoneExists,
+    });
 }
