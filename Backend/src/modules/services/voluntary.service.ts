@@ -3,12 +3,18 @@ import prisma from "../../utils/prisma";
 import { createVoluntaryInput } from "../schemas/voluntary.schema";
 
 export async function createVoluntary(input: createVoluntaryInput) {
-    const { password, ...rest } = input;
+    const { password, skills, ...rest } = input;
 
     const hashedPassword = await hashPassword(password);
 
     const voluntary = await prisma.voluntary.create({
-        data: { ...rest, password: hashedPassword },
+        data: {
+            ...rest,
+            password: hashedPassword,
+            skills: {
+                connect: skills.map((name) => ({ name })),
+            },
+        },
     });
 
     return voluntary;

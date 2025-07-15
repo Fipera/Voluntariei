@@ -1,5 +1,15 @@
 import Stepper from "@/components/custom/stepper";
-import { Button, ButtonIcon } from "@/components/ui/button";
+import { SkillGroupAccordion } from "@/components/custom/voluntaryskills/skillgroupdropdown";
+import { Accordion } from "@/components/ui/accordion";
+import { Box } from "@/components/ui/box";
+import { Button } from "@/components/ui/button";
+import {
+    Checkbox,
+    CheckboxIcon,
+    CheckboxIndicator,
+    CheckboxLabel,
+} from "@/components/ui/checkbox";
+import { Divider } from "@/components/ui/divider";
 import {
     FormControl,
     FormControlError,
@@ -7,22 +17,34 @@ import {
     FormControlErrorText,
 } from "@/components/ui/form-control";
 import { HStack } from "@/components/ui/hstack";
+import { AddIcon, Icon } from "@/components/ui/icon";
 import { Image } from "@/components/ui/image";
 import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import api from "@/services/api";
-import { useSignupInstitutionStore } from "@/store/useSignupInstitutionStore";
+import { useSignupVoluntaryStore } from "@/store/useSignupVoluntaryStore";
 import { formatarCEP } from "@/utils/formatters/format";
 import { SigninFormData, signinSchema } from "@/utils/schemas/signinSchema";
 import {
-    SignupInstitutionSecondStageData,
-    signupInstitutionSecondStageSchema,
-} from "@/utils/schemas/signupInstitutionSchema";
+    SignupVoluntarySecondStageData,
+    signupVoluntarySecondStageSchema,
+} from "@/utils/schemas/signupVoluntarySchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
-import { AlertCircle, Eye, EyeOff, Lock, Mail } from "lucide-react-native";
+import {
+    AlertCircle,
+    ArrowDown,
+    ArrowRight,
+    CheckIcon,
+    Eye,
+    EyeOff,
+    Lock,
+    Mail,
+    MinusIcon,
+    PlusIcon,
+} from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
@@ -30,44 +52,33 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export function SignupVoluntarySecondStage() {
     const router = useRouter();
-    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [formattedCep, setFormattedCep] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const { updateData } = useSignupInstitutionStore();
+    const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+    const { updateData } = useSignupVoluntaryStore();
     const {
         control,
         handleSubmit,
         setValue,
         formState: { errors },
-    } = useForm<SignupInstitutionSecondStageData>({
-        resolver: zodResolver(signupInstitutionSecondStageSchema),
+    } = useForm<SignupVoluntarySecondStageData>({
+        resolver: zodResolver(signupVoluntarySecondStageSchema),
     });
 
-    const onSubmit = (formData: SignupInstitutionSecondStageData) => {
+    setValue("skills", selectedSkills);
+
+    const onSubmit = (formData: SignupVoluntarySecondStageData) => {
         console.log("Form válido:", formData);
         updateData(formData);
-        router.push("/signupInstitutionThirdStage");
+        router.push("/signupVoluntaryThirdStage");
     };
 
-    const buscarEnderecoPorCep = async (cep: string) => {
-        try {
-            const { data } = await api.get(
-                `https://viacep.com.br/ws/${cep}/json/`
-            );
-
-            if (data.erro) {
-                setErrorMessage("CEP não encontrado.");
-                return;
-            }
-
-            setValue("street", data.logradouro || "");
-            setValue("neighborhood", data.bairro || "");
-            setValue("city", data.localidade || "");
-            setValue("state", data.uf || "");
-        } catch (error) {
-            setErrorMessage("Erro ao buscar o CEP.");
-        }
+    const toggleSkill = (option: string) => {
+        setSelectedSkills((prev) =>
+            prev.includes(option)
+                ? prev.filter((item) => item !== option)
+                : [...prev, option]
+        );
     };
 
     return (
@@ -87,318 +98,158 @@ export function SignupVoluntarySecondStage() {
                     <VStack className="flex-1 items-center justify-between px-4 pb-6">
                         <VStack className="flex-1 items-center justify-start">
                             <Stepper etapaAtual={2} />
-
                             <Text
                                 size="xl"
                                 className="font-PoppinsBold text-blue-dark text-center mt-6"
                             >
-                                Etapa 2 de 3 SECUND
+                                Etapa 2 de 3
                             </Text>
-
                             <Text
                                 size="2xl"
                                 className="font-PoppinsBold text-blue-dark text-center mt-10"
                             >
-                                Endereço
+                                Habilidades
+                            </Text>
+                            <Text
+                                size="md"
+                                className="font-PoppinsBold text-grey-light text-center mt-10"
+                            >
+                                Conte com o que você pode contribuir e {"\n"}{" "}
+                                nós conectamos você com a causa certa.
                             </Text>
 
-                            <FormControl isInvalid={!!errors.cep}>
-                                <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
-                                    CEP
-                                </Text>
-
-                                <Controller
-                                    control={control}
-                                    name="cep"
-                                    render={({
-                                        field: { onChange, value },
-                                    }) => (
-                                        <Input
-                                            variant="rounded"
-                                            size="sm"
-                                            className="w-full max-w-[280px] h-12 bg-white border border-input-border shadow-shadow rounded-[12px] mt-2"
-                                        >
-                                            <HStack className="items-center justify-start ml-3">
-                                                <InputField
-                                                    keyboardType="number-pad"
-                                                    className=""
-                                                    value={formattedCep}
-                                                    onChangeText={(text) => {
-                                                        const formatado =
-                                                            formatarCEP(text);
-                                                        setFormattedCep(
-                                                            formatado
-                                                        );
-                                                        const apenasNumeros =
-                                                            formatado.replace(
-                                                                /\D/g,
-                                                                ""
-                                                            );
-
-                                                        onChange(apenasNumeros);
-                                                        setErrorMessage("");
-
-                                                        if (
-                                                            apenasNumeros.length ===
-                                                            8
-                                                        ) {
-                                                            buscarEnderecoPorCep(
-                                                                apenasNumeros
-                                                            );
-                                                        }
-                                                    }}
-                                                />
-                                            </HStack>
-                                        </Input>
-                                    )}
+                            <Accordion className="m-10 bg-transparent">
+                                <SkillGroupAccordion
+                                    title="📘 Educação"
+                                    value="item-1"
+                                    selectedSkills={selectedSkills}
+                                    toggleSkill={toggleSkill}
+                                    skills={[
+                                        {
+                                            value: "educacao-reforco-escolar",
+                                            label: "Reforço Escolar",
+                                        },
+                                        {
+                                            value: "educacao-alfabetizacao",
+                                            label: "Alfabetização",
+                                        },
+                                        {
+                                            value: "educacao-aulas-de-informatica",
+                                            label: "Aulas de informática",
+                                        },
+                                    ]}
                                 />
-                                {errors.cep && (
-                                    <FormControlError>
-                                        <FormControlErrorIcon
-                                            as={AlertCircle}
-                                        />
-                                        <FormControlErrorText>
-                                            {errors.cep.message}
-                                        </FormControlErrorText>
-                                    </FormControlError>
-                                )}
-                            </FormControl>
-
-                            <FormControl isInvalid={!!errors.street}>
-                                <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
-                                    Rua
-                                </Text>
-
-                                <Controller
-                                    control={control}
-                                    name="street"
-                                    render={({
-                                        field: { onChange, value },
-                                    }) => (
-                                        <Input
-                                            variant="rounded"
-                                            size="sm"
-                                            className="w-full max-w-[280px] h-12 bg-white border border-input-border shadow-shadow rounded-[12px] mt-2"
-                                        >
-                                            <HStack className="items-center justify-start ml-3">
-                                                <InputField
-                                                    keyboardType="default"
-                                                    className=""
-                                                    value={value}
-                                                    onChangeText={(text) => {
-                                                        onChange(text);
-                                                        setErrorMessage("");
-                                                    }}
-                                                />
-                                            </HStack>
-                                        </Input>
-                                    )}
+                                <SkillGroupAccordion
+                                    title="❤️ Saúde"
+                                    value="item-2"
+                                    selectedSkills={selectedSkills}
+                                    toggleSkill={toggleSkill}
+                                    skills={[
+                                        {
+                                            value: "school-tutoring",
+                                            label: "School tutoring",
+                                        },
+                                        {
+                                            value: "literacy",
+                                            label: "Literacy",
+                                        },
+                                        {
+                                            value: "computer-lessons",
+                                            label: "Computer lessons",
+                                        },
+                                    ]}
                                 />
-                                {errors.street && (
-                                    <FormControlError>
-                                        <FormControlErrorIcon
-                                            as={AlertCircle}
-                                        />
-                                        <FormControlErrorText>
-                                            {errors.street.message}
-                                        </FormControlErrorText>
-                                    </FormControlError>
-                                )}
-                            </FormControl>
-
-                            <HStack className="flex-row gap-x-4">
-                                {/* Bairro (maior) */}
-                                <FormControl
-                                    isInvalid={!!errors.neighborhood}
-                                    className="w-[160px]"
-                                >
-                                    <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
-                                        Bairro
-                                    </Text>
-                                    <Controller
-                                        control={control}
-                                        name="neighborhood"
-                                        render={({
-                                            field: { onChange, value },
-                                        }) => (
-                                            <Input
-                                                variant="rounded"
-                                                size="sm"
-                                                className="h-12 bg-white border border-input-border shadow-shadow rounded-[12px]"
-                                            >
-                                                <HStack className="items-center justify-start ml-3">
-                                                    <InputField
-                                                        keyboardType="default"
-                                                        className=""
-                                                        value={value}
-                                                        onChangeText={(
-                                                            text
-                                                        ) => {
-                                                            onChange(text);
-                                                            setErrorMessage("");
-                                                        }}
-                                                    />
-                                                </HStack>
-                                            </Input>
-                                        )}
-                                    />
-                                    {errors.neighborhood && (
-                                        <FormControlError>
-                                            <FormControlErrorIcon
-                                                as={AlertCircle}
-                                            />
-                                            <FormControlErrorText>
-                                                {errors.neighborhood.message}
-                                            </FormControlErrorText>
-                                        </FormControlError>
-                                    )}
-                                </FormControl>
-
-                                {/* Telefone (menor) */}
-                                <FormControl
-                                    isInvalid={!!errors.numberHouse}
-                                    className="w-[100px]"
-                                >
-                                    <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
-                                        numero
-                                    </Text>
-                                    <Controller
-                                        control={control}
-                                        name="numberHouse"
-                                        render={({
-                                            field: { onChange, value },
-                                        }) => (
-                                            <Input
-                                                variant="rounded"
-                                                size="sm"
-                                                className="h-12 bg-white border border-input-border shadow-shadow rounded-[12px]"
-                                            >
-                                                <HStack className="items-center justify-start ml-3">
-                                                    <InputField
-                                                        keyboardType="number-pad"
-                                                        className=""
-                                                        value={value}
-                                                        onChangeText={(
-                                                            text
-                                                        ) => {
-                                                            onChange(text);
-                                                            setErrorMessage("");
-                                                        }}
-                                                    />
-                                                </HStack>
-                                            </Input>
-                                        )}
-                                    />
-                                    {errors.numberHouse && (
-                                        <FormControlError>
-                                            <FormControlErrorIcon
-                                                as={AlertCircle}
-                                            />
-                                            <FormControlErrorText>
-                                                {errors.numberHouse.message}
-                                            </FormControlErrorText>
-                                        </FormControlError>
-                                    )}
-                                </FormControl>
-                            </HStack>
-
-                            <FormControl isInvalid={!!errors.city}>
-                                <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
-                                    Cidade
-                                </Text>
-
-                                <Controller
-                                    control={control}
-                                    name="city"
-                                    render={({
-                                        field: { onChange, value },
-                                    }) => (
-                                        <Input
-                                            variant="rounded"
-                                            size="sm"
-                                            className="w-full max-w-[280px] h-12 bg-white border border-input-border shadow-shadow rounded-[12px] mt-2"
-                                        >
-                                            <HStack className="items-center justify-start ml-3">
-                                                <InputField
-                                                    keyboardType="default"
-                                                    className=""
-                                                    value={value}
-                                                    onChangeText={(text) => {
-                                                        onChange(text);
-                                                        setErrorMessage("");
-                                                    }}
-                                                />
-                                            </HStack>
-                                        </Input>
-                                    )}
+                                <SkillGroupAccordion
+                                    title="🎭 Cultura e Arte"
+                                    value="item-3"
+                                    selectedSkills={selectedSkills}
+                                    toggleSkill={toggleSkill}
+                                    skills={[
+                                        {
+                                            value: "school-tutoring",
+                                            label: "School tutoring",
+                                        },
+                                        {
+                                            value: "literacy",
+                                            label: "Literacy",
+                                        },
+                                        {
+                                            value: "computer-lessons",
+                                            label: "Computer lessons",
+                                        },
+                                    ]}
                                 />
-                                {errors.city && (
-                                    <FormControlError>
-                                        <FormControlErrorIcon
-                                            as={AlertCircle}
-                                        />
-                                        <FormControlErrorText>
-                                            {errors.city.message}
-                                        </FormControlErrorText>
-                                    </FormControlError>
-                                )}
-                            </FormControl>
-
-                            <FormControl isInvalid={!!errors.state}>
-                                <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
-                                    Estado
-                                </Text>
-
-                                <Controller
-                                    control={control}
-                                    name="state"
-                                    render={({
-                                        field: { onChange, value },
-                                    }) => (
-                                        <Input
-                                            variant="rounded"
-                                            size="sm"
-                                            className="w-full max-w-[280px] h-12 bg-white border border-input-border shadow-shadow rounded-[12px] mt-2"
-                                        >
-                                            <HStack className="items-center justify-start ml-3">
-                                                <InputField
-                                                    keyboardType="default"
-                                                    className=""
-                                                    value={value}
-                                                    onChangeText={(text) => {
-                                                        onChange(text);
-                                                        setErrorMessage("");
-                                                    }}
-                                                />
-                                            </HStack>
-                                        </Input>
-                                    )}
+                                <SkillGroupAccordion
+                                    title="🛠️ Construção"
+                                    value="item-4"
+                                    selectedSkills={selectedSkills}
+                                    toggleSkill={toggleSkill}
+                                    skills={[
+                                        {
+                                            value: "school-tutoring",
+                                            label: "School tutoring",
+                                        },
+                                        {
+                                            value: "literacy",
+                                            label: "Literacy",
+                                        },
+                                        {
+                                            value: "computer-lessons",
+                                            label: "Computer lessons",
+                                        },
+                                    ]}
                                 />
-                                {errors.state && (
-                                    <FormControlError>
-                                        <FormControlErrorIcon
-                                            as={AlertCircle}
-                                        />
-                                        <FormControlErrorText>
-                                            {errors.state.message}
-                                        </FormControlErrorText>
-                                    </FormControlError>
-                                )}
-                            </FormControl>
+                                <SkillGroupAccordion
+                                    title="🤝 Apoio Social"
+                                    value="item-5"
+                                    selectedSkills={selectedSkills}
+                                    toggleSkill={toggleSkill}
+                                    skills={[
+                                        {
+                                            value: "school-tutoring",
+                                            label: "School tutoring",
+                                        },
+                                        {
+                                            value: "literacy",
+                                            label: "Literacy",
+                                        },
+                                        {
+                                            value: "computer-lessons",
+                                            label: "Computer lessons",
+                                        },
+                                    ]}
+                                />
+                            </Accordion>
 
                             <Button
                                 onPress={handleSubmit(onSubmit)}
-                                disabled={isLoading}
-                                className="min-w-[300px] max-w-[350px] h-[44px] bg-blue-dark rounded-[12px] shadow-shadow flex-row items-center justify-center mt-12"
+                                disabled={selectedSkills.length === 0}
+                                className={`min-w-[300px] max-w-[350px] h-[44px] rounded-[12px] shadow-shadow flex-row items-center justify-center mt-12 ${
+                                    selectedSkills.length === 0
+                                        ? "bg-gray-300"
+                                        : "bg-blue-dark"
+                                }`}
                             >
                                 {isLoading ? (
                                     <Spinner />
                                 ) : (
-                                    <Text className="text-white font-InterBold">
+                                    <Text
+                                        className={`font-InterBold ${
+                                            selectedSkills.length === 0
+                                                ? "text-gray-500"
+                                                : "text-white"
+                                        }`}
+                                    >
                                         Próximo
                                     </Text>
                                 )}
                             </Button>
+
+                            {selectedSkills.length > 0 && (
+                                <Text className="text-blue-dark mt-4">
+                                    Selected: {selectedSkills.join(", ")}
+                                </Text>
+                            )}
                         </VStack>
                     </VStack>
                 </ScrollView>

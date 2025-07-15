@@ -206,11 +206,12 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": true,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://fipera:senha@localhost:5433/voluntariei"
+        "value": null
       }
     }
   },

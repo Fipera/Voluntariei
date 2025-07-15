@@ -7,6 +7,7 @@ import {
 import {
     checkUniquenessVoluntaryInput,
     createVoluntaryInput,
+    createVoluntarySchema,
     loginVoluntaryInput,
 } from "../schemas/voluntary.schema";
 import { PrismaClientKnownRequestError } from "../../generated/prisma/runtime/library";
@@ -17,12 +18,40 @@ import {
 } from "../services/institution.service";
 import { verifyPassword } from "../../utils/hash";
 import { server } from "../../app";
+import path from "path";
+import fs from "fs";
+import { promisify } from "util";
+import { pipeline } from "stream";
+
+
+const pump = promisify(pipeline);
 
 export async function registerVoluntaryHandler(
-    request: FastifyRequest<{ Body: createVoluntaryInput }>,
+    request: FastifyRequest,
     reply: FastifyReply
 ) {
-    const body = request.body;
+    const body: Record<string, any> = {};
+    let logoUrl = "";
+
+    // Cria pasta de uploads se não existir
+    const uploadsDir = path.join(__dirname, "..", "..", "uploads");
+    if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    //  Processa multipart/form-data
+    const parts = request.parts();
+    for await (const part of parts) {
+        if (part.type === "file" && part.fieldname === "logo") {
+            const filename = `${Date.now()}-${part.filename}`;
+            const filePath = path.join(uploadsDir, filename);
+
+            await pump(part.file, fs.createWriteStream(filePath));
+            logoUrl = `/uploads/${filename}`;
+        } else if (part.type === "field") {
+            body[part.fieldname] = part.value;
+        }
+    }
 
     try {
         const voluntaryWithSameEmail = await findVoluntaryByEmail(body.email);
@@ -47,9 +76,15 @@ export async function registerVoluntaryHandler(
                 .send({ message: "Telefone já está em uso" });
         }
 
-        const voluntary = await createVoluntary(body);
 
-        return reply.code(201).send(voluntary);
+        const parsed = createVoluntarySchema.parse({
+            ...body,
+            logoUrl,
+        });
+
+        const institution = await createVoluntary(parsed);
+
+        return reply.code(201).send(institution);
     } catch (err) {
         if (
             err instanceof PrismaClientKnownRequestError &&

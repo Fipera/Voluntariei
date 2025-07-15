@@ -20,13 +20,13 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import api from "@/services/api";
-import { useSignupInstitutionStore } from "@/store/useSignupInstitutionStore";
+import { useSignupVoluntaryStore } from "@/store/useSignupVoluntaryStore";
 import { AppError } from "@/utils/AppError";
 import { SigninFormData, signinSchema } from "@/utils/schemas/signinSchema";
 import {
-    SignupInstitutionThirdStageData,
-    signupInstitutionThirdStageSchema,
-} from "@/utils/schemas/signupInstitutionSchema";
+    SignupVoluntaryThirdStageData,
+    signupVoluntaryThirdStageSchema,
+} from "@/utils/schemas/signupVoluntarySchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import { AlertCircle, Eye, EyeOff, Lock, Mail } from "lucide-react-native";
@@ -53,7 +53,7 @@ export function SignupVoluntaryThirdStage() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-    const { data, updateData, clearData } = useSignupInstitutionStore();
+    const { data, updateData, clearData } = useSignupVoluntaryStore();
     const [userPhoto, setUserPhoto] = useState<PhotoFile | null>(null);
 
     const {
@@ -61,15 +61,13 @@ export function SignupVoluntaryThirdStage() {
         handleSubmit,
         setError,
         formState: { errors },
-    } = useForm<SignupInstitutionThirdStageData>({
-        resolver: zodResolver(signupInstitutionThirdStageSchema),
+    } = useForm<SignupVoluntaryThirdStageData>({
+        resolver: zodResolver(signupVoluntaryThirdStageSchema),
     });
 
-    const checkUniqueness = async (
-        formData: SignupInstitutionThirdStageData
-    ) => {
+    const checkUniqueness = async (formData: SignupVoluntaryThirdStageData) => {
         try {
-            const response = await api.post("/institution/check-uniqueness", {
+            const response = await api.post("/voluntary/check-uniqueness", {
                 email: formData.email,
             });
 
@@ -115,7 +113,7 @@ export function SignupVoluntaryThirdStage() {
         }
     };
 
-    const onSubmit = async (formData: SignupInstitutionThirdStageData) => {
+    const onSubmit = async (formData: SignupVoluntaryThirdStageData) => {
         setIsLoading(true);
         setErrorMessage("");
 
@@ -144,24 +142,26 @@ export function SignupVoluntaryThirdStage() {
 
         Object.entries(fullData).forEach(([key, value]) => {
             if (value !== undefined) {
-                form.append(key, value);
+                if (Array.isArray(value)) {
+                    form.append(key, JSON.stringify(value)); // skills
+                } else {
+                    form.append(key, String(value)); // resto
+                }
             }
         });
         console.log(form);
 
         try {
             setIsLoading(true);
-            const response = await api.post("/institution", form, {
+            const response = await api.post("/voluntary", form, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             });
 
-           
-
             setIsLoading(false);
             clearData();
-            router.push("/(institution)");
+            router.push("/(voluntary)");
         } catch (error) {
             console.log("Erro completo:", error);
             setIsLoading(false);

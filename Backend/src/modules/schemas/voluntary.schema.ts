@@ -1,61 +1,45 @@
 import { buildJsonSchemas } from "fastify-zod";
 import { z } from "zod";
 
-const voluntaryCore = {
+const VoluntaryCore = {
+    email: z
+        .string({ required_error: "Email is required" })
+        .email("Invalid email"),
 
-    email: z.string({
-        required_error: 'Email Obrigatório',
-        invalid_type_error: 'Email Inválido'
-    }),
-    name: z.string({
-        required_error: 'Email Obrigatório',
-        invalid_type_error: 'Email Inválido'
-    }),
-    password: z.string({
-        required_error: 'Email Obrigatório',
-        invalid_type_error: 'Email Inválido'
-    }),
-    phoneNumber: z.string({
-        required_error: 'Celular Obrigatório',
-    }),
-    address: z.object({
-        cep: z.number({
-         required_error: "cep obrigatório",
-        }),
-        state: z.string({
-         required_error: "estado obrigatório",
-        }),
-        city: z.string({
-         required_error: "cidade obrigatório",
-        }),
-        road: z.string({
-         required_error: "rua obrigatório",
-        }),
-        neighborhood: z.string({
-         required_error: "bairro obrigatório",
-        }),
-        number: z.number({
-         required_error: "numero obrigatório",
-        }),
-     })
-}
+    name: z.string({ required_error: "Name is required" }),
 
-const createVoluntarySchema = z.object({
-    ...voluntaryCore,
+    phoneNumber: z
+        .string({ required_error: "Phone number is required" })
+        .regex(/^\d{10,11}$/, "Phone number must have 10 or 11 digits"),
+
+    cep: z
+        .string({ required_error: "Postal code is required" })
+        .regex(/^\d{8}$/, "Postal code must have exactly 8 digits"),
+
+    city: z
+        .string({ required_error: "City is required" })
+        .regex(/^[A-Za-zÀ-ÿ\s]+$/, "City cannot contain numbers or symbols"),
+
+    state: z
+        .string({ required_error: "State is required" })
+        .regex(/^[A-Za-zÀ-ÿ\s]+$/, "State cannot contain numbers or symbols"),
+
+    skills: z.array(z.string()).min(1, "Select at least one skill"),
+};
+
+export const createVoluntarySchema = z.object({
+    ...VoluntaryCore,
     password: z.string({
         required_error: "senha é obrigatória",
         invalid_type_error: "senha inválida",
     }),
+    logoUrl: z.string().optional(),
 });
 
 const createVoluntaryResponseSchema = z.object({
     id: z.number(),
-    ...voluntaryCore
+    ...VoluntaryCore,
 });
-
-
-
-
 
 const loginVoluntarySchema = z.object({
     email: z
@@ -64,45 +48,42 @@ const loginVoluntarySchema = z.object({
             invalid_type_error: "email inválido",
         })
         .email(),
-        password: z.string({
-            required_error: "senha é obrigatória",
-            invalid_type_error: "senha inválida",
-        }),
-})
-
-
+    password: z.string({
+        required_error: "senha é obrigatória",
+        invalid_type_error: "senha inválida",
+    }),
+});
 
 const loginVoluntaryResponseSchema = z.object({
-   accessToken: z.string()
-})
+    accessToken: z.string(),
+});
 
 const checkUniquenessVoluntarySchema = z.object({
-  email: z.string().email().optional(),
-  phoneNumber: z.string().optional(),
+    email: z.string().email().optional(),
+    phoneNumber: z.string().optional(),
 });
-
 
 const checkUniquenessVoluntaryResponseSchema = z.object({
-  email: z.boolean(),
-  phoneNumber: z.boolean(),
-
+    email: z.boolean(),
+    phoneNumber: z.boolean(),
 });
-
-
-
 
 export type createVoluntaryInput = z.infer<typeof createVoluntarySchema>;
 export type loginVoluntaryInput = z.infer<typeof loginVoluntarySchema>;
-export type checkUniquenessVoluntaryInput = z.infer<typeof checkUniquenessVoluntarySchema>;
+export type checkUniquenessVoluntaryInput = z.infer<
+    typeof checkUniquenessVoluntarySchema
+>;
 
-export const {schemas: voluntarySchemas, $ref} = buildJsonSchemas({
-    createVoluntarySchema,
-    createVoluntaryResponseSchema,
-    loginVoluntarySchema,
-    loginVoluntaryResponseSchema,
-    checkUniquenessVoluntarySchema,
-    checkUniquenessVoluntaryResponseSchema
-
-}, {
-     $id: "voluntarySchemas"
-})
+export const { schemas: voluntarySchemas, $ref } = buildJsonSchemas(
+    {
+        createVoluntarySchema,
+        createVoluntaryResponseSchema,
+        loginVoluntarySchema,
+        loginVoluntaryResponseSchema,
+        checkUniquenessVoluntarySchema,
+        checkUniquenessVoluntaryResponseSchema,
+    },
+    {
+        $id: "voluntarySchemas",
+    }
+);
