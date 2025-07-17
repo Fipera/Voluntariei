@@ -119,6 +119,7 @@ export function SignupVoluntarySecondStage() {
                             </Text>
 
                             <Accordion className="m-10 bg-transparent">
+                                {/* 📘 EDUCAÇÃO */}
                                 <SkillGroupAccordion
                                     title="📘 Educação"
                                     value="item-1"
@@ -127,38 +128,58 @@ export function SignupVoluntarySecondStage() {
                                     skills={[
                                         {
                                             value: "educacao-reforco-escolar",
-                                            label: "Reforço Escolar",
+                                            label: "Reforço escolar",
                                         },
                                         {
-                                            value: "educacao-alfabetizacao",
-                                            label: "Alfabetização",
+                                            value: "educacao-alfabetizacao-adultos",
+                                            label: "Alfabetização de adultos",
                                         },
                                         {
-                                            value: "educacao-aulas-de-informatica",
-                                            label: "Aulas de informática",
+                                            value: "educacao-informatica-basica",
+                                            label: "Aulas de informática básica",
+                                        },
+                                        {
+                                            value: "educacao-idiomas",
+                                            label: "Ensino de idiomas",
+                                        },
+                                        {
+                                            value: "educacao-orientacao-profissional",
+                                            label: "Orientação profissional",
                                         },
                                     ]}
                                 />
+
+                                {/* ❤ SAÚDE */}
                                 <SkillGroupAccordion
-                                    title="❤️ Saúde"
+                                    title="❤ Saúde"
                                     value="item-2"
                                     selectedSkills={selectedSkills}
                                     toggleSkill={toggleSkill}
                                     skills={[
                                         {
-                                            value: "school-tutoring",
-                                            label: "School tutoring",
+                                            value: "saude-primeiros-socorros",
+                                            label: "Primeiros socorros",
                                         },
                                         {
-                                            value: "literacy",
-                                            label: "Literacy",
+                                            value: "saude-cuidados-idosos",
+                                            label: "Cuidados com idosos",
                                         },
                                         {
-                                            value: "computer-lessons",
-                                            label: "Computer lessons",
+                                            value: "saude-pessoas-deficiencia",
+                                            label: "Apoio a pessoas com deficiência",
+                                        },
+                                        {
+                                            value: "saude-educacao-nutricional",
+                                            label: "Educação nutricional",
+                                        },
+                                        {
+                                            value: "saude-campanha-sangue",
+                                            label: "Campanhas de doação de sangue",
                                         },
                                     ]}
                                 />
+
+                                {/* 🎭 CULTURA E ARTE */}
                                 <SkillGroupAccordion
                                     title="🎭 Cultura e Arte"
                                     value="item-3"
@@ -166,39 +187,59 @@ export function SignupVoluntarySecondStage() {
                                     toggleSkill={toggleSkill}
                                     skills={[
                                         {
-                                            value: "school-tutoring",
-                                            label: "School tutoring",
+                                            value: "arte-musica",
+                                            label: "Música (instrumental ou canto)",
                                         },
                                         {
-                                            value: "literacy",
-                                            label: "Literacy",
+                                            value: "arte-teatro-danca",
+                                            label: "Teatro e dança",
                                         },
                                         {
-                                            value: "computer-lessons",
-                                            label: "Computer lessons",
+                                            value: "arte-foto-video",
+                                            label: "Fotografia e vídeo",
+                                        },
+                                        {
+                                            value: "arte-artes-plasticas",
+                                            label: "Artes plásticas e artesanato",
+                                        },
+                                        {
+                                            value: "arte-producao-eventos",
+                                            label: "Produção cultural em eventos",
                                         },
                                     ]}
                                 />
+
+                                {/* 🛠 CONSTRUÇÃO */}
                                 <SkillGroupAccordion
-                                    title="🛠️ Construção"
+                                    title="🛠 Construção"
                                     value="item-4"
                                     selectedSkills={selectedSkills}
                                     toggleSkill={toggleSkill}
                                     skills={[
                                         {
-                                            value: "school-tutoring",
-                                            label: "School tutoring",
+                                            value: "construcao-pintura",
+                                            label: "Pintura e acabamento",
                                         },
                                         {
-                                            value: "literacy",
-                                            label: "Literacy",
+                                            value: "construcao-marcenaria",
+                                            label: "Marcenaria / carpintaria",
                                         },
                                         {
-                                            value: "computer-lessons",
-                                            label: "Computer lessons",
+                                            value: "construcao-eletrica",
+                                            label: "Reparos elétricos",
+                                        },
+                                        {
+                                            value: "construcao-alvenaria",
+                                            label: "Alvenaria e manutenção geral",
+                                        },
+                                        {
+                                            value: "construcao-jardinagem",
+                                            label: "Jardinagem e paisagismo",
                                         },
                                     ]}
                                 />
+
+                                {/* 🤝 APOIO SOCIAL */}
                                 <SkillGroupAccordion
                                     title="🤝 Apoio Social"
                                     value="item-5"
@@ -206,21 +247,28 @@ export function SignupVoluntarySecondStage() {
                                     toggleSkill={toggleSkill}
                                     skills={[
                                         {
-                                            value: "school-tutoring",
-                                            label: "School tutoring",
+                                            value: "social-distribuicao-alimentos",
+                                            label: "Distribuição de alimentos/roupas",
                                         },
                                         {
-                                            value: "literacy",
-                                            label: "Literacy",
+                                            value: "social-logistica-eventos",
+                                            label: "Organização logística de eventos",
                                         },
                                         {
-                                            value: "computer-lessons",
-                                            label: "Computer lessons",
+                                            value: "social-recepcao-acolhimento",
+                                            label: "Recepção e acolhimento ao público",
+                                        },
+                                        {
+                                            value: "social-fundraising",
+                                            label: "Captação de recursos",
+                                        },
+                                        {
+                                            value: "social-midias-sociais",
+                                            label: "Gestão de mídias sociais",
                                         },
                                     ]}
                                 />
                             </Accordion>
-
                             <Button
                                 onPress={handleSubmit(onSubmit)}
                                 disabled={selectedSkills.length === 0}

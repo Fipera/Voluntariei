@@ -15,6 +15,9 @@ export async function createVoluntary(input: createVoluntaryInput) {
                 connect: skills.map((name) => ({ name })),
             },
         },
+        include: {
+            skills: true,
+        },
     });
 
     return voluntary;

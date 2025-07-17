@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsnd --respawn --transpile-only --exit-child src/app.ts"
+    "dev": "tsnd --respawn --transpile-only --exit-child src/app.ts",
+    "seed": "prisma db seed"
   },
   "author": "",
   "license": "ISC",
@@ -11,6 +12,7 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "prisma": "^6.6.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
@@ -25,5 +27,8 @@
     "ts-node-dev": "^2.0.0",
     "zod": "^3.24.2",
     "zod-to-json-schema": "^3.24.5"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   }
 }

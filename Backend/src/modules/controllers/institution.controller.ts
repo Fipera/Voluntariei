@@ -29,80 +29,82 @@ import fs from "fs";
 const pump = promisify(pipeline);
 
 export async function registerInstitutionHandler(
-    request: FastifyRequest,
-    reply: FastifyReply
+  request: FastifyRequest,
+  reply: FastifyReply
 ) {
-    const body: Record<string, any> = {};
-    let logoUrl = "";
+  let body: Record<string, any> = {};
+  let logoUrl = "";
 
-    // Cria pasta de uploads se não existir
-    const uploadsDir = path.join(__dirname, "..", "..", "uploads");
-    if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir, { recursive: true });
-    }
+  // Cria pasta de uploads se não existir
+  const uploadsDir = path.join(__dirname, "..", "..", "uploads");
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
 
-    //  Processa multipart/form-data
+  // Verifica se é multipart
+  const contentType = request.headers["content-type"] || "";
+  if (contentType.includes("multipart/form-data")) {
     const parts = request.parts();
     for await (const part of parts) {
-        if (part.type === "file" && part.fieldname === "logo") {
-            const filename = `${Date.now()}-${part.filename}`;
-            const filePath = path.join(uploadsDir, filename);
+      if (part.type === "file" && part.fieldname === "logo") {
+        const filename = `${Date.now()}-${part.filename}`;
+        const filePath = path.join(uploadsDir, filename);
 
-            await pump(part.file, fs.createWriteStream(filePath));
-            logoUrl = `/uploads/${filename}`;
-        } else if (part.type === "field") {
-            body[part.fieldname] = part.value;
-        }
+        await pump(part.file, fs.createWriteStream(filePath));
+        logoUrl = `/uploads/${filename}`;
+      } else if (part.type === "field") {
+        body[part.fieldname] = part.value;
+      }
+    }
+  } else {
+
+    body = request.body as Record<string, any>;
+    logoUrl = body.logoUrl || "";
+  }
+
+  try {
+    const voluntaryWithSameEmail = await findVoluntaryByEmail(body.email);
+    const voluntaryWithSamePhone = await findVoluntaryByPhone(body.phoneNumber);
+    const institutionWithSameEmail = await findInstitutionByEmail(body.email);
+    const institutionWithSamePhone = await findInstitutionByPhone(body.phoneNumber);
+    const institutionWithSameCnpj = await findInstitutionByCnpj(body.cnpj);
+
+    if (voluntaryWithSameEmail || institutionWithSameEmail) {
+      return reply.status(400).send({ message: "Email já está em uso" });
     }
 
-    try {
-        const voluntaryWithSameEmail = await findVoluntaryByEmail(body.email);
-        const voluntaryWithSamePhone = await findVoluntaryByPhone(
-            body.phoneNumber
-        );
-
-        const institutionWithSameEmail = await findInstitutionByEmail(
-            body.email
-        );
-        const institutionWithSamePhone = await findInstitutionByPhone(
-            body.phoneNumber
-        );
-        const institutionWithSameCnpj = await findInstitutionByCnpj(body.cnpj);
-
-        if (voluntaryWithSameEmail || institutionWithSameEmail) {
-            return reply.status(400).send({ message: "Email já está em uso" });
-        }
-
-        if (voluntaryWithSamePhone || institutionWithSamePhone) {
-            return reply
-                .status(400)
-                .send({ message: "Telefone já está em uso" });
-        }
-
-        if (institutionWithSameCnpj) {
-            return reply.status(400).send({ message: "CNPJ já está em uso" });
-        }
-
-        const parsed = createInstitutionSchema.parse({
-            ...body,
-            logoUrl,
-        });
-
-        const institution = await createInstitution(parsed);
-
-        return reply.code(201).send(institution);
-    } catch (err) {
-        if (
-            err instanceof PrismaClientKnownRequestError &&
-            err.code === "P2002"
-        ) {
-            const meta = err.meta as { target?: string[] };
-
-            const field = meta?.target?.[0] || "Campo";
-
-            throw new AccountAlreadyExistsError(field);
-        }
+    if (voluntaryWithSamePhone || institutionWithSamePhone) {
+      return reply.status(400).send({ message: "Telefone já está em uso" });
     }
+
+    if (institutionWithSameCnpj) {
+      return reply.status(400).send({ message: "CNPJ já está em uso" });
+    }
+
+    const parsed = createInstitutionSchema.parse({
+      ...body,
+      logoUrl,
+    });
+
+    const institution = await createInstitution(parsed);
+
+    return reply.code(201).send(institution);
+  } catch (err) {
+    if (
+      err instanceof PrismaClientKnownRequestError &&
+      err.code === "P2002"
+    ) {
+      const meta = err.meta as { target?: string[] };
+      const field = meta?.target?.[0] || "Campo";
+
+      throw new AccountAlreadyExistsError(field);
+    }
+
+    return reply.status(500).send({
+      error: "Erro ao criar instituição",
+      details: err,
+    });
+  }
 }
 
 export async function loginInstitutionHandler(

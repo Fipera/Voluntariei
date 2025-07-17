@@ -7,7 +7,6 @@ async function voluntaryRoutes(server: FastifyInstance) {
         "/",
         {
             schema: {
-                body: $ref("createVoluntarySchema"),
                 response: { 201: $ref("createVoluntaryResponseSchema") },
             },
         },

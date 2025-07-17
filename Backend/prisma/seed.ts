@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// Os 25 "slugs" exatamente iguais aos que o app envia
 const skills = [
   // 📘 Educação
   "educacao-reforco-escolar",

@@ -23,34 +23,40 @@ import fs from "fs";
 import { promisify } from "util";
 import { pipeline } from "stream";
 
-
 const pump = promisify(pipeline);
 
 export async function registerVoluntaryHandler(
     request: FastifyRequest,
     reply: FastifyReply
 ) {
-    const body: Record<string, any> = {};
+    let body: Record<string, any> = {};
     let logoUrl = "";
 
-    // Cria pasta de uploads se não existir
-    const uploadsDir = path.join(__dirname, "..", "..", "uploads");
-    if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir, { recursive: true });
-    }
+    const contentType = request.headers["content-type"];
 
-    //  Processa multipart/form-data
-    const parts = request.parts();
-    for await (const part of parts) {
-        if (part.type === "file" && part.fieldname === "logo") {
-            const filename = `${Date.now()}-${part.filename}`;
-            const filePath = path.join(uploadsDir, filename);
-
-            await pump(part.file, fs.createWriteStream(filePath));
-            logoUrl = `/uploads/${filename}`;
-        } else if (part.type === "field") {
-            body[part.fieldname] = part.value;
+    // Se for multipart
+    if (contentType?.includes("multipart/form-data")) {
+        const uploadsDir = path.join(__dirname, "..", "..", "uploads");
+        if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
         }
+
+        const parts = request.parts();
+        for await (const part of parts) {
+            if (part.type === "file" && part.fieldname === "logo") {
+                const filename = `${Date.now()}-${part.filename}`;
+                const filePath = path.join(uploadsDir, filename);
+
+                await pump(part.file, fs.createWriteStream(filePath));
+                logoUrl = `/uploads/${filename}`;
+            } else if (part.type === "field") {
+                body[part.fieldname] = part.value;
+            }
+        }
+    } else {
+        // Se for JSON puro
+        body = request.body as Record<string, any>;
+        logoUrl = body.logoUrl || "";
     }
 
     try {
@@ -76,26 +82,30 @@ export async function registerVoluntaryHandler(
                 .send({ message: "Telefone já está em uso" });
         }
 
+        if (typeof body.skills === "string") {
+            try {
+                body.skills = JSON.parse(body.skills);
+            } catch {
+                body.skills = [];
+            }
+        }
 
         const parsed = createVoluntarySchema.parse({
             ...body,
             logoUrl,
         });
 
-        const institution = await createVoluntary(parsed);
+        const voluntary = await createVoluntary(parsed);
 
-        return reply.code(201).send(institution);
+        return reply.code(201).send({
+            ...voluntary,
+            skills: voluntary.skills.map((skill) => skill.name),
+        });
     } catch (err) {
-        if (
-            err instanceof PrismaClientKnownRequestError &&
-            err.code === "P2002"
-        ) {
-            const meta = err.meta as { target?: string[] };
-
-            const field = meta?.target?.[0] || "Campo";
-
-            throw new AccountAlreadyExistsError(field);
-        }
+        console.error(err);
+        return reply
+            .status(400)
+            .send({ error: "Erro ao criar voluntário", details: err });
     }
 }
 

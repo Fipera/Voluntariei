@@ -15,8 +15,9 @@ export const SkillCheckbox = ({
   toggleSkill: (value: string) => void;
 }) => {
   return (
-    <Box className="border border-blue-dark shadow-shadow rounded-lg p-4 flex-row items-center">
+    <Box className="w-full border border-blue-dark shadow-shadow rounded-lg p-4 flex-row flex-wrap items-start gap-2">
       <Checkbox
+        className="flex-row items-start flex-1" 
         value={value}
         isChecked={selectedSkills.includes(value)}
         onChange={() => toggleSkill(value)}
@@ -27,10 +28,11 @@ export const SkillCheckbox = ({
             className="text-white data-[state=unchecked]:hidden"
           />
         </CheckboxIndicator>
-        <CheckboxLabel>
+         <CheckboxLabel className="flex-1">
           <Text
             size="xl"
             className="font-PoppinsBold text-blue-dark"
+         
           >
             {label}
           </Text>
