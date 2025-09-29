@@ -25,7 +25,7 @@ import { useRouter } from "expo-router";
 import { AlertCircle, Eye, EyeOff, Lock, Mail } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export function SignupInstitutionSecondStage() {
@@ -84,26 +84,78 @@ export function SignupInstitutionSecondStage() {
                     contentContainerStyle={{ flexGrow: 1 }}
                     keyboardShouldPersistTaps="handled"
                 >
-                    <VStack className="flex-1 items-center justify-between px-4 pb-6">
-                        <VStack className="flex-1 items-center justify-start">
+                    <VStack
+                        style={{
+                            flex: 1,
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            paddingHorizontal: 16,
+                            paddingBottom: 24,
+                        }}
+                    >
+                        <View style={{ width: "100%", alignItems: "center" }}>
                             <Stepper etapaAtual={2} />
 
                             <Text
-                                size="xl"
-                                className="font-PoppinsBold text-blue-dark text-center mt-6"
+                                style={{
+                                    marginTop: 12,
+                                    alignSelf: "center",
+                                    fontFamily: "Nunito-Bold",
+                                    fontSize: 16,
+                                    lineHeight: 22,
+                                    color: "#173663",
+                                }}
                             >
                                 Etapa 2 de 3
                             </Text>
-
                             <Text
-                                size="2xl"
-                                className="font-PoppinsBold text-blue-dark text-center mt-10"
+                                style={{
+                                    marginTop: 24,
+                                    alignSelf: "center",
+                                    fontFamily: "Nunito-Bold",
+                                    fontSize: 28,
+                                    lineHeight: 38,
+                                    color: "#173663",
+                                    textAlign: "center",
+                                }}
                             >
                                 Endereço
                             </Text>
+                            <Text
+                                style={{
+                                    marginTop: 8,
+                                    alignSelf: "center",
+                                    fontFamily: "Nunito-Regular",
+                                    fontSize: 16,
+                                    lineHeight: 22,
+                                    color: "#000",
+                                    textAlign: "center",
+                                }}
+                            >
+                                Informe o endereço da sua instituição
+                            </Text>
+                        </View>
 
+                        <View
+                            style={{
+                                marginTop: 16,
+                                width: "100%",
+                                maxWidth: 350,
+                                alignSelf: "center",
+                                gap: 16,
+                            }}
+                        >
                             <FormControl isInvalid={!!errors.cep}>
-                                <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
+                                <Text
+                                    style={{
+                                        fontFamily: "Nunito-Bold",
+                                        fontSize: 16,
+                                        lineHeight: 22,
+                                        color: "#173663",
+                                        marginLeft: 4,
+                                        marginBottom: 8,
+                                    }}
+                                >
                                     CEP
                                 </Text>
 
@@ -116,7 +168,19 @@ export function SignupInstitutionSecondStage() {
                                         <Input
                                             variant="rounded"
                                             size="sm"
-                                            className="w-full max-w-[280px] h-12 bg-white border border-input-border shadow-shadow rounded-[12px] mt-2"
+                                            style={{
+                                                width: "100%",
+                                                height: 43,
+                                                backgroundColor: "#FDFDFD",
+                                                borderColor: "#B7B7B7",
+                                                borderWidth: 1,
+                                                borderRadius: 8,
+                                                shadowColor: "#000",
+                                                shadowOffset: { width: 0, height: 2 },
+                                                shadowOpacity: 0.25,
+                                                shadowRadius: 2,
+                                                elevation: 2,
+                                            }}
                                         >
                                             <HStack className="items-center justify-start ml-3">
                                                 <InputField
@@ -164,76 +228,51 @@ export function SignupInstitutionSecondStage() {
                                 )}
                             </FormControl>
 
-                            <FormControl isInvalid={!!errors.street}>
-                                <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
-                                    Rua
-                                </Text>
-
-                                <Controller
-                                    control={control}
-                                    name="street"
-                                    render={({
-                                        field: { onChange, value },
-                                    }) => (
-                                        <Input
-                                            variant="rounded"
-                                            size="sm"
-                                            className="w-full max-w-[280px] h-12 bg-white border border-input-border shadow-shadow rounded-[12px] mt-2"
-                                        >
-                                            <HStack className="items-center justify-start ml-3">
-                                                <InputField
-                                                    keyboardType="default"
-                                                    className=""
-                                                    value={value}
-                                                    onChangeText={(text) => {
-                                                        onChange(text);
-                                                        setErrorMessage("");
-                                                    }}
-                                                />
-                                            </HStack>
-                                        </Input>
-                                    )}
-                                />
-                                {errors.street && (
-                                    <FormControlError>
-                                        <FormControlErrorIcon
-                                            as={AlertCircle}
-                                        />
-                                        <FormControlErrorText>
-                                            {errors.street.message}
-                                        </FormControlErrorText>
-                                    </FormControlError>
-                                )}
-                            </FormControl>
-
-                            <HStack className="flex-row gap-x-4">
-                                {/* Bairro (maior) */}
-                                <FormControl
-                                    isInvalid={!!errors.neighborhood}
-                                    className="w-[160px]"
-                                >
-                                    <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
-                                        Bairro
+                            {/* Endereço + Nº */}
+                            <HStack
+                                className="flex-row gap-x-4"
+                                style={{ width: "100%", justifyContent: "space-between" }}
+                            >
+                                <FormControl isInvalid={!!errors.street} style={{ width: "70%" }}>
+                                    <Text
+                                        style={{
+                                            fontFamily: "Nunito-Bold",
+                                            fontSize: 16,
+                                            lineHeight: 22,
+                                            color: "#173663",
+                                            marginLeft: 4,
+                                            marginBottom: 8,
+                                        }}
+                                    >
+                                        Endereço
                                     </Text>
                                     <Controller
                                         control={control}
-                                        name="neighborhood"
-                                        render={({
-                                            field: { onChange, value },
-                                        }) => (
+                                        name="street"
+                                        render={({ field: { onChange, value } }) => (
                                             <Input
                                                 variant="rounded"
                                                 size="sm"
-                                                className="h-12 bg-white border border-input-border shadow-shadow rounded-[12px]"
+                                                style={{
+                                                    width: "100%",
+                                                    height: 43,
+                                                    backgroundColor: "#FDFDFD",
+                                                    borderColor: "#B7B7B7",
+                                                    borderWidth: 1,
+                                                    borderRadius: 8,
+                                                    shadowColor: "#000",
+                                                    shadowOffset: { width: 0, height: 2 },
+                                                    shadowOpacity: 0.25,
+                                                    shadowRadius: 2,
+                                                    elevation: 2,
+                                                }}
                                             >
                                                 <HStack className="items-center justify-start ml-3">
                                                     <InputField
                                                         keyboardType="default"
                                                         className=""
                                                         value={value}
-                                                        onChangeText={(
-                                                            text
-                                                        ) => {
+                                                        onChangeText={(text) => {
                                                             onChange(text);
                                                             setErrorMessage("");
                                                         }}
@@ -242,45 +281,56 @@ export function SignupInstitutionSecondStage() {
                                             </Input>
                                         )}
                                     />
-                                    {errors.neighborhood && (
+                                    {errors.street && (
                                         <FormControlError>
-                                            <FormControlErrorIcon
-                                                as={AlertCircle}
-                                            />
+                                            <FormControlErrorIcon as={AlertCircle} />
                                             <FormControlErrorText>
-                                                {errors.neighborhood.message}
+                                                {errors.street.message}
                                             </FormControlErrorText>
                                         </FormControlError>
                                     )}
                                 </FormControl>
 
-                                {/* Telefone (menor) */}
-                                <FormControl
-                                    isInvalid={!!errors.numberHouse}
-                                    className="w-[100px]"
-                                >
-                                    <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
-                                        numero
+                                <FormControl isInvalid={!!errors.numberHouse} style={{ width: "30%" }}>
+                                    <Text
+                                        style={{
+                                            fontFamily: "Nunito-Bold",
+                        fontSize: 16,
+                        lineHeight: 22,
+                        color: "#173663",
+                        marginLeft: 4,
+                        marginBottom: 8,
+                                        }}
+                                    >
+                                        Nº
                                     </Text>
                                     <Controller
                                         control={control}
                                         name="numberHouse"
-                                        render={({
-                                            field: { onChange, value },
-                                        }) => (
+                                        render={({ field: { onChange, value } }) => (
                                             <Input
                                                 variant="rounded"
                                                 size="sm"
-                                                className="h-12 bg-white border border-input-border shadow-shadow rounded-[12px]"
+                                                style={{
+                                                    width: "100%",
+                                                    height: 43,
+                                                    backgroundColor: "#FDFDFD",
+                                                    borderColor: "#B7B7B7",
+                                                    borderWidth: 1,
+                                                    borderRadius: 8,
+                                                    shadowColor: "#000",
+                                                    shadowOffset: { width: 0, height: 2 },
+                                                    shadowOpacity: 0.25,
+                                                    shadowRadius: 2,
+                                                    elevation: 2,
+                                                }}
                                             >
                                                 <HStack className="items-center justify-start ml-3">
                                                     <InputField
                                                         keyboardType="number-pad"
                                                         className=""
                                                         value={value}
-                                                        onChangeText={(
-                                                            text
-                                                        ) => {
+                                                        onChangeText={(text) => {
                                                             onChange(text);
                                                             setErrorMessage("");
                                                         }}
@@ -291,9 +341,7 @@ export function SignupInstitutionSecondStage() {
                                     />
                                     {errors.numberHouse && (
                                         <FormControlError>
-                                            <FormControlErrorIcon
-                                                as={AlertCircle}
-                                            />
+                                            <FormControlErrorIcon as={AlertCircle} />
                                             <FormControlErrorText>
                                                 {errors.numberHouse.message}
                                             </FormControlErrorText>
@@ -302,21 +350,40 @@ export function SignupInstitutionSecondStage() {
                                 </FormControl>
                             </HStack>
 
-                            <FormControl isInvalid={!!errors.city}>
-                                <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
-                                    Cidade
+                            {/* Bairro */}
+                            <FormControl isInvalid={!!errors.neighborhood}>
+                                <Text
+                                    style={{
+                                        fontFamily: "Nunito-Bold",
+                                        fontSize: 16,
+                                        lineHeight: 22,
+                                        color: "#173663",
+                                        marginLeft: 4,
+                                        marginBottom: 8,
+                                    }}
+                                >
+                                    Bairro
                                 </Text>
-
                                 <Controller
                                     control={control}
-                                    name="city"
-                                    render={({
-                                        field: { onChange, value },
-                                    }) => (
+                                    name="neighborhood"
+                                    render={({ field: { onChange, value } }) => (
                                         <Input
                                             variant="rounded"
                                             size="sm"
-                                            className="w-full max-w-[280px] h-12 bg-white border border-input-border shadow-shadow rounded-[12px] mt-2"
+                                            style={{
+                                                width: "100%",
+                                                height: 43,
+                                                backgroundColor: "#FDFDFD",
+                                                borderColor: "#B7B7B7",
+                                                borderWidth: 1,
+                                                borderRadius: 8,
+                                                shadowColor: "#000",
+                                                shadowOffset: { width: 0, height: 2 },
+                                                shadowOpacity: 0.25,
+                                                shadowRadius: 2,
+                                                elevation: 2,
+                                            }}
                                         >
                                             <HStack className="items-center justify-start ml-3">
                                                 <InputField
@@ -332,77 +399,196 @@ export function SignupInstitutionSecondStage() {
                                         </Input>
                                     )}
                                 />
-                                {errors.city && (
+                                {errors.neighborhood && (
                                     <FormControlError>
-                                        <FormControlErrorIcon
-                                            as={AlertCircle}
-                                        />
+                                        <FormControlErrorIcon as={AlertCircle} />
                                         <FormControlErrorText>
-                                            {errors.city.message}
+                                            {errors.neighborhood.message}
                                         </FormControlErrorText>
                                     </FormControlError>
                                 )}
                             </FormControl>
 
-                            <FormControl isInvalid={!!errors.state}>
-                                <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
-                                    Estado
-                                </Text>
-
-                                <Controller
-                                    control={control}
-                                    name="state"
-                                    render={({
-                                        field: { onChange, value },
-                                    }) => (
-                                        <Input
-                                            variant="rounded"
-                                            size="sm"
-                                            className="w-full max-w-[280px] h-12 bg-white border border-input-border shadow-shadow rounded-[12px] mt-2"
-                                        >
-                                            <HStack className="items-center justify-start ml-3">
-                                                <InputField
-                                                    keyboardType="default"
-                                                    className=""
-                                                    value={value}
-                                                    onChangeText={(text) => {
-                                                        onChange(text);
-                                                        setErrorMessage("");
-                                                    }}
-                                                />
-                                            </HStack>
-                                        </Input>
+                            {/* Cidade + Estado */}
+                            <HStack
+                                className="flex-row gap-x-4"
+                                style={{ width: "100%", justifyContent: "space-between" }}
+                            >
+                                <FormControl isInvalid={!!errors.city} style={{ width: "60%" }}>
+                                    <Text
+                                        style={{
+                                            fontFamily: "Nunito-Bold",
+                                            fontSize: 16,
+                                            lineHeight: 22,
+                                            color: "#173663",
+                                            marginLeft: 4,
+                                            marginBottom: 8,
+                                        }}
+                                    >
+                                        Cidade
+                                    </Text>
+                                    <Controller
+                                        control={control}
+                                        name="city"
+                                        render={({ field: { onChange, value } }) => (
+                                            <Input
+                                                variant="rounded"
+                                                size="sm"
+                                                style={{
+                                                    width: "100%",
+                                                    height: 43,
+                                                    backgroundColor: "#FDFDFD",
+                                                    borderColor: "#B7B7B7",
+                                                    borderWidth: 1,
+                                                    borderRadius: 8,
+                                                    shadowColor: "#000",
+                                                    shadowOffset: { width: 0, height: 2 },
+                                                    shadowOpacity: 0.25,
+                                                    shadowRadius: 2,
+                                                    elevation: 2,
+                                                }}
+                                            >
+                                                <HStack className="items-center justify-start ml-3">
+                                                    <InputField
+                                                        keyboardType="default"
+                                                        className=""
+                                                        value={value}
+                                                        onChangeText={(text) => {
+                                                            onChange(text);
+                                                            setErrorMessage("");
+                                                        }}
+                                                    />
+                                                </HStack>
+                                            </Input>
+                                        )}
+                                    />
+                                    {errors.city && (
+                                        <FormControlError>
+                                            <FormControlErrorIcon as={AlertCircle} />
+                                            <FormControlErrorText>
+                                                {errors.city.message}
+                                            </FormControlErrorText>
+                                        </FormControlError>
                                     )}
-                                />
-                                {errors.state && (
-                                    <FormControlError>
-                                        <FormControlErrorIcon
-                                            as={AlertCircle}
-                                        />
-                                        <FormControlErrorText>
-                                            {errors.state.message}
-                                        </FormControlErrorText>
-                                    </FormControlError>
-                                )}
-                            </FormControl>
+                                </FormControl>
 
+                                <FormControl isInvalid={!!errors.state} style={{ width: "30%" }}>
+                                    <Text
+                                        style={{
+                                            fontFamily: "Nunito-Bold",
+                                            fontSize: 16,
+                                            lineHeight: 22,
+                                            color: "#173663",
+                                            marginLeft: 4,
+                                            marginBottom: 8,
+                                        }}
+                                    >
+                                        Estado
+                                    </Text>
+                                    <Controller
+                                        control={control}
+                                        name="state"
+                                        render={({ field: { onChange, value } }) => (
+                                            <Input
+                                                variant="rounded"
+                                                size="sm"
+                                                style={{
+                                                    width: "100%",
+                                                    height: 43,
+                                                    backgroundColor: "#FDFDFD",
+                                                    borderColor: "#B7B7B7",
+                                                    borderWidth: 1,
+                                                    borderRadius: 8,
+                                                    shadowColor: "#000",
+                                                    shadowOffset: { width: 0, height: 2 },
+                                                    shadowOpacity: 0.25,
+                                                    shadowRadius: 2,
+                                                    elevation: 2,
+                                                }}
+                                            >
+                                                <HStack className="items-center justify-start ml-3">
+                                                    <InputField
+                                                        keyboardType="default"
+                                                        className=""
+                                                        value={value}
+                                                        onChangeText={(text) => {
+                                                            onChange(text);
+                                                            setErrorMessage("");
+                                                        }}
+                                                    />
+                                                </HStack>
+                                            </Input>
+                                        )}
+                                    />
+                                    {errors.state && (
+                                        <FormControlError>
+                                            <FormControlErrorIcon as={AlertCircle} />
+                                            <FormControlErrorText>
+                                                {errors.state.message}
+                                            </FormControlErrorText>
+                                        </FormControlError>
+                                    )}
+                                </FormControl>
+                            </HStack>
+
+                        </View>
+
+                        <View style={{ width: "100%", alignItems: "center", gap: 12 }}>
+                            {/* Button */}
                             <Button
                                 onPress={handleSubmit(onSubmit)}
                                 disabled={isLoading}
-                                className="min-w-[300px] max-w-[350px] h-[44px] bg-blue-dark rounded-[12px] shadow-shadow flex-row items-center justify-center mt-12"
+                                style={{
+                                    height: 44,
+                                    backgroundColor: "#173663",
+                                    borderRadius: 12,
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    padding: 10,
+                                }}
                             >
                                 {isLoading ? (
                                     <Spinner />
                                 ) : (
-                                    <Text className="text-white font-InterBold">
+                                    <Text
+                                        style={{
+                                            fontFamily: "Nunito-Bold",
+                                            fontSize: 18,
+                                            lineHeight: 25,
+                                            color: "#FFFFFF",
+                                        }}
+                                    >
                                         Próximo
                                     </Text>
                                 )}
                             </Button>
-                        </VStack>
+
+                            {/* Footer image + helper */}
+                            <View style={{ alignItems: "center", gap: 8 }}>
+                                <Image
+                                    alt="local"
+                                    style={{ width: 74, height: 42 }}
+                                    source={require("@/assets/images/signin/local.png")}
+                                />
+                                <Text
+                                    style={{
+                                        fontFamily: "Nunito-Regular",
+                                        fontSize: 16,
+                                        lineHeight: 22,
+                                        color: "#000",
+                                        textAlign: "center",
+                                    }}
+                                >
+                                    {`Digite o CEP para preencher\nos campos automaticamente`}
+                                </Text>
+                            </View>
+                        </View>
                     </VStack>
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
+

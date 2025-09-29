@@ -7,4 +7,4 @@ import { SignupInstitutionSecondStage } from "@/screens/SignupInstitution/Second
 import { SignupVoluntaryFirstStage } from "@/screens/SignupVoluntary/FirstStage";
 import { SignupVoluntarySecondStage } from "@/screens/SignupVoluntary/SecondStage";
 
-export default () => <Home/>
+export default () => <SignupVoluntaryFirstStage/>

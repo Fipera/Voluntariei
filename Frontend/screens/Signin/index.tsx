@@ -14,7 +14,7 @@ import { VStack } from "@/components/ui/vstack";
 import { useRouter } from "expo-router";
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react-native";
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, Dimensions } from "react-native";
 import api from "@/services/api";
 import { AppError } from "@/utils/AppError";
 import {
@@ -37,6 +37,10 @@ export default () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const { width: SCREEN_WIDTH } = Dimensions.get("window");
+    const H_PADDING = 24; // screen horizontal padding
+    const MAX_CONTENT_WIDTH = 310; // as per design
+    const contentWidth = Math.min(MAX_CONTENT_WIDTH, SCREEN_WIDTH - H_PADDING * 2);
 
     const {
         control,
@@ -93,24 +97,51 @@ export default () => {
                     contentContainerStyle={{ flexGrow: 1 }}
                     keyboardShouldPersistTaps="handled"
                 >
-                    <VStack className="flex-1 items-center justify-between px-4 pb-8">
-                        <VStack className="flex-1 items-center justify-center">
+                    <VStack
+                        style={{
+                            flex: 1,
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            paddingHorizontal: 16,
+                            paddingBottom: 32,
+                        }}
+                    >
+                        <VStack style={{ flex: 1, alignItems: "center", justifyContent: "center", width: "100%" }}>
                             <Image
                                 size="xl"
                                 source={require("/assets/images/signin/logo-voluntariei.png")}
                                 alt="Logo"
+                                style={{ width: 162, height: 160, marginTop: 24, marginBottom: 16 }}
                             />
 
                             <Text
-                                size="2xl"
-                                className="font-PoppinsBold text-blue-dark text-center mt-6"
+                                size="lg"
+                                style={{
+                                    width: Math.min(310, SCREEN_WIDTH - 32),
+                                    height: 38,
+                                    fontFamily: "Nunito-Bold",
+                                    fontSize: 28,
+                                    lineHeight: 38,
+                                    textAlign: "center",
+                                    color: "#173663",
+                                    marginTop: 8,
+                                }}
                             >
                                 Acesse sua Conta
                             </Text>
 
                             <FormControl isInvalid={!!errors.email}>
-                                <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
-                                    Email
+                                <Text
+                                    style={{
+                                        marginTop: 16,
+                                        marginLeft: 4,
+                                        fontFamily: "Nunito-Bold",
+                                        fontSize: 16,
+                                        lineHeight: 22,
+                                        color: "#173663",
+                                    }}
+                                >
+                                    E-mail
                                 </Text>
 
                                 <Controller
@@ -122,17 +153,32 @@ export default () => {
                                         <Input
                                             variant="rounded"
                                             size="sm"
-                                            className="w-full max-w-[280px] h-12 bg-white border border-input-border shadow-shadow rounded-[12px] mt-2"
+                                            style={{
+                                                width: contentWidth,
+                                                height: 43,
+                                                backgroundColor: "#FDFDFD",
+                                                borderColor: "#B7B7B7",
+                                                borderWidth: 1,
+                                                borderRadius: 8,
+                                                marginTop: 8,
+                                                // shadow iOS
+                                                shadowColor: "#000",
+                                                shadowOffset: { width: 0, height: 2 },
+                                                shadowOpacity: 0.25,
+                                                shadowRadius: 2,
+                                                // elevation Android
+                                                elevation: 2,
+                                            }}
                                         >
-                                            <HStack className="items-center justify-start ml-3">
+                                            <HStack style={{ alignItems: "center", justifyContent: "flex-start", marginLeft: 12, width: "100%" }}>
                                                 <InputField
                                                     keyboardType="email-address"
-                                                    className=""
                                                     value={value}
                                                     onChangeText={(text) => {
                                                         onChange(text);
                                                         setErrorMessage("");
                                                     }}
+                                                    style={{ width: "100%" }}
                                                 />
                                             </HStack>
                                         </Input>
@@ -150,11 +196,16 @@ export default () => {
                                 )}
                             </FormControl>
 
-                            <FormControl
-                                isInvalid={!!errors.password}
-                                className="mt-3"
-                            >
-                                <Text className="text-sm text-blue-dark font-PoppinsBold mt- ml-1">
+                            <FormControl isInvalid={!!errors.password} style={{ marginTop: 12 }}>
+                                <Text
+                                    style={{
+                                        marginLeft: 4,
+                                        fontFamily: "Nunito-Bold",
+                                        fontSize: 16,
+                                        lineHeight: 22,
+                                        color: "#173663",
+                                    }}
+                                >
                                     Senha
                                 </Text>
                                 <Controller
@@ -166,41 +217,42 @@ export default () => {
                                         <Input
                                             variant="rounded"
                                             size="sm"
-                                            className="w-full max-w-[280px] h-12 bg-white border border-input-border shadow-shadow rounded-[12px] mt-2"
+                                            style={{
+                                                width: contentWidth,
+                                                height: 43,
+                                                backgroundColor: "#FDFDFD",
+                                                borderColor: "#B7B7B7",
+                                                borderWidth: 1,
+                                                borderRadius: 8,
+                                                marginTop: 8,
+                                                shadowColor: "#000",
+                                                shadowOffset: { width: 0, height: 2 },
+                                                shadowOpacity: 0.25,
+                                                shadowRadius: 2,
+                                                elevation: 2,
+                                            }}
                                         >
-                                            <HStack className="items-center justify-start ml-3">
+                                            <HStack style={{ alignItems: "center", justifyContent: "flex-start", marginLeft: 12, marginRight: 8, width: "100%" }}>
                                                 <InputField
-                                                    secureTextEntry={
-                                                        !showPassword
-                                                    }
-                                                    className=""
+                                                    secureTextEntry={!showPassword}
                                                     value={value}
                                                     onChangeText={(text) => {
                                                         onChange(text);
                                                         setErrorMessage("");
                                                     }}
+                                                    style={{ flex: 1 }}
                                                 />
                                                 <Button
                                                     variant="link"
                                                     action="default"
-                                                    className="bg-transparent p-0 mr-2"
-                                                    onPress={() =>
-                                                        setShowPassword(
-                                                            !showPassword
-                                                        )
-                                                    }
+                                                    onPress={() => setShowPassword(!showPassword)}
+                                                    style={{ backgroundColor: "transparent", padding: 0, marginRight: 0 }}
                                                 >
                                                     <ButtonIcon
-                                                        as={
-                                                            showPassword
-                                                                ? EyeOff
-                                                                : Eye
-                                                        }
-                                                        className={`w-6 h-6 ${
-                                                            showPassword
-                                                                ? "text-blue-dark"
-                                                                : "text-grey-dark"
-                                                        }`}
+                                                        as={showPassword ? EyeOff : Eye}
+                                                        color={showPassword ? "#173663" : "#6B7280"}
+                                                        width={24}
+                                                        height={24}
                                                     />
                                                 </Button>
                                             </HStack>
@@ -219,16 +271,16 @@ export default () => {
                                 )}
                             </FormControl>
 
-                            <HStack className="w-full max-w-[280px] items-center">
-                                <HStack className="flex-1 items-center justify-start">
+                            <HStack style={{ width: contentWidth, alignItems: "center", marginTop: 8 }}>
+                                <HStack style={{ flex: 1, alignItems: "center", justifyContent: "flex-start" }}>
                                     <Checkbox value="invison">
-                                        <CheckboxIndicator className="w-[12px] h-[12px]">
+                                        <CheckboxIndicator style={{ width: 12, height: 12 }}>
                                             <CheckboxIcon
                                                 as={CheckIcon}
                                                 size="sm"
                                             />
                                         </CheckboxIndicator>
-                                        <CheckboxLabel className="text-sm font-PoppinsRegular">
+                                        <CheckboxLabel style={{ fontSize: 14, fontFamily: "Nunito" }}>
                                             Lembrar de mim
                                         </CheckboxLabel>
                                     </Checkbox>
@@ -237,9 +289,9 @@ export default () => {
                                 <Button
                                     variant="link"
                                     action="default"
-                                    className="ml-auto p-0"
+                                    style={{ marginLeft: "auto", padding: 0 }}
                                 >
-                                    <ButtonText className="text-blue-dark text-sm font-PoppinsRegular">
+                                    <ButtonText style={{ color: "#173663", fontSize: 14, fontFamily: "Nunito" }}>
                                         Esqueci minha senha
                                     </ButtonText>
                                 </Button>
@@ -254,22 +306,31 @@ export default () => {
                             <Button
                                 onPress={handleSubmit(handleLogin)}
                                 disabled={isLoading}
-                                className="min-w-[300px] max-w-[350px] h-[44px] bg-blue-dark rounded-[12px] shadow-shadow flex-row items-center justify-center mt-4"
+                                style={{
+                                    width: contentWidth,
+                                    height: 45,
+                                    backgroundColor: "#173663",
+                                    borderRadius: 12,
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    marginTop: 20,
+                                }}
                             >
                                 {isLoading ? (
                                     <Spinner />
                                 ) : (
-                                    <Text className="text-white font-InterBold">
+                                    <Text style={{ color: "#FFFFFF", fontFamily: "Nunito-Bold", fontSize: 18, lineHeight: 25 }}>
                                         Entrar
                                     </Text>
                                 )}
                             </Button>
                         </VStack>
 
-                        <VStack className="items-center mt-2">
+                        <VStack style={{ alignItems: "center", marginTop: 8 }}>
                             <Text
                                 size="sm"
-                                className="text-grey-light font-PoppinsRegular"
+                                style={{ color: "#B7B7B7", fontFamily: "Nunito", fontWeight: "500", fontSize: 14, lineHeight: 19 }}
                             >
                                 Não possui uma conta?
                             </Text>
@@ -277,12 +338,12 @@ export default () => {
                             <Button
                                 variant="link"
                                 action="default"
-                                className="p-2 m-0"
+                                style={{ padding: 8, margin: 0 }}
                                 onPress={() => router.push("/home")}
                             >
                                 <ButtonText
                                     size="sm"
-                                    className="text-blue-dark font-PoppinsMedium"
+                                    style={{ color: "#173663", fontFamily: "Nunito-Bold", fontSize: 16, lineHeight: 22, textDecorationLine: "underline", textAlign: "center" }}
                                 >
                                     Cadastre-se
                                 </ButtonText>

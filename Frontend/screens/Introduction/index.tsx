@@ -9,53 +9,114 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Dimensions, View } from "react-native";
 
 export default () => {
     const router = useRouter();
+    const { width: SCREEN_WIDTH } = Dimensions.get("window");
+    // Illustration responsive sizing (max 374 x 389.29)
+    const HORIZONTAL_PADDING = 16; // px-4
+    const maxImgWidth = 374;
+    const desiredImgWidth = Math.min(maxImgWidth, SCREEN_WIDTH - HORIZONTAL_PADDING * 2);
+    const imgAspect = 389.29 / 374; // height/width
+    const desiredImgHeight = desiredImgWidth * imgAspect;
     return (
         <SafeAreaView
             style={{ flex: 1, backgroundColor: "#f7f7f7" }}
             edges={["top", "left", "right", "bottom"]}
         >
-            <VStack className="flex-1 items-center justify-between px-4 pb-8">
-                <VStack className="flex-1 items-center justify-center max-h-[600px]">
+            <VStack
+                style={{
+                    flex: 1,
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    paddingHorizontal: HORIZONTAL_PADDING,
+                    paddingBottom: 32, // pb-8
+                }}
+            >
+                <VStack
+                    style={{
+                        flex: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        maxHeight: 600,
+                        width: "100%",
+                    }}
+                >
                     <Image
                         size="3xl"
                         source={require("/assets/images/signin/Img-Voluntario.png")}
-                        alt="Logo"
+                        alt="img-onboarding"
+                        style={{
+                            width: desiredImgWidth,
+                            height: desiredImgHeight,
+                            alignSelf: "stretch",
+                        }}
                     />
 
                     <Text
                         size="4xl"
-                        className="font-PoppinsBold text-blue-dark text-center mt-12"
+                        style={{
+                            marginTop: 24,
+                            width: "100%",
+                            maxWidth: 374,
+                            height: 38,
+                            fontFamily: "Nunito-Bold",
+                            fontSize: 28,
+                            lineHeight: 38,
+                            textAlign: "center",
+                            color: "#173663",
+                            alignSelf: "stretch",
+                        }}
                     >
                         Faça a Diferença
                     </Text>
 
                     <Text
                         size="xl"
-                        className="font-PoppinsRegular text-grey-light text-center mt-6"
+                        style={{
+                            marginTop: 16,
+                            width: "100%",
+                            maxWidth: 374,
+                            height: 44,
+                            fontFamily: "Nunito-SemiBold",
+                            fontSize: 16,
+                            lineHeight: 22,
+                            color: "#080808",
+                            textAlign: "center",
+                            alignSelf: "stretch",
+                        }}
                     >
-                        Participe como voluntário ou {"\n"}
-                        conecte sua instituição com {"\n"}
-                        quem precisa.
+                        Participe como voluntário ou conecte sua instituição com quem precisa.
                     </Text>
-                     </VStack>
+                </VStack>
 
-                    <Button
-                        className="w-[62px] h-[62px] bg-blue-dark rounded-full p-[10px] justify-center items-center"
-                        variant="solid"
-                        size="lg"
-                        onPress={() => router.push("/home")}
-                    >
-                        <ButtonIcon
-                            as={ArrowRightIcon}
-                            height={42}
-                            width={42}
-                            className="text-white"
-                        />
-                    </Button>
-               
+                <Button
+                    variant="solid"
+                    size="lg"
+                    style={{
+                        width: 64,
+                        height: 64,
+                        backgroundColor: "#173663",
+                        borderRadius: 16,
+                        padding: 0,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        // shadow (iOS)
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 4 },
+                        shadowOpacity: 0.15,
+                        shadowRadius: 8,
+                        // elevation (Android)
+                        elevation: 6,
+                    }}
+                    onPress={() => router.push("/home")}
+                >
+                    <View style={{ padding: 16 }}>
+                        <ButtonIcon as={ArrowRightIcon} color="#FFFFFF" width={24} height={24} />
+                    </View>
+                </Button>
+
             </VStack>
         </SafeAreaView>
     );

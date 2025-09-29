@@ -48,17 +48,30 @@ function AppRoutes() {
     );
 }
 
-
-
 export default function RootLayout() {
     const [loaded] = useFonts({
-        SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-        "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
-        "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
-        "Poppins-Medium": require("../assets/fonts/Poppins-Medium.ttf"),
-        "Inter-Bold": require("../assets/fonts/Inter_18pt-Bold.ttf"),
-        "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
-        "Poppins-Italic": require("../assets/fonts/Poppins-Italic.ttf"),
+        "Nunito-Regular": require("../assets/fonts/Nunito-Regular.ttf"),
+        "Nunito-Italic": require("../assets/fonts/Nunito-Italic.ttf"),
+
+        "Nunito-Light": require("../assets/fonts/Nunito-Light.ttf"),
+        "Nunito-LightItalic": require("../assets/fonts/Nunito-LightItalic.ttf"),
+        "Nunito-ExtraLight": require("../assets/fonts/Nunito-ExtraLight.ttf"),
+        "Nunito-ExtraLightItalic": require("../assets/fonts/Nunito-ExtraLightItalic.ttf"),
+
+        "Nunito-Medium": require("../assets/fonts/Nunito-Medium.ttf"),
+        "Nunito-MediumItalic": require("../assets/fonts/Nunito-MediumItalic.ttf"),
+
+        "Nunito-SemiBold": require("../assets/fonts/Nunito-SemiBold.ttf"),
+        "Nunito-SemiBoldItalic": require("../assets/fonts/Nunito-SemiBoldItalic.ttf"),
+
+        "Nunito-Bold": require("../assets/fonts/Nunito-Bold.ttf"),
+        "Nunito-BoldItalic": require("../assets/fonts/Nunito-BoldItalic.ttf"),
+
+        "Nunito-ExtraBold": require("../assets/fonts/Nunito-ExtraBold.ttf"),
+        "Nunito-ExtraBoldItalic": require("../assets/fonts/Nunito-ExtraBoldItalic.ttf"),
+
+        "Nunito-Black": require("../assets/fonts/Nunito-Black.ttf"),
+        "Nunito-BlackItalic": require("../assets/fonts/Nunito-BlackItalic.ttf"),
     });
 
     useEffect(() => {
