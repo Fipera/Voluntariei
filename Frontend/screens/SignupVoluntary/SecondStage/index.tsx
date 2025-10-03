@@ -1,54 +1,20 @@
 import Stepper from "@/components/custom/stepper";
-import { SkillGroupAccordion } from "@/components/custom/voluntaryskills/skillgroupdropdown";
-import { Accordion } from "@/components/ui/accordion";
-import { Box } from "@/components/ui/box";
 import { Button } from "@/components/ui/button";
-import {
-    Checkbox,
-    CheckboxIcon,
-    CheckboxIndicator,
-    CheckboxLabel,
-} from "@/components/ui/checkbox";
-import { Divider } from "@/components/ui/divider";
-import {
-    FormControl,
-    FormControlError,
-    FormControlErrorIcon,
-    FormControlErrorText,
-} from "@/components/ui/form-control";
 import { HStack } from "@/components/ui/hstack";
-import { AddIcon, Icon } from "@/components/ui/icon";
 import { Image } from "@/components/ui/image";
-import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import api from "@/services/api";
 import { useSignupVoluntaryStore } from "@/store/useSignupVoluntaryStore";
-import { formatarCEP } from "@/utils/formatters/format";
-import { SigninFormData, signinSchema } from "@/utils/schemas/signinSchema";
-import {
-    SignupVoluntarySecondStageData,
-    signupVoluntarySecondStageSchema,
-} from "@/utils/schemas/signupVoluntarySchema";
+import { SignupVoluntarySecondStageData, signupVoluntarySecondStageSchema } from "@/utils/schemas/signupVoluntarySchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
-import {
-    AlertCircle,
-    ArrowDown,
-    ArrowRight,
-    CheckIcon,
-    Eye,
-    EyeOff,
-    Lock,
-    Mail,
-    MinusIcon,
-    PlusIcon,
-} from "lucide-react-native";
+import { AlertCircle } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { SKILL_GROUPS } from '@/utils/constants/voluntarySkills';
 
 export function SignupVoluntarySecondStage() {
     const router = useRouter();
@@ -73,13 +39,18 @@ export function SignupVoluntarySecondStage() {
         router.push("/signupVoluntaryThirdStage");
     };
 
+    const MAX_SKILLS = 5;
+
     const toggleSkill = (option: string) => {
-        setSelectedSkills((prev) =>
-            prev.includes(option)
-                ? prev.filter((item) => item !== option)
-                : [...prev, option]
-        );
+        setSelectedSkills((prev) => {
+            const exists = prev.includes(option);
+            if (exists) return prev.filter((i) => i !== option);
+            if (prev.length >= MAX_SKILLS) return prev;
+            return [...prev, option];
+        });
     };
+
+    const skillGroups: { key: string; icon: string; title: string; skills: { value: string; label: string; image?: any }[] }[] = SKILL_GROUPS;
 
     return (
         <SafeAreaView
@@ -95,210 +66,61 @@ export function SignupVoluntarySecondStage() {
                     contentContainerStyle={{ flexGrow: 1 }}
                     keyboardShouldPersistTaps="handled"
                 >
-                    <VStack className="flex-1 items-center justify-between px-4 pb-6">
-                        <VStack className="flex-1 items-center justify-start">
-                            <Stepper etapaAtual={2} />
-                            <Text
-                                size="xl"
-                                className="font-PoppinsBold text-blue-dark text-center mt-6"
-                            >
-                                Etapa 2 de 3
-                            </Text>
-                            <Text
-                                size="2xl"
-                                className="font-PoppinsBold text-blue-dark text-center mt-10"
-                            >
-                                Habilidades
-                            </Text>
-                            <Text
-                                size="md"
-                                className="font-PoppinsBold text-grey-light text-center mt-10"
-                            >
-                                Conte com o que você pode contribuir e {"\n"}{" "}
-                                nós conectamos você com a causa certa.
-                            </Text>
-
-                            <Accordion className="m-10 bg-transparent">
-                                {/* 📘 EDUCAÇÃO */}
-                                <SkillGroupAccordion
-                                    title="📘 Educação"
-                                    value="item-1"
-                                    selectedSkills={selectedSkills}
-                                    toggleSkill={toggleSkill}
-                                    skills={[
-                                        {
-                                            value: "educacao-reforco-escolar",
-                                            label: "Reforço escolar",
-                                        },
-                                        {
-                                            value: "educacao-alfabetizacao-adultos",
-                                            label: "Alfabetização de adultos",
-                                        },
-                                        {
-                                            value: "educacao-informatica-basica",
-                                            label: "Aulas de informática básica",
-                                        },
-                                        {
-                                            value: "educacao-idiomas",
-                                            label: "Ensino de idiomas",
-                                        },
-                                        {
-                                            value: "educacao-orientacao-profissional",
-                                            label: "Orientação profissional",
-                                        },
-                                    ]}
-                                />
-
-                                {/* ❤ SAÚDE */}
-                                <SkillGroupAccordion
-                                    title="❤ Saúde"
-                                    value="item-2"
-                                    selectedSkills={selectedSkills}
-                                    toggleSkill={toggleSkill}
-                                    skills={[
-                                        {
-                                            value: "saude-primeiros-socorros",
-                                            label: "Primeiros socorros",
-                                        },
-                                        {
-                                            value: "saude-cuidados-idosos",
-                                            label: "Cuidados com idosos",
-                                        },
-                                        {
-                                            value: "saude-pessoas-deficiencia",
-                                            label: "Apoio a pessoas com deficiência",
-                                        },
-                                        {
-                                            value: "saude-educacao-nutricional",
-                                            label: "Educação nutricional",
-                                        },
-                                        {
-                                            value: "saude-campanha-sangue",
-                                            label: "Campanhas de doação de sangue",
-                                        },
-                                    ]}
-                                />
-
-                                {/* 🎭 CULTURA E ARTE */}
-                                <SkillGroupAccordion
-                                    title="🎭 Cultura e Arte"
-                                    value="item-3"
-                                    selectedSkills={selectedSkills}
-                                    toggleSkill={toggleSkill}
-                                    skills={[
-                                        {
-                                            value: "arte-musica",
-                                            label: "Música (instrumental ou canto)",
-                                        },
-                                        {
-                                            value: "arte-teatro-danca",
-                                            label: "Teatro e dança",
-                                        },
-                                        {
-                                            value: "arte-foto-video",
-                                            label: "Fotografia e vídeo",
-                                        },
-                                        {
-                                            value: "arte-artes-plasticas",
-                                            label: "Artes plásticas e artesanato",
-                                        },
-                                        {
-                                            value: "arte-producao-eventos",
-                                            label: "Produção cultural em eventos",
-                                        },
-                                    ]}
-                                />
-
-                                {/* 🛠 CONSTRUÇÃO */}
-                                <SkillGroupAccordion
-                                    title="🛠 Construção"
-                                    value="item-4"
-                                    selectedSkills={selectedSkills}
-                                    toggleSkill={toggleSkill}
-                                    skills={[
-                                        {
-                                            value: "construcao-pintura",
-                                            label: "Pintura e acabamento",
-                                        },
-                                        {
-                                            value: "construcao-marcenaria",
-                                            label: "Marcenaria / carpintaria",
-                                        },
-                                        {
-                                            value: "construcao-eletrica",
-                                            label: "Reparos elétricos",
-                                        },
-                                        {
-                                            value: "construcao-alvenaria",
-                                            label: "Alvenaria e manutenção geral",
-                                        },
-                                        {
-                                            value: "construcao-jardinagem",
-                                            label: "Jardinagem e paisagismo",
-                                        },
-                                    ]}
-                                />
-
-                                {/* 🤝 APOIO SOCIAL */}
-                                <SkillGroupAccordion
-                                    title="🤝 Apoio Social"
-                                    value="item-5"
-                                    selectedSkills={selectedSkills}
-                                    toggleSkill={toggleSkill}
-                                    skills={[
-                                        {
-                                            value: "social-distribuicao-alimentos",
-                                            label: "Distribuição de alimentos/roupas",
-                                        },
-                                        {
-                                            value: "social-logistica-eventos",
-                                            label: "Organização logística de eventos",
-                                        },
-                                        {
-                                            value: "social-recepcao-acolhimento",
-                                            label: "Recepção e acolhimento ao público",
-                                        },
-                                        {
-                                            value: "social-fundraising",
-                                            label: "Captação de recursos",
-                                        },
-                                        {
-                                            value: "social-midias-sociais",
-                                            label: "Gestão de mídias sociais",
-                                        },
-                                    ]}
-                                />
-                            </Accordion>
-                            <Button
-                                onPress={handleSubmit(onSubmit)}
-                                disabled={selectedSkills.length === 0}
-                                className={`min-w-[300px] max-w-[350px] h-[44px] rounded-[12px] shadow-shadow flex-row items-center justify-center mt-12 ${
-                                    selectedSkills.length === 0
-                                        ? "bg-gray-300"
-                                        : "bg-blue-dark"
-                                }`}
-                            >
-                                {isLoading ? (
-                                    <Spinner />
-                                ) : (
-                                    <Text
-                                        className={`font-InterBold ${
-                                            selectedSkills.length === 0
-                                                ? "text-gray-500"
-                                                : "text-white"
-                                        }`}
-                                    >
-                                        Próximo
-                                    </Text>
-                                )}
-                            </Button>
-
-                            {selectedSkills.length > 0 && (
-                                <Text className="text-blue-dark mt-4">
-                                    Selected: {selectedSkills.join(", ")}
-                                </Text>
+                    <VStack className="flex-1 items-center px-4 pb-6">
+                        <Stepper etapaAtual={2} />
+                        <Text className="font-NunitoBold text-[16px] leading-[22px] text-[#173663] mt-4">Etapa 2 de 3</Text>
+                        <Text className="font-NunitoBold text-[28px] leading-[38px] text-[#173663] mt-6">Habilidades</Text>
+                        <Text className="font-NunitoRegular text-[16px] leading-[22px] text-black text-center w-[310px] mt-4">
+                            Selecione até 5 áreas em que deseja atuar. Assim poderemos indicar oportunidades de voluntariado alinhadas ao seu perfil.
+                        </Text>
+                        <View style={{ width: '100%', marginTop: 32, gap: 40 }}>
+                            {skillGroups.map(group => (
+                                <VStack key={group.key} className="w-full">
+                                    <HStack className="items-center mb-4 px-1" style={{ gap: 8 }}>
+                                        <Text className="text-[20px]">{group.icon}</Text>
+                                        <Text className="font-NunitoBold text-[20px] leading-[27px] text-[#173663]">{group.title}</Text>
+                                    </HStack>
+                                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 16 }}>
+                                        <HStack style={{ gap: 20 }}>
+                                            {group.skills.map(skill => {
+                                                const active = selectedSkills.includes(skill.value);
+                                                return (
+                                                    <VStack key={skill.value} className="items-center" style={{ width: 82 }}>
+                                                        <Button
+                                                            onPress={() => toggleSkill(skill.value)}
+                                                            className={`${active ? 'bg-[#173663]' : 'bg-gray-300'} rounded-full w-[82px] h-[82px] p-0 overflow-hidden`}
+                                                        >
+                                                            {/* Static placeholder image or colored circle */}
+                                                            <Image
+                                                                alt={skill.label}
+                                                                source={require('@/assets/images/signin/local.png')}
+                                                                style={{ width: 82, height: 82, opacity: active ? 0.8 : 1 }}
+                                                            />
+                                                        </Button>
+                                                        <Text className="font-NunitoRegular text-[12px] leading-[16px] text-black text-center mt-1" numberOfLines={2}>
+                                                            {skill.label}
+                                                        </Text>
+                                                    </VStack>
+                                                );
+                                            })}
+                                        </HStack>
+                                    </ScrollView>
+                                </VStack>
+                            ))}
+                        </View>
+                        <Text className="font-NunitoBold text-[14px] mt-8 text-[#173663]">{selectedSkills.length}/{5} selecionadas</Text>
+                        <Button
+                            onPress={handleSubmit(onSubmit)}
+                            disabled={selectedSkills.length === 0}
+                            className={`min-w-[300px] max-w-[350px] h-[44px] rounded-[12px] shadow-shadow flex-row items-center justify-center mt-4 ${selectedSkills.length === 0 ? 'bg-gray-300' : 'bg-blue-dark'}`}
+                        >
+                            {isLoading ? <Spinner /> : (
+                                <Text className={`font-InterBold ${selectedSkills.length === 0 ? 'text-gray-500' : 'text-white'}`}>Próximo</Text>
                             )}
-                        </VStack>
+                        </Button>
+                        {selectedSkills.length >= MAX_SKILLS && (
+                            <Text className="text-red-500 text-[12px] mt-2">Limite máximo alcançado.</Text>
+                        )}
                     </VStack>
                 </ScrollView>
             </KeyboardAvoidingView>

@@ -33,7 +33,6 @@ export const createVoluntarySchema = z.object({
         required_error: "senha é obrigatória",
         invalid_type_error: "senha inválida",
     }),
-    logoUrl: z.string().optional(),
 });
 
 const createVoluntaryResponseSchema = z.object({
@@ -68,11 +67,30 @@ const checkUniquenessVoluntaryResponseSchema = z.object({
     phoneNumber: z.boolean(),
 });
 
+const updateVoluntarySchema = z.object({
+    phoneNumber: z.string().regex(/^\d{10,11}$/).optional(),
+    city: z.string().regex(/^[A-Za-zÀ-ÿ\s]+$/).optional(),
+    state: z.string().regex(/^[A-Za-zÀ-ÿ\s]+$/).optional(),
+    skills: z.array(z.string()).optional()
+});
+
+const updateVoluntaryResponseSchema = z.object({
+    id: z.number(),
+    email: z.string(),
+    name: z.string(),
+    phoneNumber: z.string(),
+    cep: z.string(),
+    city: z.string(),
+    state: z.string(),
+    skills: z.array(z.string())
+});
+
 export type createVoluntaryInput = z.infer<typeof createVoluntarySchema>;
 export type loginVoluntaryInput = z.infer<typeof loginVoluntarySchema>;
 export type checkUniquenessVoluntaryInput = z.infer<
     typeof checkUniquenessVoluntarySchema
 >;
+export type updateVoluntaryInput = z.infer<typeof updateVoluntarySchema>;
 
 export const { schemas: voluntarySchemas, $ref } = buildJsonSchemas(
     {
@@ -82,6 +100,8 @@ export const { schemas: voluntarySchemas, $ref } = buildJsonSchemas(
         loginVoluntaryResponseSchema,
         checkUniquenessVoluntarySchema,
         checkUniquenessVoluntaryResponseSchema,
+        updateVoluntarySchema,
+        updateVoluntaryResponseSchema
     },
     {
         $id: "voluntarySchemas",

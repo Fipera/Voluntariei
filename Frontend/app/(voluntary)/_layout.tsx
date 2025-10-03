@@ -1,12 +1,27 @@
-import { Stack, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { Tabs, useRouter } from "expo-router";
+import { House, Calendar, User } from 'lucide-react-native';
+import { useEffect, useMemo, useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, Platform } from "react-native";
+import { VStack } from "@/components/ui/vstack";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default () => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+
+  // Altura base da tab bar
+  const BASE_HEIGHT = 60;
+
+  // Padding inferior adicional para garantir clique acima da navigation bar (Android gestural / 3-button)
+  const extraBottom = useMemo(() => {
+    // Se o inset bottom já é grande (gestures), só usa ele
+    if (insets.bottom >= 16) return insets.bottom;
+    // Caso contrário adiciona um espaçamento mínimo
+    return insets.bottom + 16; // 16px mínimo para área clicável
+  }, [insets.bottom]);
 
   useEffect(() => {
     const checkAccess = async () => {
@@ -26,15 +41,41 @@ export default () => {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <VStack style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" />
-      </View>
+      </VStack>
     );
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
-    </Stack>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: '#fff',
+        tabBarInactiveTintColor: '#fff',
+        tabBarStyle: {
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          backgroundColor: '#0F3765',
+          borderTopWidth: 0,
+          elevation: 20,
+          shadowColor: '#000',
+          shadowOpacity: 0.15,
+          shadowRadius: 8,
+          shadowOffset: { width: 0, height: -2 },
+          height: BASE_HEIGHT + extraBottom,
+          paddingTop: 8,
+          paddingBottom: extraBottom - 4,
+        },
+        tabBarItemStyle: { paddingBottom: 0 },
+        tabBarLabelStyle: { fontSize: 12, fontFamily: 'Nunito-SemiBold', marginBottom: 4 },
+      }}
+    >
+      {/* Index is the Hub */}
+      <Tabs.Screen name="index" options={{ title: 'Hub', tabBarIcon: ({color}) => <House size={22} color={color} /> }} />
+      <Tabs.Screen name="schedule" options={{ title: 'Agenda', tabBarIcon: ({color}) => <Calendar size={22} color={color} /> }} />
+      <Tabs.Screen name="profile" options={{ title: 'Perfil', tabBarIcon: ({color}) => <User size={22} color={color} /> }} />
+    </Tabs>
   );
 };

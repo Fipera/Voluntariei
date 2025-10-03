@@ -3,14 +3,17 @@ import {
     createVoluntary,
     findVoluntaryByEmail,
     findVoluntaryByPhone,
+    updateVoluntary,
+    findVoluntaryById,
 } from "../services/voluntary.service";
 import {
     checkUniquenessVoluntaryInput,
     createVoluntaryInput,
     createVoluntarySchema,
     loginVoluntaryInput,
+    updateVoluntaryInput,
 } from "../schemas/voluntary.schema";
-import { PrismaClientKnownRequestError } from "../../generated/prisma/runtime/library";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { AccountAlreadyExistsError } from "../../errors/email.already.exists";
 import {
     findInstitutionByEmail,
@@ -18,46 +21,13 @@ import {
 } from "../services/institution.service";
 import { verifyPassword } from "../../utils/hash";
 import { server } from "../../app";
-import path from "path";
-import fs from "fs";
-import { promisify } from "util";
-import { pipeline } from "stream";
 
-const pump = promisify(pipeline);
 
 export async function registerVoluntaryHandler(
     request: FastifyRequest,
     reply: FastifyReply
 ) {
-    let body: Record<string, any> = {};
-    let logoUrl = "";
-
-    const contentType = request.headers["content-type"];
-
-    // Se for multipart
-    if (contentType?.includes("multipart/form-data")) {
-        const uploadsDir = path.join(__dirname, "..", "..", "uploads");
-        if (!fs.existsSync(uploadsDir)) {
-            fs.mkdirSync(uploadsDir, { recursive: true });
-        }
-
-        const parts = request.parts();
-        for await (const part of parts) {
-            if (part.type === "file" && part.fieldname === "logo") {
-                const filename = `${Date.now()}-${part.filename}`;
-                const filePath = path.join(uploadsDir, filename);
-
-                await pump(part.file, fs.createWriteStream(filePath));
-                logoUrl = `/uploads/${filename}`;
-            } else if (part.type === "field") {
-                body[part.fieldname] = part.value;
-            }
-        }
-    } else {
-        // Se for JSON puro
-        body = request.body as Record<string, any>;
-        logoUrl = body.logoUrl || "";
-    }
+    const body: Record<string, any> = request.body as Record<string, any>;
 
     try {
         const voluntaryWithSameEmail = await findVoluntaryByEmail(body.email);
@@ -90,10 +60,7 @@ export async function registerVoluntaryHandler(
             }
         }
 
-        const parsed = createVoluntarySchema.parse({
-            ...body,
-            logoUrl,
-        });
+    const parsed = createVoluntarySchema.parse(body);
 
         const voluntary = await createVoluntary(parsed);
 
@@ -180,4 +147,55 @@ export async function checkVoluntaryUniquenessHandler(
         email: !!emailExists,
         phoneNumber: !!phoneExists,
     });
+}
+
+export async function updateVoluntaryHandler(
+    request: any,
+    reply: FastifyReply
+) {
+    const body: Record<string, any> = request.body as Record<string, any>;
+
+    try {
+        if (typeof body.skills === "string") {
+            try {
+                body.skills = JSON.parse(body.skills);
+            } catch {
+                body.skills = [];
+            }
+        }
+
+        const parsed: updateVoluntaryInput = body;
+
+        const updated = await updateVoluntary(request.user.id, parsed);
+
+        return reply.code(200).send({
+            id: updated.id,
+            email: updated.email,
+            name: updated.name,
+            phoneNumber: updated.phoneNumber,
+            cep: updated.cep,
+            city: updated.city,
+            state: updated.state,
+            skills: updated.skills.map((s) => s.name),
+        });
+    } catch (err) {
+        return reply.status(400).send({ error: "Erro ao atualizar", details: err });
+    }
+}
+
+export async function getVoluntaryMeHandler(request: any, reply: FastifyReply){
+    const me = await findVoluntaryById(request.user.id);
+    if(!me){
+        return reply.code(404).send({ message: "Not found" })
+    }
+    return reply.send({
+        id: me.id,
+        email: me.email,
+        name: me.name,
+        phoneNumber: me.phoneNumber,
+        cep: me.cep,
+        city: me.city,
+        state: me.state,
+        skills: me.skills.map(s=>s.name)
+    })
 }

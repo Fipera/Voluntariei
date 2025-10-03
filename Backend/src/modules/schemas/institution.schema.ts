@@ -24,7 +24,6 @@ export const createInstitutionSchema = z.object({
         required_error: "senha é obrigatória",
         invalid_type_error: "senha inválida",
     }),
-    logoUrl: z.string().optional(),
 });
 
 const createInstitutionResponseSchema = z.object({
@@ -62,11 +61,30 @@ const checkUniquenessInstitutionResponseSchema = z.object({
   cnpj: z.boolean(),
 });
 
+const updateInstitutionSchema = z.object({
+    phoneNumber: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    reason: z.string().optional()
+});
+
+const updateInstitutionResponseSchema = z.object({
+    id: z.number(),
+    email: z.string(),
+    name: z.string(),
+    phoneNumber: z.string(),
+    cnpj: z.string(),
+    city: z.string(),
+    state: z.string(),
+    reason: z.string()
+});
+
 export type createInstitutionInput = z.infer<typeof createInstitutionSchema>;
 
 export type LoginInstitutionInput = z.infer<typeof loginInstitutionSchema>;
 
 export type checkUniquenessInstitutionInput = z.infer<typeof checkUniquenessInstitutionSchema>;
+export type updateInstitutionInput = z.infer<typeof updateInstitutionSchema>;
 
 export const { schemas: institutionSchemas, $ref } = buildJsonSchemas(
     {
@@ -75,7 +93,9 @@ export const { schemas: institutionSchemas, $ref } = buildJsonSchemas(
         loginInstitutionSchema,
         loginInstitutionResponseSchema,
         checkUniquenessInstitutionSchema,
-        checkUniquenessInstitutionResponseSchema
+        checkUniquenessInstitutionResponseSchema,
+        updateInstitutionSchema,
+        updateInstitutionResponseSchema
     },
     {
         $id: "institutionSchemas",

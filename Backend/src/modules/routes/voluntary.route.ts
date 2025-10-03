@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { checkVoluntaryUniquenessHandler, loginVoluntaryHandler, registerVoluntaryHandler } from "../controllers/voluntary.controller";
+import { checkVoluntaryUniquenessHandler, loginVoluntaryHandler, registerVoluntaryHandler, updateVoluntaryHandler, getVoluntaryMeHandler } from "../controllers/voluntary.controller";
 import { $ref } from "../schemas/voluntary.schema";
 
 async function voluntaryRoutes(server: FastifyInstance) {
@@ -40,7 +40,24 @@ async function voluntaryRoutes(server: FastifyInstance) {
             checkVoluntaryUniquenessHandler
         );
     
+    server.patch(
+        "/update",
+        {
+            preHandler: [server.authenticate],
+            schema: {
+                body: $ref("updateVoluntarySchema"),
+                response: { 200: $ref("updateVoluntaryResponseSchema") }
+            },
+            attachValidation: false
+        },
+        updateVoluntaryHandler
+    );
 
+    server.get(
+        "/me",
+        { preHandler: [server.authenticate] },
+        getVoluntaryMeHandler
+    )
 }
 
 export default voluntaryRoutes;

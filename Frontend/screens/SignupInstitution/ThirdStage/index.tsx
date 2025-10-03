@@ -69,15 +69,11 @@ export function SignupInstitutionThirdStage() {
             return;
         }
 
-        const fullData = { ...data, ...formData } as Record<string, any>;
-        const form = new FormData();
-        Object.entries(fullData).forEach(([key, value]) => {
-            if (value !== undefined) form.append(key, value as any);
-        });
+        const fullData = { ...data, ...formData };
 
         try {
             setIsLoading(true);
-            await api.post("/institution", form, { headers: { "Content-Type": "multipart/form-data" } });
+            await api.post("/institution", fullData);
             setIsLoading(false);
             clearData();
             router.push("/(institution)");
@@ -113,7 +109,7 @@ export function SignupInstitutionThirdStage() {
                                     render={({ field: { onChange, value } }) => (
                                         <Input variant="rounded" size="sm" style={{ width: 310, height: 43, backgroundColor: "#FDFDFD", borderColor: "#B7B7B7", borderWidth: 1, borderRadius: 8, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 2, elevation: 2, alignSelf: "center" }}>
                                             <HStack style={{ alignItems: "center", justifyContent: "flex-start", marginLeft: 12 }}>
-                                                <InputField keyboardType="email-address" value={value} placeholder="ex: filpinhodelas@gmail.com" onChangeText={(text) => { onChange(text); setErrorMessage(""); }} />
+                                                <InputField keyboardType="email-address" value={value} placeholder="ex: usuario@gmail.com" onChangeText={(text) => { onChange(text); setErrorMessage(""); }} />
                                             </HStack>
                                         </Input>
                                     )}

@@ -29,7 +29,6 @@ model Institution {
   state        String
   numberHouse  String
   street       String
-  logoUrl      String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -49,28 +48,26 @@ model Card {
 }
 
 model Voluntary {
-  id           Int    @id @default(autoincrement())
-  email        String @unique
-  name         String
-  password     String
-  phoneNumber  String @unique
+  id          Int    @id @default(autoincrement())
+  email       String @unique
+  name        String
+  password    String
+  phoneNumber String @unique
 
-  cep          String
-  city         String
-  state        String
-  logoUrl      String?
+  cep   String
+  city  String
+  state String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   skills       Skill[]
   participants Participation[]
-
 }
 
 model Skill {
-  id      Int     @id @default(autoincrement())
-  name    String  @unique
+  id         Int         @id @default(autoincrement())
+  name       String      @unique
   volunteers Voluntary[]
 }
 

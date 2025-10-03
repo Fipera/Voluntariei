@@ -1,9 +1,10 @@
 import { FastifyInstance } from "fastify";
 import {
     checkInstitutionUniquenessHandler,
-    getInstitutionsHandler,
     loginInstitutionHandler,
     registerInstitutionHandler,
+    updateInstitutionHandler,
+    getInstitutionMeHandler
 } from "../controllers/institution.controller";
 import { $ref } from "../schemas/institution.schema";
 
@@ -48,9 +49,24 @@ async function institutionRoutes(server: FastifyInstance) {
         checkInstitutionUniquenessHandler
     );
 
-    server.get("/", {
-        preHandler: [server.authenticate],
-    }, getInstitutionsHandler)
+    server.get(
+        "/me",
+        { preHandler: [server.authenticate] },
+        getInstitutionMeHandler
+    )
+
+    server.patch(
+        "/update",
+        {
+            preHandler: [server.authenticate],
+            schema: {
+                body: $ref("updateInstitutionSchema"),
+                response: { 200: $ref("updateInstitutionResponseSchema") }
+            },
+            attachValidation: false
+        },
+        updateInstitutionHandler
+    )
 }
 
 export default institutionRoutes;

@@ -1,6 +1,6 @@
 import { hashPassword } from "../../utils/hash";
 import prisma from "../../utils/prisma";
-import { createInstitutionInput } from "../schemas/institution.schema";
+import { createInstitutionInput, updateInstitutionInput } from "../schemas/institution.schema";
 
 export async function createInstitution(input: createInstitutionInput) {
 
@@ -45,4 +45,15 @@ export async function findInstitutions(){
             
         }
     })
+}
+
+export async function updateInstitution(id: number, data: updateInstitutionInput){
+    return prisma.institution.update({
+        where:{ id },
+        data
+    })
+}
+
+export async function findInstitutionById(id: number){
+    return prisma.institution.findUnique({ where: { id } })
 }

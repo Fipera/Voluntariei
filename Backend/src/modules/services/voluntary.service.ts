@@ -1,6 +1,6 @@
 import { hashPassword } from "../../utils/hash";
 import prisma from "../../utils/prisma";
-import { createVoluntaryInput } from "../schemas/voluntary.schema";
+import { createVoluntaryInput, updateVoluntaryInput } from "../schemas/voluntary.schema";
 
 export async function createVoluntary(input: createVoluntaryInput) {
     const { password, skills, ...rest } = input;
@@ -33,4 +33,26 @@ export async function findVoluntaryByEmail(email: string) {
 
 export async function findVoluntaryByPhone(phoneNumber: string) {
     return prisma.voluntary.findUnique({ where: { phoneNumber } });
+}
+
+export async function updateVoluntary(id: number, data: updateVoluntaryInput) {
+    const { skills, ...rest } = data;
+
+    const updated = await prisma.voluntary.update({
+        where: { id },
+        data: {
+            ...rest,
+            ...(skills ? { skills: { set: skills.map((name) => ({ name })) } } : {}),
+        },
+        include: { skills: true },
+    });
+
+    return updated;
+}
+
+export async function findVoluntaryById(id: number) {
+    return prisma.voluntary.findUnique({
+        where: { id },
+        include: { skills: true },
+    });
 }

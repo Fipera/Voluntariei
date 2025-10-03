@@ -30,9 +30,32 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
+.env.local
 .env*.local
+.env.development
+.env.production
+.env.staging
+
+# lock alternativo se usar só npm
+yarn.lock
+
+# Editor / IDE
+*.iml
+*.swp
+
+# Mobile build artifacts
+*.apk
+*.aab
+*.ipa
+*.xcarchive
+
+# Keystores
+*.keystore
 
 # typescript
 *.tsbuildinfo
 
 app-example
+android/
+ios/

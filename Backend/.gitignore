@@ -26,7 +26,15 @@ yarn-error.log*
 # Prisma
 prisma/dev.db
 prisma/dev.sqlite
-prisma/migrations/
+# NÃO ignorar migrations para versionar o histórico.
+# (Se quiser ignorar novamente, remova este comentário e re-adicione a linha abaixo)
+# prisma/migrations/
+
+# Código gerado (ex: prisma client custom, caso configurado)
+src/generated/
+
+# Uploads (arquivos enviados pelo usuário não devem ir para o repositório)
+src/uploads/
 
 # --------------------------
 # Coverage de testes
@@ -43,3 +51,5 @@ coverage/
 # Outros
 *.tgz
 *.gz
+*.pid
+*.pid.lock

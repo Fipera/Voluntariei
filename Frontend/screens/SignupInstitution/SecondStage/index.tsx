@@ -9,6 +9,7 @@ import {
 import { HStack } from "@/components/ui/hstack";
 import { Image } from "@/components/ui/image";
 import { Input, InputField, InputIcon } from "@/components/ui/input";
+import { StateSelect } from '@/components/custom/StateSelect';
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -88,9 +89,10 @@ export function SignupInstitutionSecondStage() {
                         style={{
                             flex: 1,
                             alignItems: "center",
-                            justifyContent: "space-between",
-                            paddingHorizontal: 16,
+                            paddingHorizontal: 20,
                             paddingBottom: 24,
+                            paddingTop: 8,
+                            gap: 16,
                         }}
                     >
                         <View style={{ width: "100%", alignItems: "center" }}>
@@ -110,11 +112,11 @@ export function SignupInstitutionSecondStage() {
                             </Text>
                             <Text
                                 style={{
-                                    marginTop: 24,
+                                    marginTop: 12,
                                     alignSelf: "center",
                                     fontFamily: "Nunito-Bold",
-                                    fontSize: 28,
-                                    lineHeight: 38,
+                                    fontSize: 26,
+                                    lineHeight: 32,
                                     color: "#173663",
                                     textAlign: "center",
                                 }}
@@ -138,11 +140,10 @@ export function SignupInstitutionSecondStage() {
 
                         <View
                             style={{
-                                marginTop: 16,
                                 width: "100%",
-                                maxWidth: 350,
+                                maxWidth: 360,
                                 alignSelf: "center",
-                                gap: 16,
+                                gap: 14,
                             }}
                         >
                             <FormControl isInvalid={!!errors.cep}>
@@ -230,8 +231,8 @@ export function SignupInstitutionSecondStage() {
 
                             {/* Endereço + Nº */}
                             <HStack
-                                className="flex-row gap-x-4"
-                                style={{ width: "100%", justifyContent: "space-between" }}
+                                className="flex-row"
+                                style={{ width: "100%", gap: 12 }}
                             >
                                 <FormControl isInvalid={!!errors.street} style={{ width: "70%" }}>
                                     <Text
@@ -411,10 +412,10 @@ export function SignupInstitutionSecondStage() {
 
                             {/* Cidade + Estado */}
                             <HStack
-                                className="flex-row gap-x-4"
-                                style={{ width: "100%", justifyContent: "space-between" }}
+                                className="flex-row"
+                                style={{ width: "100%", gap: 12, marginBottom: 8 }}
                             >
-                                <FormControl isInvalid={!!errors.city} style={{ width: "60%" }}>
+                                <FormControl isInvalid={!!errors.city} style={{ width: "70%" }}>
                                     <Text
                                         style={{
                                             fontFamily: "Nunito-Bold",
@@ -489,35 +490,7 @@ export function SignupInstitutionSecondStage() {
                                         control={control}
                                         name="state"
                                         render={({ field: { onChange, value } }) => (
-                                            <Input
-                                                variant="rounded"
-                                                size="sm"
-                                                style={{
-                                                    width: "100%",
-                                                    height: 43,
-                                                    backgroundColor: "#FDFDFD",
-                                                    borderColor: "#B7B7B7",
-                                                    borderWidth: 1,
-                                                    borderRadius: 8,
-                                                    shadowColor: "#000",
-                                                    shadowOffset: { width: 0, height: 2 },
-                                                    shadowOpacity: 0.25,
-                                                    shadowRadius: 2,
-                                                    elevation: 2,
-                                                }}
-                                            >
-                                                <HStack className="items-center justify-start ml-3">
-                                                    <InputField
-                                                        keyboardType="default"
-                                                        className=""
-                                                        value={value}
-                                                        onChangeText={(text) => {
-                                                            onChange(text);
-                                                            setErrorMessage("");
-                                                        }}
-                                                    />
-                                                </HStack>
-                                            </Input>
+                                            <StateSelect value={value} onChange={(val)=>{ onChange(val); setErrorMessage(""); }} height={43} />
                                         )}
                                     />
                                     {errors.state && (
@@ -533,7 +506,7 @@ export function SignupInstitutionSecondStage() {
 
                         </View>
 
-                        <View style={{ width: "100%", alignItems: "center", gap: 12 }}>
+                        <View style={{ width: "100%", alignItems: "center", gap: 12, marginTop: 4 }}>
                             {/* Button */}
                             <Button
                                 onPress={handleSubmit(onSubmit)}

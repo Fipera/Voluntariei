@@ -1,10 +1,4 @@
 import Stepper from "@/components/custom/stepper";
-import {
-    Avatar,
-    AvatarBadge,
-    AvatarFallbackText,
-    AvatarGroup,
-} from "@/components/ui/avatar";
 import { Button, ButtonIcon } from "@/components/ui/button";
 import {
     FormControl,
@@ -14,7 +8,7 @@ import {
 } from "@/components/ui/form-control";
 import { HStack } from "@/components/ui/hstack";
 import { AddIcon, Icon } from "@/components/ui/icon";
-import { Image } from "@/components/ui/image";
+// Removed avatar/image picker for this step to align with institution layout
 import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
@@ -39,13 +33,7 @@ import {
     ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
-type PhotoFile = {
-    uri: string;
-    name: string;
-    type: string;
-};
+import { Checkbox, CheckboxIndicator, CheckboxIcon } from "@/components/ui/checkbox";
 
 export function SignupVoluntaryThirdStage() {
     const router = useRouter();
@@ -54,7 +42,7 @@ export function SignupVoluntaryThirdStage() {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const { data, updateData, clearData } = useSignupVoluntaryStore();
-    const [userPhoto, setUserPhoto] = useState<PhotoFile | null>(null);
+    const [termsAccepted, setTermsAccepted] = useState(false);
 
     const {
         control,
@@ -78,40 +66,6 @@ export function SignupVoluntaryThirdStage() {
         }
     };
 
-    const selectUserPhoto = async () => {
-        const photoSelected = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ["images"],
-            quality: 1,
-            aspect: [4, 4],
-            allowsEditing: true,
-        });
-
-        if (photoSelected.canceled) {
-            return;
-        }
-
-        const photoURI = photoSelected.assets[0].uri;
-        const timestamp = new Date().getTime();
-
-        if (photoURI) {
-            const photoInfo = (await FileSystem.getInfoAsync(photoURI)) as {
-                size: number;
-            };
-
-            if (photoInfo.size && photoInfo.size / 1024 / 1024 > 5) {
-                return Alert.alert("Imagem muito grande.");
-            }
-
-            const fileExtension = photoURI.split(".").pop();
-
-            const photoFile = {
-                uri: photoURI,
-                name: `photo_${timestamp}.${fileExtension}`,
-                type: `image/${fileExtension}`,
-            };
-            setUserPhoto(photoFile);
-        }
-    };
 
     const onSubmit = async (formData: SignupVoluntaryThirdStageData) => {
         setIsLoading(true);
@@ -135,29 +89,10 @@ export function SignupVoluntaryThirdStage() {
         }
 
         const fullData = { ...data, ...formData };
-        const form = new FormData();
-        if (userPhoto) {
-            form.append("logo", userPhoto as any);
-        }
-
-        Object.entries(fullData).forEach(([key, value]) => {
-            if (value !== undefined) {
-                if (Array.isArray(value)) {
-                    form.append(key, JSON.stringify(value)); // skills
-                } else {
-                    form.append(key, String(value)); // resto
-                }
-            }
-        });
-        console.log(form);
 
         try {
             setIsLoading(true);
-            const response = await api.post("/voluntary", form, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
+            const response = await api.post("/voluntary", fullData);
 
             setIsLoading(false);
             clearData();
@@ -189,250 +124,71 @@ export function SignupVoluntaryThirdStage() {
                     contentContainerStyle={{ flexGrow: 1 }}
                     keyboardShouldPersistTaps="handled"
                 >
-                    <VStack className="flex-1 items-center justify-between px-4 pb-6">
-                        <VStack className="flex-1 items-center justify-start">
+                    <VStack style={{ flex: 1, alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingBottom: 24 }}>
+                        <VStack style={{ width: "100%", alignItems: "center" }}>
                             <Stepper etapaAtual={3} />
-
-                            <Text
-                                size="xl"
-                                className="font-PoppinsBold text-blue-dark text-center mt-6"
-                            >
-                                Etapa 3 de 3
-                            </Text>
-
-                            <Button
-                                variant="link"
-                                action="default"
-                                className="bg-transparent p-0 mt-16 mb-16"
-                                onPress={selectUserPhoto}
-                            >
-                                <Avatar
-                                    size="2xl"
-                                    className="bg-black overflow-hidden"
-                                >
-                                    {userPhoto ? (
-                                        <Image
-                                            source={{ uri: userPhoto.uri }}
-                                            alt="Logo da instituição"
-                                            className="w-full h-full"
-                                            resizeMode="cover"
-                                        />
-                                    ) : (
-                                        <Icon
-                                            as={AddIcon}
-                                            size="xl2"
-                                            className="stroke-white"
-                                        />
-                                    )}
-                                </Avatar>
-                            </Button>
-
-                            <Text
-                                size="md"
-                                className="font-PoppinsBold text-blue-dark text-center mt-6"
-                            >
-                                {data.name}
-                            </Text>
-
-                            <Text
-                                size="xl"
-                                className="font-PoppinsBold text-blue-dark text-center mt-6"
-                            >
-                                Acesso
-                            </Text>
-
+                            <Text style={{ marginTop: 12, fontFamily: 'Nunito-Bold', fontSize: 16, lineHeight: 22, color: '#173663' }}>Etapa 3 de 3</Text>
+                            <Text style={{ marginTop: 24, fontFamily: 'Nunito-Bold', fontSize: 28, lineHeight: 38, color: '#173663', textAlign: 'center' }}>Dados de Acesso</Text>
+                            <Text style={{ marginTop: 8, fontFamily: 'Nunito-Regular', fontSize: 16, lineHeight: 22, color: '#000', textAlign: 'center', maxWidth: 350 }}>Crie seu login para acessar o sistema</Text>
+                        </VStack>
+                        <VStack style={{ width: '100%', maxWidth: 312, alignSelf: 'center', marginTop: 16 }}>
                             <FormControl isInvalid={!!errors.email}>
-                                <Text className="text-sm text-blue-dark font-PoppinsBold mt-6 ml-1">
-                                    E-mail
-                                </Text>
-
-                                <Controller
-                                    control={control}
-                                    name="email"
-                                    render={({
-                                        field: { onChange, value },
-                                    }) => (
-                                        <Input
-                                            variant="rounded"
-                                            size="sm"
-                                            className="w-full max-w-[280px] h-12 bg-white border border-input-border shadow-shadow rounded-[12px] mt-2"
-                                        >
-                                            <HStack className="items-center justify-start ml-3">
-                                                <InputField
-                                                    keyboardType="email-address"
-                                                    className=""
-                                                    value={value}
-                                                    onChangeText={(text) => {
-                                                        onChange(text);
-                                                        setErrorMessage("");
-                                                    }}
-                                                />
-                                            </HStack>
-                                        </Input>
-                                    )}
-                                />
-                                {errors.email && (
-                                    <FormControlError>
-                                        <FormControlErrorIcon
-                                            as={AlertCircle}
-                                        />
-                                        <FormControlErrorText>
-                                            {errors.email.message}
-                                        </FormControlErrorText>
-                                    </FormControlError>
-                                )}
+                                <Text style={{ fontFamily: 'Nunito-Bold', fontSize: 16, lineHeight: 22, color: '#173663', marginLeft: 4, marginBottom: 8 }}>E-mail</Text>
+                                <Controller control={control} name="email" render={({ field: { onChange, value } }) => (
+                                    <Input variant="rounded" size="sm" style={{ width: 310, height: 43, backgroundColor: '#FDFDFD', borderColor: '#B7B7B7', borderWidth: 1, borderRadius: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 2, elevation: 2, alignSelf: 'center' }}>
+                                        <HStack style={{ alignItems: 'center', justifyContent: 'flex-start', marginLeft: 12 }}>
+                                            <InputField keyboardType="email-address" value={value} placeholder="ex: usuario@gmail.com" onChangeText={(text) => { onChange(text); setErrorMessage(''); }} />
+                                        </HStack>
+                                    </Input>
+                                )} />
+                                {errors.email && <FormControlError><FormControlErrorIcon as={AlertCircle} /><FormControlErrorText>{errors.email.message}</FormControlErrorText></FormControlError>}
                             </FormControl>
-
-                            <FormControl
-                                isInvalid={!!errors.password}
-                                className="mt-3"
-                            >
-                                <Text className="text-sm text-blue-dark font-PoppinsBold mt- ml-1">
-                                    Senha
-                                </Text>
-                                <Controller
-                                    control={control}
-                                    name="password"
-                                    render={({
-                                        field: { onChange, value },
-                                    }) => (
-                                        <Input
-                                            variant="rounded"
-                                            size="sm"
-                                            className="w-full max-w-[280px] h-12 bg-white border border-input-border shadow-shadow rounded-[12px] mt-2"
-                                        >
-                                            <HStack className="items-center justify-start ml-3">
-                                                <InputField
-                                                    secureTextEntry={
-                                                        !showPassword
-                                                    }
-                                                    className=""
-                                                    value={value}
-                                                    onChangeText={(text) => {
-                                                        onChange(text);
-                                                        setErrorMessage("");
-                                                    }}
-                                                />
-                                                <Button
-                                                    variant="link"
-                                                    action="default"
-                                                    className="bg-transparent p-0 mr-2"
-                                                    onPress={() =>
-                                                        setShowPassword(
-                                                            !showPassword
-                                                        )
-                                                    }
-                                                >
-                                                    <ButtonIcon
-                                                        as={
-                                                            showPassword
-                                                                ? EyeOff
-                                                                : Eye
-                                                        }
-                                                        className={`w-6 h-6 ${
-                                                            showPassword
-                                                                ? "text-blue-dark"
-                                                                : "text-grey-dark"
-                                                        }`}
-                                                    />
-                                                </Button>
-                                            </HStack>
-                                        </Input>
-                                    )}
-                                />
-                                {errors.password && (
-                                    <FormControlError>
-                                        <FormControlErrorIcon
-                                            as={AlertCircle}
-                                        />
-                                        <FormControlErrorText>
-                                            {errors.password.message}
-                                        </FormControlErrorText>
-                                    </FormControlError>
-                                )}
+                            <FormControl isInvalid={!!errors.password} style={{ marginTop: 16 }}>
+                                <Text style={{ fontFamily: 'Nunito-Bold', fontSize: 16, lineHeight: 22, color: '#173663', marginLeft: 4, marginBottom: 8 }}>Senha</Text>
+                                <Controller control={control} name="password" render={({ field: { onChange, value } }) => (
+                                    <Input variant="rounded" size="sm" style={{ width: 310, height: 43, backgroundColor: '#FDFDFD', borderColor: '#B7B7B7', borderWidth: 1, borderRadius: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 2, elevation: 2, alignSelf: 'center' }}>
+                                        <HStack style={{ alignItems: 'center', justifyContent: 'flex-start', marginLeft: 12 }}>
+                                            <InputField secureTextEntry={!showPassword} value={value} onChangeText={(text) => { onChange(text); setErrorMessage(''); }} />
+                                            <Button variant="link" action="default" className="bg-transparent p-0 mr-2" onPress={() => setShowPassword(!showPassword)}>
+                                                <ButtonIcon as={showPassword ? EyeOff : Eye} className={`w-6 h-6 ${showPassword ? 'text-blue-dark' : 'text-grey-dark'}`} />
+                                            </Button>
+                                        </HStack>
+                                    </Input>
+                                )} />
+                                <Text style={{ marginTop: 8, fontFamily: 'Nunito-Regular', fontSize: 14, lineHeight: 20, color: '#5D667A', alignSelf: 'flex-start', marginLeft: 4 }}>Use no mínimo 6 caracteres</Text>
+                                {errors.password && <FormControlError><FormControlErrorIcon as={AlertCircle} /><FormControlErrorText>{errors.password.message}</FormControlErrorText></FormControlError>}
                             </FormControl>
-
-                            <FormControl
-                                isInvalid={!!errors.passwordConfirm}
-                                className="mt-3"
-                            >
-                                <Text className="text-sm text-blue-dark font-PoppinsBold mt- ml-1">
-                                    Confirmar Senha
-                                </Text>
-                                <Controller
-                                    control={control}
-                                    name="passwordConfirm"
-                                    render={({
-                                        field: { onChange, value },
-                                    }) => (
-                                        <Input
-                                            variant="rounded"
-                                            size="sm"
-                                            className="w-full max-w-[280px] h-12 bg-white border border-input-border shadow-shadow rounded-[12px] mt-2"
-                                        >
-                                            <HStack className="items-center justify-start ml-3">
-                                                <InputField
-                                                    secureTextEntry={
-                                                        !showConfirmPassword
-                                                    }
-                                                    className=""
-                                                    value={value}
-                                                    onChangeText={(text) => {
-                                                        onChange(text);
-                                                        setErrorMessage("");
-                                                    }}
-                                                />
-                                                <Button
-                                                    variant="link"
-                                                    action="default"
-                                                    className="bg-transparent p-0 mr-2"
-                                                    onPress={() =>
-                                                        setShowConfirmPassword(
-                                                            !showConfirmPassword
-                                                        )
-                                                    }
-                                                >
-                                                    <ButtonIcon
-                                                        as={
-                                                            showConfirmPassword
-                                                                ? EyeOff
-                                                                : Eye
-                                                        }
-                                                        className={`w-6 h-6 ${
-                                                            showConfirmPassword
-                                                                ? "text-blue-dark"
-                                                                : "text-grey-dark"
-                                                        }`}
-                                                    />
-                                                </Button>
-                                            </HStack>
-                                        </Input>
-                                    )}
-                                />
-                                {errors.passwordConfirm && (
-                                    <FormControlError>
-                                        <FormControlErrorIcon
-                                            as={AlertCircle}
-                                        />
-                                        <FormControlErrorText>
-                                            {errors.passwordConfirm.message}
-                                        </FormControlErrorText>
-                                    </FormControlError>
-                                )}
+                            <FormControl isInvalid={!!errors.passwordConfirm} style={{ marginTop: 16 }}>
+                                <Text style={{ fontFamily: 'Nunito-Bold', fontSize: 16, lineHeight: 22, color: '#173663', marginLeft: 4, marginBottom: 8 }}>Confirmar Senha</Text>
+                                <Controller control={control} name="passwordConfirm" render={({ field: { onChange, value } }) => (
+                                    <Input variant="rounded" size="sm" style={{ width: 310, height: 43, backgroundColor: '#FDFDFD', borderColor: '#B7B7B7', borderWidth: 1, borderRadius: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 2, elevation: 2, alignSelf: 'center' }}>
+                                        <HStack style={{ alignItems: 'center', justifyContent: 'flex-start', marginLeft: 12 }}>
+                                            <InputField secureTextEntry={!showConfirmPassword} value={value} onChangeText={(text) => { onChange(text); setErrorMessage(''); }} />
+                                            <Button variant="link" action="default" className="bg-transparent p-0 mr-2" onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                                                <ButtonIcon as={showConfirmPassword ? EyeOff : Eye} className={`w-6 h-6 ${showConfirmPassword ? 'text-blue-dark' : 'text-grey-dark'}`} />
+                                            </Button>
+                                        </HStack>
+                                    </Input>
+                                )} />
+                                {errors.passwordConfirm && <FormControlError><FormControlErrorIcon as={AlertCircle} /><FormControlErrorText>{errors.passwordConfirm.message}</FormControlErrorText></FormControlError>}
                             </FormControl>
-
-                            <Button
-                                onPress={handleSubmit(onSubmit)}
-                                disabled={isLoading}
-                                className="min-w-[300px] max-w-[350px] h-[44px] bg-blue-dark rounded-[12px] shadow-shadow flex-row items-center justify-center mt-12"
-                            >
-                                {isLoading ? (
-                                    <Spinner />
-                                ) : (
-                                    <Text className="text-white font-InterBold">
-                                        Cadastrar
-                                    </Text>
-                                )}
+                        </VStack>
+                        <VStack style={{ width: '100%', alignItems: 'center', paddingBottom: 8, gap: 12 }}>
+                            <Text style={{ marginTop: 16, fontFamily: 'Nunito-Regular', fontSize: 14, lineHeight: 20, color: '#000', width: 312, alignSelf: 'center' }}>
+                                Com sua conta, você poderá acessar funcionalidades e oportunidades alinhadas ao seu perfil de voluntário.
+                            </Text>
+                            <HStack style={{ width: 312, alignSelf: 'center', marginTop: 12 }}>
+                                <Checkbox value="terms" isChecked={termsAccepted} onChange={() => setTermsAccepted(!termsAccepted)} aria-label="terms">
+                                    <CheckboxIndicator style={{ width: 16, height: 16 }}>
+                                        <CheckboxIcon />
+                                    </CheckboxIndicator>
+                                </Checkbox>
+                                <Text style={{ marginLeft: 12, flex: 1, fontFamily: 'Nunito-Regular', fontSize: 14, lineHeight: 20, color: '#000' }}>
+                                    Li e aceito os <Text style={{ color: '#173663', textDecorationLine: 'underline', fontFamily: 'Nunito-Bold' }}>Termos de Uso</Text> e a <Text style={{ color: '#173663', textDecorationLine: 'underline', fontFamily: 'Nunito-Bold' }}>Política de Privacidade</Text>
+                                </Text>
+                            </HStack>
+                            <Button onPress={handleSubmit(onSubmit)} disabled={isLoading || !termsAccepted} style={{ width: 310, height: 44, borderRadius: 12, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: 10, marginTop: 16, alignSelf: 'center', backgroundColor: !termsAccepted ? '#b7c4da' : '#173663' }}>
+                                {isLoading ? <Spinner /> : <Text style={{ fontFamily: 'Nunito-Bold', fontSize: 18, lineHeight: 25, color: '#FFFFFF' }}>Finalizar Cadastro</Text>}
                             </Button>
                         </VStack>
                     </VStack>

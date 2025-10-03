@@ -8,6 +8,7 @@ import {
 import { HStack } from "@/components/ui/hstack";
 import { Image } from "@/components/ui/image";
 import { Input, InputField, InputIcon } from "@/components/ui/input";
+import { StateSelect } from '@/components/custom/StateSelect';
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -24,11 +25,12 @@ import { AlertCircle, Eye, EyeOff, Lock, Mail } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View, Dimensions } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { formatarCNPJ, formatarTelefone } from "@/utils/formatters/format";
 import api from "@/services/api";
 
 export function SignupVoluntaryFirstStage() {
+    const insets = useSafeAreaInsets();
     const router = useRouter();
     const [formattedTelefone, setFormattedTelefone] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -131,9 +133,10 @@ export function SignupVoluntaryFirstStage() {
                         style={{
                             flex: 1,
                             alignItems: "center",
-                            justifyContent: "space-between",
-                            paddingHorizontal: 16,
-                            paddingBottom: 24,
+                            paddingHorizontal: 20,
+                            paddingBottom: 20,
+                            paddingTop: Math.max(insets.top, 12),
+                            gap: 16,
                         }}
                     >
                         {/* Top Section */}
@@ -141,15 +144,15 @@ export function SignupVoluntaryFirstStage() {
                             <Image
                                 source={require("@/assets/images/signin/icone-voluntario.png")}
                                 alt="icone-voluntario"
-                                style={{ width: 108, height: 92, marginTop: SCREEN_HEIGHT * 0.08, alignSelf: "center", resizeMode: "contain" as const }}
+                                style={{ width: 104, height: 88, alignSelf: "center", resizeMode: "contain" as const }}
                             />
                             <Text
                                 style={{
-                                    marginTop: 20,
+                                    marginTop: 12,
                                     alignSelf: "center",
                                     fontFamily: "Nunito-Bold",
-                                    fontSize: 28,
-                                    lineHeight: 38,
+                                    fontSize: 26,
+                                    lineHeight: 32,
                                     color: "#173663",
                                     textAlign: "center",
                                 }}
@@ -175,11 +178,10 @@ export function SignupVoluntaryFirstStage() {
                         {/* Form Section */}
                         <View
                             style={{
-                                marginTop: 16,
                                 width: "100%",
-                                maxWidth: 350,
+                                maxWidth: 360,
                                 alignSelf: "center",
-                                gap: 16,
+                                gap: 14,
                             }}
                         >
                             <FormControl isInvalid={!!errors.name}>
@@ -202,19 +204,7 @@ export function SignupVoluntaryFirstStage() {
                                         <Input
                                             variant="rounded"
                                             size="sm"
-                                            style={{
-                                                width: "100%",
-                                                height: 43,
-                                                backgroundColor: "#FDFDFD",
-                                                borderColor: "#B7B7B7",
-                                                borderWidth: 1,
-                                                borderRadius: 8,
-                                                shadowColor: "#000",
-                                                shadowOffset: { width: 0, height: 2 },
-                                                shadowOpacity: 0.25,
-                                                shadowRadius: 2,
-                                                elevation: 2,
-                                            }}
+                                            style={{ width: "100%", height: 42, backgroundColor: "#FDFDFD", borderColor: "#B7B7B7", borderWidth: 1, borderRadius: 8 }}
                                         >
                                             <HStack style={{ alignItems: "center", justifyContent: "flex-start", marginLeft: 12 }}>
                                                 <InputField
@@ -257,19 +247,7 @@ export function SignupVoluntaryFirstStage() {
                                         <Input
                                             variant="rounded"
                                             size="sm"
-                                            style={{
-                                                width: "100%",
-                                                height: 43,
-                                                backgroundColor: "#FDFDFD",
-                                                borderColor: "#B7B7B7",
-                                                borderWidth: 1,
-                                                borderRadius: 8,
-                                                shadowColor: "#000",
-                                                shadowOffset: { width: 0, height: 2 },
-                                                shadowOpacity: 0.25,
-                                                shadowRadius: 2,
-                                                elevation: 2,
-                                            }}
+                                            style={{ width: "100%", height: 42, backgroundColor: "#FDFDFD", borderColor: "#B7B7B7", borderWidth: 1, borderRadius: 8 }}
                                         >
                                             <HStack style={{ alignItems: "center", justifyContent: "flex-start", marginLeft: 12 }}>
                                                 <InputField
@@ -314,19 +292,7 @@ export function SignupVoluntaryFirstStage() {
                                         <Input
                                             variant="rounded"
                                             size="sm"
-                                            style={{
-                                                width: "100%",
-                                                height: 43,
-                                                backgroundColor: "#FDFDFD",
-                                                borderColor: "#B7B7B7",
-                                                borderWidth: 1,
-                                                borderRadius: 8,
-                                                shadowColor: "#000",
-                                                shadowOffset: { width: 0, height: 2 },
-                                                shadowOpacity: 0.25,
-                                                shadowRadius: 2,
-                                                elevation: 2,
-                                            }}
+                                            style={{ width: "100%", height: 42, backgroundColor: "#FDFDFD", borderColor: "#B7B7B7", borderWidth: 1, borderRadius: 8 }}
                                         >
                                             <HStack style={{ alignItems: "center", justifyContent: "flex-start", marginLeft: 12 }}>
                                                 <InputField
@@ -375,19 +341,7 @@ export function SignupVoluntaryFirstStage() {
                                         <Input
                                             variant="rounded"
                                             size="sm"
-                                            style={{
-                                                width: "100%",
-                                                height: 43,
-                                                backgroundColor: "#FDFDFD",
-                                                borderColor: "#B7B7B7",
-                                                borderWidth: 1,
-                                                borderRadius: 8,
-                                                shadowColor: "#000",
-                                                shadowOffset: { width: 0, height: 2 },
-                                                shadowOpacity: 0.25,
-                                                shadowRadius: 2,
-                                                elevation: 2,
-                                            }}
+                                            style={{ width: "100%", height: 42, backgroundColor: "#FDFDFD", borderColor: "#B7B7B7", borderWidth: 1, borderRadius: 8 }}
                                         >
                                             <HStack style={{ alignItems: "center", justifyContent: "flex-start", marginLeft: 12 }}>
                                                 <InputField
@@ -427,34 +381,7 @@ export function SignupVoluntaryFirstStage() {
                                     control={control}
                                     name="state"
                                     render={({ field: { onChange, value } }) => (
-                                        <Input
-                                            variant="rounded"
-                                            size="sm"
-                                            style={{
-                                                width: "100%",
-                                                height: 43,
-                                                backgroundColor: "#FDFDFD",
-                                                borderColor: "#B7B7B7",
-                                                borderWidth: 1,
-                                                borderRadius: 8,
-                                                shadowColor: "#000",
-                                                shadowOffset: { width: 0, height: 2 },
-                                                shadowOpacity: 0.25,
-                                                shadowRadius: 2,
-                                                elevation: 2,
-                                            }}
-                                        >
-                                            <HStack style={{ alignItems: "center", justifyContent: "flex-start", marginLeft: 12 }}>
-                                                <InputField
-                                                    keyboardType="default"
-                                                    value={value}
-                                                    onChangeText={(text) => {
-                                                        onChange(text);
-                                                        setErrorMessage("");
-                                                    }}
-                                                />
-                                            </HStack>
-                                        </Input>
+                                        <StateSelect value={value} onChange={(val)=>{ onChange(val); setErrorMessage(""); }} height={42} />
                                     )}
                                 />
                                 {errors.state && (
@@ -467,13 +394,13 @@ export function SignupVoluntaryFirstStage() {
                         </View>
 
                         {/* Bottom Section */}
-                        <View style={{ width: "100%", alignItems: "center", gap: 12 }}>
+                        <View style={{ width: "100%", alignItems: "center", gap: 10, marginTop: 4 }}>
                             <Button
                                 onPress={handleSubmit(onSubmit)}
                                 disabled={isLoading}
                                 style={{
-                                    width: 310,
-                                    height: 44,
+                                    width: 300,
+                                    height: 42,
                                     backgroundColor: "#173663",
                                     borderRadius: 12,
                                     display: "flex",
@@ -491,16 +418,7 @@ export function SignupVoluntaryFirstStage() {
                                     </Text>
                                 )}
                             </Button>
-                            <Text
-                                style={{
-                                    fontFamily: "Nunito-Regular",
-                                    fontSize: 14,
-                                    lineHeight: 20,
-                                    color: "#000",
-                                    textAlign: "center",
-                                    width: 312,
-                                }}
-                            >
+                            <Text style={{ fontFamily: "Nunito-Regular", fontSize: 13, lineHeight: 18, color: "#000", textAlign: "center", width: 300 }}>
                                 {"Com seu cadastro, você poderá se conectar\na instituições que precisam da sua ajuda."}
                             </Text>
                         </View>

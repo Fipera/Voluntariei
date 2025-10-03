@@ -5,62 +5,30 @@ import {
     findInstitutionByEmail,
     findInstitutionByPhone,
     findInstitutions,
+    updateInstitution,
+    findInstitutionById,
 } from "../services/institution.service";
 import {
     checkUniquenessInstitutionInput,
     createInstitutionInput,
     createInstitutionSchema,
     LoginInstitutionInput,
+    updateInstitutionInput,
 } from "../schemas/institution.schema";
 import { verifyPassword } from "../../utils/hash";
 import { server } from "../../app";
 import { AccountAlreadyExistsError } from "../../errors/email.already.exists";
-import { PrismaClientKnownRequestError } from "../../generated/prisma/runtime/library";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import {
     findVoluntaryByEmail,
     findVoluntaryByPhone,
 } from "../services/voluntary.service";
-import { promisify } from "util";
-import { pipeline } from "stream";
-import multipart from "@fastify/multipart";
-import path from "path";
-import fs from "fs";
-
-const pump = promisify(pipeline);
 
 export async function registerInstitutionHandler(
   request: FastifyRequest,
   reply: FastifyReply
 ) {
-  let body: Record<string, any> = {};
-  let logoUrl = "";
-
-  // Cria pasta de uploads se não existir
-  const uploadsDir = path.join(__dirname, "..", "..", "uploads");
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-  }
-
-  // Verifica se é multipart
-  const contentType = request.headers["content-type"] || "";
-  if (contentType.includes("multipart/form-data")) {
-    const parts = request.parts();
-    for await (const part of parts) {
-      if (part.type === "file" && part.fieldname === "logo") {
-        const filename = `${Date.now()}-${part.filename}`;
-        const filePath = path.join(uploadsDir, filename);
-
-        await pump(part.file, fs.createWriteStream(filePath));
-        logoUrl = `/uploads/${filename}`;
-      } else if (part.type === "field") {
-        body[part.fieldname] = part.value;
-      }
-    }
-  } else {
-
-    body = request.body as Record<string, any>;
-    logoUrl = body.logoUrl || "";
-  }
+  const body: Record<string, any> = request.body as Record<string, any>;
 
   try {
     const voluntaryWithSameEmail = await findVoluntaryByEmail(body.email);
@@ -81,10 +49,7 @@ export async function registerInstitutionHandler(
       return reply.status(400).send({ message: "CNPJ já está em uso" });
     }
 
-    const parsed = createInstitutionSchema.parse({
-      ...body,
-      logoUrl,
-    });
+  const parsed = createInstitutionSchema.parse(body);
 
     const institution = await createInstitution(parsed);
 
@@ -157,7 +122,6 @@ export async function loginInstitutionHandler(
         return reply.code(401).send({ message: "E-mail ou senha incorreta" });
     }
 
-    // Se não encontrou nenhum
     return reply.code(401).send({ message: "E-mail ou senha incorreta" });
 }
 
@@ -186,4 +150,43 @@ export async function checkInstitutionUniquenessHandler(
         phoneNumber: !!phoneExists,
         cnpj: !!cnpjExists,
     });
+}
+
+export async function updateInstitutionHandler(
+    request: any,
+    reply: FastifyReply
+){
+    try {
+        const updated = await updateInstitution(request.user.id, request.body);
+
+        return reply.code(200).send({
+            id: updated.id,
+            email: updated.email,
+            name: updated.name,
+            phoneNumber: updated.phoneNumber,
+            cnpj: updated.cnpj,
+            city: updated.city,
+            state: updated.state,
+            reason: updated.reason
+        })
+    } catch(err){
+        return reply.status(400).send({ error: "Erro ao atualizar", details: err })
+    }
+}
+
+export async function getInstitutionMeHandler(request: any, reply: FastifyReply){
+    const me = await findInstitutionById(request.user.id);
+    if(!me){
+        return reply.code(404).send({ message: "Not found" })
+    }
+    return reply.send({
+        id: me.id,
+        email: me.email,
+        name: me.name,
+        phoneNumber: me.phoneNumber,
+        cnpj: me.cnpj,
+        city: me.city,
+        state: me.state,
+        reason: me.reason
+    })
 }
