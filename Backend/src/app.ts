@@ -6,6 +6,8 @@ import authenticate from "./plugins/authenticate";
 import voluntaryRoutes from "./modules/routes/voluntary.route";
 import { voluntarySchemas } from "./modules/schemas/voluntary.schema";
 import multipart from "@fastify/multipart";
+import cardRoutes from "./modules/routes/card.route";
+import { cardSchemas } from "./modules/schemas/card.schema";
 export const server = Fastify();
 
 server.get("/healthcheck", async function () {
@@ -29,8 +31,13 @@ async function main() {
         server.addSchema(schema);
     }
 
+    for (const schema of cardSchemas) {
+        server.addSchema(schema);
+    }
+
     server.register(institutionRoutes, { prefix: "/institution" });
     server.register(voluntaryRoutes, { prefix: "/voluntary" });
+    server.register(cardRoutes, { prefix: "/cards" });
 
     try {
         await server.listen({ port: 3000, host: "0.0.0.0" });

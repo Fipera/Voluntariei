@@ -1,0 +1,283 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ScrollView, View, StyleSheet, Image as RNImage, Pressable, Alert } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { VStack } from '@/components/ui/vstack';
+import { HStack } from '@/components/ui/hstack';
+import { Text } from '@/components/ui/text';
+import { Button } from '@/components/ui/button';
+import { Box } from '@/components/ui/box';
+import { Spinner } from '@/components/ui/spinner';
+import { Calendar, ChevronLeft, MapPin, Tag, Check } from 'lucide-react-native';
+import api from '@/services/api';
+import { useAuth } from '@/providers/AuthProvider';
+import { SKILL_IMAGE_MAP, DEFAULT_SKILL_IMAGE } from '@/utils/constants/voluntarySkillImages';
+import { SKILL_GROUPS } from '@/utils/constants/voluntarySkills';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+
+interface CardDetail {
+  id: number;
+  title: string;
+  description?: string;
+  banner?: string | null;
+  startAt: string;
+  endAt: string;
+  createdAt?: string;
+  isOnline: boolean;
+  cep?: string;
+  neighborhood?: string;
+  city?: string;
+  state?: string;
+  numberHouse?: string;
+  street?: string;
+  complement?: string;
+  locationNote?: string;
+  maxVolunteers: number;
+  status: 'ACTIVE' | 'PENDING' | 'FINALIZED' | 'CANCELED';
+  skills: string[];
+}
+
+function StatusTag({ status }: { status: 'ACTIVE' | 'PENDING' | 'FINALIZED' | 'CANCELED' }){
+  const map = {
+    ACTIVE: { label: 'Ativa', bg: '#DCFCE7', fg: '#166534' },
+    PENDING: { label: 'Pendente', bg: '#FEF9C3', fg: '#92400E' },
+    FINALIZED: { label: 'Finalizada', bg: '#E2E8F0', fg: '#0F172A' },
+    CANCELED: { label: 'Cancelada', bg: '#FEE2E2', fg: '#991B1B' },
+  } as const;
+  const cfg = map[status];
+  return (
+    <HStack style={{ paddingHorizontal:10, paddingVertical:6, borderRadius:999, backgroundColor: cfg.bg, alignItems:'center' }}>
+      <Text style={{ fontFamily:'Nunito-Bold', color: cfg.fg, fontSize:12 }}>{cfg.label}</Text>
+    </HStack>
+  );
+}
+
+function StatusBadge({ status }: { status: 'ACTIVE' | 'PENDING' | 'FINALIZED' | 'CANCELED' }){
+  const map = {
+    ACTIVE: { label: 'Ativa', bg: '#1BAF71', icon: true },
+    PENDING: { label: 'Pendente', bg: '#D97706', icon: false },
+    FINALIZED: { label: 'Finalizada', bg: '#64748B', icon: false },
+    CANCELED: { label: 'Cancelada', bg: '#DC2626', icon: false },
+  } as const;
+  const cfg = map[status];
+  return (
+    <HStack style={{ height:24, minWidth:100, paddingHorizontal:10, borderRadius:12, backgroundColor: cfg.bg, alignItems:'center', justifyContent:'center', gap:4 }}>
+      {cfg.icon && <Check size={12} color="#fff" strokeWidth={2} />}
+      <Text style={{ color:'#fff', fontFamily:'Nunito-Bold', fontSize:12 }}>{cfg.label}</Text>
+    </HStack>
+  );
+}
+
+export default function OpportunityDetail(){
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { token } = useAuth();
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const tabBarHeight = useBottomTabBarHeight ? useBottomTabBarHeight() : 70;
+
+  const [data, setData] = useState<CardDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'details' | 'subscriptions'>('details');
+  const [isCancelling, setIsCancelling] = useState(false);
+
+  // wait until backend reflects canceled status
+  async function waitForCancellation(maxTries = 14, delayMs = 900){
+    for (let i=0; i<maxTries; i++){
+      try{
+        const { data: d } = await api.get<CardDetail>(`/cards/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+        if (d?.status === 'CANCELED') return true;
+      }catch{}
+      await new Promise(res=> setTimeout(res, delayMs));
+    }
+    return false;
+  }
+
+  useEffect(() => {
+    async function load(){
+      if(!token || !id) return;
+      try{
+        setLoading(true);
+        const { data } = await api.get<CardDetail>(`/cards/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+        setData(data);
+      }finally{
+        setLoading(false);
+      }
+    }
+    load();
+  }, [token, id]);
+
+  function formatDate(dt: string){
+    const d = new Date(dt);
+    const date = d.toLocaleDateString('pt-BR');
+    const time = d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+    return `${date} - ${time}`;
+  }
+
+  const address = useMemo(()=>{
+    const p = [] as string[];
+    if(data?.street) p.push(data.street);
+    if(data?.numberHouse) p.push(data.numberHouse);
+    if(data?.neighborhood) p.push(data.neighborhood);
+    const cityState = [data?.city, data?.state].filter(Boolean).join(', ');
+    if(cityState) p.push(cityState);
+    if(data?.cep) p.push(data.cep);
+    return p.join(', ');
+  }, [data]);
+
+  // cancel handler
+  async function handleCancel(){
+    if(!id || !token) return;
+    Alert.alert(
+      'Cancelar Vaga',
+      'Tem certeza que deseja cancelar esta vaga? Esta ação não pode ser desfeita.',
+      [
+        { text: 'Não', style: 'cancel' },
+        { text: 'Sim, cancelar', style: 'destructive', onPress: async ()=>{
+            try{
+              setIsCancelling(true);
+              await api.post(`/cards/${id}/cancel`, {}, { headers: { Authorization: `Bearer ${token}` } });
+              await waitForCancellation();
+              router.replace({ pathname: '/(institution)', params: { filter: 'ALL' } } as any);
+            } catch(e){
+              Alert.alert('Erro', 'Não foi possível cancelar a vaga.');
+              setIsCancelling(false);
+            }
+        } }
+      ]
+    );
+  }
+
+  if(loading){
+    return (
+      <SafeAreaView style={{ flex:1 }} edges={['top','left','right']}>
+        <VStack style={{ flex:1, alignItems:'center', justifyContent:'center' }}>
+          <Spinner />
+        </VStack>
+      </SafeAreaView>
+    )
+  }
+
+  if(!data){
+    return null;
+  }
+
+  return (
+    <SafeAreaView style={{ flex:1 }} edges={['top','left','right']}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal:20, paddingTop: insets.top + 8, paddingBottom: (tabBarHeight || 70) + 24 }}>
+        {/* Header */}
+        <HStack style={{ alignItems:'center', gap:8, marginBottom:16 }}>
+          <Pressable onPress={()=> router.replace({ pathname: '/(institution)', params: { filter: 'ALL' } } as any)} hitSlop={10} style={{ padding:6 }}>
+            <ChevronLeft size={22} color="#173663" />
+          </Pressable>
+          <Text style={{ fontSize:22, lineHeight:30, fontFamily:'Nunito-Bold', color:'#173663' }}>Gerenciamento da Vaga</Text>
+        </HStack>
+
+        {/* Mini Card */}
+        <HStack style={{ gap:12, backgroundColor:'#fff', borderRadius:12, overflow:'hidden', borderWidth:1, borderColor:'#E5E7EB', padding:10, elevation:2, shadowColor:'#000', shadowOpacity:0.1, shadowRadius:4 }}>
+          <Box style={{ width:140, height:84, borderRadius:8, overflow:'hidden', backgroundColor:'#e5e7eb' }}>
+            {data.banner ? (
+              <RNImage source={{ uri: data.banner }} style={StyleSheet.absoluteFillObject} resizeMode='cover' />
+            ) : null}
+          </Box>
+          <VStack style={{ flex:1, justifyContent:'space-between', paddingVertical:4 }}>
+            <Text style={{ fontSize:18, fontFamily:'Nunito-Bold', color:'#173663' }} numberOfLines={1}>{data.title}</Text>
+            {data.createdAt && (
+              <Text style={{ fontSize:12, color:'#64748B' }}>Criado: {new Date(data.createdAt).toLocaleDateString('pt-BR')}</Text>
+            )}
+            <HStack style={{ justifyContent:'flex-start' }}>
+              <StatusBadge status={data.status} />
+            </HStack>
+          </VStack>
+        </HStack>
+
+        {/* Tabs header 50/50 */}
+        <VStack style={{ marginTop:20, marginBottom:12 }}>
+          <HStack style={{ alignItems:'center' }}>
+            <Pressable onPress={()=> setActiveTab('details')} style={{ flex:1, alignItems:'center', paddingVertical:8 }}>
+              <Text style={{ fontSize:20, lineHeight:27, fontFamily:'Nunito-Bold', color:'#173663' }}>Detalhes</Text>
+            </Pressable>
+            <Pressable onPress={()=> setActiveTab('subscriptions')} style={{ flex:1, alignItems:'center', paddingVertical:8 }}>
+              <Text style={{ fontSize:20, lineHeight:27, fontFamily:'Nunito-Bold', color:'#173663' }}>Inscrições</Text>
+            </Pressable>
+          </HStack>
+          <HStack>
+            <Box style={{ height:1, width:'50%', backgroundColor: activeTab==='details' ? '#173663' : '#B7B7B7' }} />
+            <Box style={{ height:1, width:'50%', backgroundColor: activeTab==='subscriptions' ? '#173663' : '#B7B7B7' }} />
+          </HStack>
+        </VStack>
+
+        {/* Content */}
+        {activeTab === 'details' ? (
+        <VStack style={{ gap:20 }}>
+          {/* Datas */}
+          <VStack style={{ gap:8 }}>
+            <HStack style={{ gap:8, alignItems:'center' }}>
+              <Calendar size={18} color="#173663" />
+              <Text style={{ fontSize:18, fontFamily:'Nunito-Bold', color:'#173663' }}>Datas</Text>
+            </HStack>
+            <Text style={{ color:'#1F2937' }}>{formatDate(data.startAt)}</Text>
+            <Text style={{ color:'#1F2937' }}>{formatDate(data.endAt)}</Text>
+          </VStack>
+
+          {/* Local */}
+          <VStack style={{ gap:8 }}>
+            <HStack style={{ gap:8, alignItems:'center' }}>
+              <MapPin size={18} color="#173663" />
+              <Text style={{ fontSize:18, fontFamily:'Nunito-Bold', color:'#173663' }}>Local</Text>
+            </HStack>
+            <Text style={{ color:'#1F2937' }}>{data.isOnline ? 'Online' : address}</Text>
+          </VStack>
+
+          {/* Descrição */}
+          {data.description && (
+            <VStack style={{ gap:8 }}>
+              <HStack style={{ gap:8, alignItems:'center' }}>
+                <Tag size={18} color="#173663" />
+                <Text style={{ fontSize:18, fontFamily:'Nunito-Bold', color:'#173663' }}>Descrição</Text>
+              </HStack>
+              <Text style={{ color:'#1F2937' }}>{data.description}</Text>
+            </VStack>
+          )}
+
+          {/* Habilidades */}
+          {!!data.skills?.length && (
+            <VStack style={{ gap:8 }}>
+              <Text style={{ fontSize:18, fontFamily:'Nunito-Bold', color:'#173663' }}>Habilidades</Text>
+              <HStack style={{ gap:16, flexWrap:'wrap' }}>
+                {data.skills.map((s)=> {
+                  const img = SKILL_IMAGE_MAP[s] || DEFAULT_SKILL_IMAGE;
+                  const label = SKILL_GROUPS.flatMap(g=> g.skills).find(k=> k.value === s)?.label || s;
+                  return (
+                    <VStack key={s} style={{ width:74, alignItems:'center' }}>
+                      <RNImage source={img} style={{ width: 62, height: 62, borderRadius: 9999 }} />
+                      <Text style={{ marginTop:6, fontSize:12, color:'#1A202C', textAlign:'center' }} numberOfLines={2}>{label}</Text>
+                    </VStack>
+                  );
+                })}
+              </HStack>
+            </VStack>
+          )}
+
+          {/* Cancelar vaga */}
+          <Button onPress={handleCancel} disabled={isCancelling} style={{ backgroundColor:'#DC2626', height:44, borderRadius:12, marginTop:8, opacity: isCancelling ? 0.8 : 1 }}>
+            <Text style={{ color:'#fff', fontFamily:'Nunito-Bold' }}>{isCancelling ? 'Cancelando...' : 'Cancelar Vaga'}</Text>
+          </Button>
+        </VStack>
+        ) : (
+          <VStack style={{ gap:16 }}>
+            <Text style={{ color:'#64748B' }}>Inscrições em breve.</Text>
+          </VStack>
+        )}
+      </ScrollView>
+
+      {isCancelling && (
+        <View style={{ position:'absolute', top:0, left:0, right:0, bottom:0, backgroundColor:'rgba(255,255,255,0.85)', alignItems:'center', justifyContent:'center' }} pointerEvents="auto">
+          <VStack style={{ alignItems:'center', gap:12 }}>
+            <Spinner />
+            <Text style={{ fontFamily:'Nunito-Bold', color:'#173663' }}>Cancelando vaga...</Text>
+          </VStack>
+        </View>
+      )}
+    </SafeAreaView>
+  );
+}

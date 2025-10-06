@@ -8,7 +8,7 @@ import { Input, InputField } from '@/components/ui/input';
 import { Button, ButtonText } from '@/components/ui/button';
 import { useAuth } from '@/providers/AuthProvider';
 import api from '@/services/api';
-import { Settings, LogOut, FileText, Info } from 'lucide-react-native';
+import { Settings, LogOut, FileText, Info, Check } from 'lucide-react-native';
 import { StateSelect } from '@/components/custom/StateSelect';
 
 interface InstitutionMeResponse {
@@ -34,6 +34,7 @@ export default function InstitutionProfileScreen() {
   const [stateValue, setStateValue] = useState('');
   const [reason, setReason] = useState('');
   const [settingsVisible, setSettingsVisible] = useState(false);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) return;
@@ -94,7 +95,8 @@ export default function InstitutionProfileScreen() {
         reason: reason || undefined,
       }, { headers: { Authorization: `Bearer ${token}` } });
       setData(updatedResp.data);
-      Alert.alert('Sucesso', 'Alterações salvas.');
+      setSuccessMsg('Alterações salvas com sucesso!');
+      setTimeout(()=> setSuccessMsg(null), 3000);
     } catch (e: any) {
       Alert.alert('Erro', e.message || 'Não foi possível salvar');
     } finally {
@@ -119,6 +121,14 @@ export default function InstitutionProfileScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top','left','right']}>
+      {successMsg && (
+        <View style={{ position:'absolute', top: insets.top + 8, left:16, right:16, zIndex:30 }}>
+          <View style={{ backgroundColor:'#E6FFFA', borderColor:'#2C7A7B', borderWidth:1, padding:12, borderRadius:10, flexDirection:'row', alignItems:'center', gap:8 }}>
+            <Check size={18} color="#2C7A7B" />
+            <Text style={{ color:'#234E52', fontFamily:'Nunito-Bold' }}>{successMsg}</Text>
+          </View>
+        </View>
+      )}
       <Pressable onPress={()=>setSettingsVisible(true)} style={{ position:'absolute', top: insets.top + 4, right:16, zIndex:20, padding:8 }} hitSlop={8}>
         <Settings size={26} color={'#173663'} />
       </Pressable>

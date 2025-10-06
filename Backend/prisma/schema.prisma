@@ -44,6 +44,21 @@ model Card {
   description  String?
   owner        Institution     @relation(fields: [ownerId], references: [id])
   ownerId      Int
+  banner       String?
+  startAt      DateTime
+  endAt        DateTime
+  isOnline     Boolean         @default(false)
+  cep          String?
+  neighborhood String?
+  city         String?
+  state        String?
+  numberHouse  String?
+  street       String?
+  complement   String?
+  locationNote String?
+  maxVolunteers Int
+  status       CardStatus      @default(ACTIVE)
+  skills       Skill[]
   participants Participation[]
 }
 
@@ -69,6 +84,7 @@ model Skill {
   id         Int         @id @default(autoincrement())
   name       String      @unique
   volunteers Voluntary[]
+  cards      Card[]
 }
 
 model Participation {
@@ -77,6 +93,21 @@ model Participation {
   voluntaryId Int
   card        Card      @relation(fields: [cardId], references: [id])
   cardId      Int
+  status      ParticipationStatus @default(PENDING)
+  observation String?
 
   @@unique([voluntaryId, cardId])
+}
+
+enum CardStatus {
+  ACTIVE
+  PENDING
+  FINALIZED
+  CANCELED
+}
+
+enum ParticipationStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
 }

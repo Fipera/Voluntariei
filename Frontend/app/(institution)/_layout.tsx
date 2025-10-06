@@ -71,6 +71,8 @@ export default () => {
       <Tabs.Screen name="index" options={{ title: 'Hub', tabBarIcon: ({color}) => <House size={22} color={color} /> }} />
       <Tabs.Screen name="create-opportunity" options={{ title: 'Criar Vaga', tabBarIcon: ({color}) => <Plus size={24} color={color} /> }} />
       <Tabs.Screen name="profile" options={{ title: 'Perfil', tabBarIcon: ({color}) => <User size={22} color={color} /> }} />
+      {/* Hide nested stack for opportunity detail from tab bar */}
+      <Tabs.Screen name="opportunity" options={{ href: null }} />
     </Tabs>
   );
 };
