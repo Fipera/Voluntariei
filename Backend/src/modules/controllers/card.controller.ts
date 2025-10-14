@@ -1,7 +1,23 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { createCard } from "../services/card.service";
-import { findCardsByOwner, findCardsForVoluntary, findCardByIdForOwner, cancelCard } from "../services/card.service";
+import { findCardsByOwner, findCardsForVoluntary, findCardByIdForOwner, findCardById, cancelCard, searchCardsByTitle, findAllActiveCards } from "../services/card.service";
 import { createCardSchema, createCardInput } from "../schemas/card.schema";
+
+// Helper function to calculate dynamic status
+function getCardStatus(card: any): 'ACTIVE' | 'PENDING' | 'FINALIZED' | 'CANCELED' {
+  // If card is already CANCELED or FINALIZED, keep that status
+  if (card.status === 'CANCELED' || card.status === 'FINALIZED') {
+    return card.status;
+  }
+  
+  // If card is ACTIVE and has pending participants, show as PENDING
+  if (card.status === 'ACTIVE' && card.participants?.some((p: any) => p.status === 'PENDING')) {
+    return 'PENDING';
+  }
+  
+  // Otherwise return the original status
+  return card.status;
+}
 
 export async function createCardHandler(
   request: FastifyRequest,
@@ -27,7 +43,7 @@ export async function createCardHandler(
       title: card.title,
       description: card.description ?? undefined,
       startAt: card.startAt,
-      endAt: card.endAt,
+      duration: card.duration,
       isOnline: card.isOnline,
       maxVolunteers: card.maxVolunteers,
       status: card.status,
@@ -51,32 +67,40 @@ export async function getMyCardsHandler(request: any){
     description: c.description ?? undefined,
     banner: c.banner ?? undefined,
     startAt: c.startAt,
-    endAt: c.endAt,
+    duration: c.duration,
     isOnline: c.isOnline,
     city: c.city ?? undefined,
     state: c.state ?? undefined,
     maxVolunteers: c.maxVolunteers,
-    status: c.status,
+    status: getCardStatus(c),
     skills: c.skills.map(s=>s.name),
-    participantsCount: c.participants.length
+    participantsCount: c.participants.filter(p => p.status !== 'REJECTED').length
   }))
 }
 
 export async function getFeedCardsHandler(request: any){
   const cards = await findCardsForVoluntary(request.user.id);
-  return cards.map((c)=> ({
+  
+  // Filtra oportunidades com vagas cheias
+  const availableCards = cards.filter((c) => {
+    const participantsCount = (c as any).participants?.filter((p: any) => p.status !== 'REJECTED').length ?? 0;
+    return participantsCount < c.maxVolunteers;
+  });
+  
+  return availableCards.map((c)=> ({
     id: c.id,
     title: c.title,
     description: c.description ?? undefined,
     banner: c.banner ?? undefined,
     startAt: c.startAt,
-    endAt: c.endAt,
+    duration: c.duration,
     isOnline: c.isOnline,
     city: c.city ?? c.owner?.city ?? undefined,
     state: c.state ?? c.owner?.state ?? undefined,
     maxVolunteers: c.maxVolunteers,
     status: c.status,
     skills: c.skills.map(s=>s.name),
+    participantsCount: (c as any).participants?.filter((p: any) => p.status !== 'REJECTED').length ?? 0,
     institution: c.owner?.name
   }))
 }
@@ -92,7 +116,7 @@ export async function getMyCardDetailHandler(request: any, reply: FastifyReply){
     description: c.description ?? undefined,
     banner: c.banner ?? undefined,
     startAt: c.startAt,
-    endAt: c.endAt,
+    duration: c.duration,
   createdAt: c.createAt,
     isOnline: c.isOnline,
     cep: c.cep ?? undefined,
@@ -104,15 +128,62 @@ export async function getMyCardDetailHandler(request: any, reply: FastifyReply){
     complement: c.complement ?? undefined,
     locationNote: c.locationNote ?? undefined,
     maxVolunteers: c.maxVolunteers,
-    status: c.status,
+    status: getCardStatus(c),
     skills: c.skills.map(s=>s.name),
+    participantsCount: c.participants.filter(p => p.status !== 'REJECTED').length,
     participants: c.participants.map(p=>({
       id: p.id,
       status: p.status,
       observation: p.observation ?? undefined,
-      voluntary: p.voluntary
+      voluntary: {
+        id: p.voluntary.id,
+        name: p.voluntary.name,
+        city: p.voluntary.city,
+        state: p.voluntary.state,
+        skills: p.voluntary.skills.map(s=>({ skill: s.name }))
+      }
     }))
   }
+}
+
+export async function getCardDetailHandler(request: any, reply: FastifyReply){
+  const id = Number((request.params as any)?.id);
+  const card = await findCardById(id);
+  if (!card) {
+    return reply.status(404).send({ message: "Card não encontrado" });
+  }
+
+  // Verifica se o usuário é voluntário e se já está inscrito
+  let isApplied = false;
+  if(request.user.type === 'voluntary'){
+    const userId = Number(request.user.id);
+    isApplied = card.participants.some(p => Number(p.voluntaryId) === userId);
+  }
+
+  return {
+    id: card.id,
+    title: card.title,
+    description: card.description ?? undefined,
+    banner: card.banner ?? undefined,
+    startAt: card.startAt,
+    duration: card.duration,
+    createdAt: card.createAt,
+    isOnline: card.isOnline,
+    cep: card.cep ?? undefined,
+    neighborhood: card.neighborhood ?? undefined,
+    city: card.city ?? undefined,
+    state: card.state ?? undefined,
+    numberHouse: card.numberHouse ?? undefined,
+    street: card.street ?? undefined,
+    complement: card.complement ?? undefined,
+    locationNote: card.locationNote ?? undefined,
+    maxVolunteers: card.maxVolunteers,
+    status: getCardStatus(card),
+    institution: card.owner?.name,
+    skills: card.skills.map(s=>s.name),
+    participantsCount: card.participants?.filter(p => p.status !== 'REJECTED').length ?? 0,
+    isApplied
+  };
 }
 
 export async function cancelCardHandler(request: any, reply: FastifyReply){
@@ -121,4 +192,51 @@ export async function cancelCardHandler(request: any, reply: FastifyReply){
   const updated = await cancelCard(id, request.user.id);
   if(!updated) return reply.code(404).send({ message: 'Card não encontrado' });
   return reply.send({ id: updated.id, status: updated.status });
+}
+
+export async function searchCardsHandler(request: any, reply: FastifyReply){
+  const query = request.query as any;
+  const searchQuery = query.q || '';
+  
+  if(!searchQuery || searchQuery.trim() === ''){
+    return reply.code(400).send({ message: 'Informe um termo de busca (parâmetro q)' });
+  }
+
+  const cards = await searchCardsByTitle(searchQuery.trim());
+  return cards.map((c)=> ({
+    id: c.id,
+    title: c.title,
+    description: c.description ?? undefined,
+    banner: c.banner ?? undefined,
+    startAt: c.startAt,
+    duration: c.duration,
+    isOnline: c.isOnline,
+    city: c.city ?? c.owner?.city ?? undefined,
+    state: c.state ?? c.owner?.state ?? undefined,
+    maxVolunteers: c.maxVolunteers,
+    status: c.status,
+    skills: c.skills.map(s=>s.name),
+    participantsCount: (c as any).participants?.filter((p: any) => p.status !== 'REJECTED').length ?? 0,
+    institution: c.owner?.name
+  }))
+}
+
+export async function getAllCardsHandler(request: any){
+  const cards = await findAllActiveCards();
+  return cards.map((c)=> ({
+    id: c.id,
+    title: c.title,
+    description: c.description ?? undefined,
+    banner: c.banner ?? undefined,
+    startAt: c.startAt,
+    duration: c.duration,
+    isOnline: c.isOnline,
+    city: c.city ?? c.owner?.city ?? undefined,
+    state: c.state ?? c.owner?.state ?? undefined,
+    maxVolunteers: c.maxVolunteers,
+    status: c.status,
+    skills: c.skills.map(s=>s.name),
+    participantsCount: (c as any).participants?.filter((p: any) => p.status !== 'REJECTED').length ?? 0,
+    institution: c.owner?.name
+  }))
 }

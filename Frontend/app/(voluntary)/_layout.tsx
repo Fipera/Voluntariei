@@ -76,6 +76,9 @@ export default () => {
       <Tabs.Screen name="index" options={{ title: 'Hub', tabBarIcon: ({color}) => <House size={22} color={color} /> }} />
       <Tabs.Screen name="schedule" options={{ title: 'Agenda', tabBarIcon: ({color}) => <Calendar size={22} color={color} /> }} />
       <Tabs.Screen name="profile" options={{ title: 'Perfil', tabBarIcon: ({color}) => <User size={22} color={color} /> }} />
+      
+      {/* Opportunity detail - hidden from tabs */}
+      <Tabs.Screen name="opportunity" options={{ href: null }} />
     </Tabs>
   );
 };

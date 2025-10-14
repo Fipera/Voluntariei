@@ -8,6 +8,8 @@ import { voluntarySchemas } from "./modules/schemas/voluntary.schema";
 import multipart from "@fastify/multipart";
 import cardRoutes from "./modules/routes/card.route";
 import { cardSchemas } from "./modules/schemas/card.schema";
+import participationRoutes from "./modules/routes/participation.route";
+import { participationSchemas } from "./modules/schemas/participation.schema";
 export const server = Fastify();
 
 server.get("/healthcheck", async function () {
@@ -35,9 +37,14 @@ async function main() {
         server.addSchema(schema);
     }
 
+    for (const schema of participationSchemas) {
+        server.addSchema(schema);
+    }
+
     server.register(institutionRoutes, { prefix: "/institution" });
     server.register(voluntaryRoutes, { prefix: "/voluntary" });
     server.register(cardRoutes, { prefix: "/cards" });
+    server.register(participationRoutes, { prefix: "/" });
 
     try {
         await server.listen({ port: 3000, host: "0.0.0.0" });

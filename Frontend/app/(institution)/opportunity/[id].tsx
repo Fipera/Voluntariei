@@ -8,7 +8,7 @@ import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
 import { Box } from '@/components/ui/box';
 import { Spinner } from '@/components/ui/spinner';
-import { Calendar, ChevronLeft, MapPin, Tag, Check } from 'lucide-react-native';
+import { Calendar, ChevronLeft, MapPin, Tag, Check, Users, Clock, X } from 'lucide-react-native';
 import api from '@/services/api';
 import { useAuth } from '@/providers/AuthProvider';
 import { SKILL_IMAGE_MAP, DEFAULT_SKILL_IMAGE } from '@/utils/constants/voluntarySkillImages';
@@ -21,7 +21,7 @@ interface CardDetail {
   description?: string;
   banner?: string | null;
   startAt: string;
-  endAt: string;
+  duration: number; // em minutos
   createdAt?: string;
   isOnline: boolean;
   cep?: string;
@@ -35,6 +35,21 @@ interface CardDetail {
   maxVolunteers: number;
   status: 'ACTIVE' | 'PENDING' | 'FINALIZED' | 'CANCELED';
   skills: string[];
+  participants?: Participant[];
+  participantsCount?: number;
+}
+
+interface Participant {
+  id: number;
+  status: 'PENDING' | 'CONFIRMED' | 'REJECTED';
+  observation?: string;
+  voluntary: {
+    id: number;
+    name: string;
+    city?: string;
+    state?: string;
+    skills?: Array<{ skill: string }>;
+  };
 }
 
 function StatusTag({ status }: { status: 'ACTIVE' | 'PENDING' | 'FINALIZED' | 'CANCELED' }){
@@ -68,6 +83,19 @@ function StatusBadge({ status }: { status: 'ACTIVE' | 'PENDING' | 'FINALIZED' | 
   );
 }
 
+function formatDate(dt: string){
+  const d = new Date(dt);
+  const date = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const time = d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+  return `${date} - ${time}`;
+}
+
+function calculateEndDate(startAt: string, duration: number): string {
+  const start = new Date(startAt);
+  const end = new Date(start.getTime() + duration * 60000); // duration em minutos
+  return end.toISOString();
+}
+
 export default function OpportunityDetail(){
   const { id } = useLocalSearchParams<{ id: string }>();
   const { token } = useAuth();
@@ -79,6 +107,8 @@ export default function OpportunityDetail(){
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'details' | 'subscriptions'>('details');
   const [isCancelling, setIsCancelling] = useState(false);
+  const [subscriptionFilter, setSubscriptionFilter] = useState<'all' | 'pending' | 'confirmed'>('all');
+  const [expandedObservation, setExpandedObservation] = useState<{[key: number]: boolean}>({});
 
   // wait until backend reflects canceled status
   async function waitForCancellation(maxTries = 14, delayMs = 900){
@@ -92,17 +122,18 @@ export default function OpportunityDetail(){
     return false;
   }
 
-  useEffect(() => {
-    async function load(){
-      if(!token || !id) return;
-      try{
-        setLoading(true);
-        const { data } = await api.get<CardDetail>(`/cards/${id}`, { headers: { Authorization: `Bearer ${token}` } });
-        setData(data);
-      }finally{
-        setLoading(false);
-      }
+  const load = async () => {
+    if(!token || !id) return;
+    try{
+      setLoading(true);
+      const { data } = await api.get<CardDetail>(`/cards/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      setData(data);
+    }finally{
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
     load();
   }, [token, id]);
 
@@ -124,28 +155,81 @@ export default function OpportunityDetail(){
     return p.join(', ');
   }, [data]);
 
+  const filteredParticipants = useMemo(() => {
+    if (!data?.participants) return [];
+    // Filtra apenas PENDING e CONFIRMED (exclui REJECTED)
+    const activeParticipants = data.participants.filter(p => p.status !== 'REJECTED');
+    
+    if (subscriptionFilter === 'all') return activeParticipants;
+    if (subscriptionFilter === 'pending') return activeParticipants.filter(p => p.status === 'PENDING');
+    if (subscriptionFilter === 'confirmed') return activeParticipants.filter(p => p.status === 'CONFIRMED');
+    return activeParticipants;
+  }, [data?.participants, subscriptionFilter]);
+
   // cancel handler
-  async function handleCancel(){
-    if(!id || !token) return;
+  const handleCancel = async () => {
     Alert.alert(
       'Cancelar Vaga',
       'Tem certeza que deseja cancelar esta vaga? Esta ação não pode ser desfeita.',
       [
         { text: 'Não', style: 'cancel' },
-        { text: 'Sim, cancelar', style: 'destructive', onPress: async ()=>{
-            try{
+        {
+          text: 'Sim, cancelar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
               setIsCancelling(true);
-              await api.post(`/cards/${id}/cancel`, {}, { headers: { Authorization: `Bearer ${token}` } });
-              await waitForCancellation();
-              router.replace({ pathname: '/(institution)', params: { filter: 'ALL' } } as any);
-            } catch(e){
-              Alert.alert('Erro', 'Não foi possível cancelar a vaga.');
+              await api.post(`/cards/${id}/cancel`);
+              router.back();
+            } catch (error: any) {
+              Alert.alert('Erro', error.response?.data?.message || 'Não foi possível cancelar a vaga.');
+            } finally {
               setIsCancelling(false);
             }
-        } }
+          },
+        },
       ]
     );
-  }
+  };
+
+  const handleApprove = async (participationId: number) => {
+    try {
+      await api.post(`/participations/${participationId}/approve`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      Alert.alert('Sucesso', 'Inscrição confirmada!');
+      load(); // Reload to update list
+    } catch (error: any) {
+      console.error('Erro ao aprovar:', error);
+      Alert.alert('Erro', error.response?.data?.message || 'Não foi possível confirmar a inscrição.');
+    }
+  };
+
+  const handleReject = async (participationId: number) => {
+    Alert.alert(
+      'Recusar Inscrição',
+      'Tem certeza que deseja recusar esta inscrição?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Recusar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await api.post(`/participations/${participationId}/reject`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+              });
+              Alert.alert('Sucesso', 'Inscrição recusada.');
+              load(); // Reload to update list
+            } catch (error: any) {
+              console.error('Erro ao recusar:', error);
+              Alert.alert('Erro', error.response?.data?.message || 'Não foi possível recusar a inscrição.');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   if(loading){
     return (
@@ -216,7 +300,7 @@ export default function OpportunityDetail(){
               <Text style={{ fontSize:18, fontFamily:'Nunito-Bold', color:'#173663' }}>Datas</Text>
             </HStack>
             <Text style={{ color:'#1F2937' }}>{formatDate(data.startAt)}</Text>
-            <Text style={{ color:'#1F2937' }}>{formatDate(data.endAt)}</Text>
+            <Text style={{ color:'#1F2937' }}>{data.duration ? formatDate(calculateEndDate(data.startAt, data.duration)) : ''}</Text>
           </VStack>
 
           {/* Local */}
@@ -259,13 +343,344 @@ export default function OpportunityDetail(){
           )}
 
           {/* Cancelar vaga */}
-          <Button onPress={handleCancel} disabled={isCancelling} style={{ backgroundColor:'#DC2626', height:44, borderRadius:12, marginTop:8, opacity: isCancelling ? 0.8 : 1 }}>
-            <Text style={{ color:'#fff', fontFamily:'Nunito-Bold' }}>{isCancelling ? 'Cancelando...' : 'Cancelar Vaga'}</Text>
-          </Button>
+          {data.status !== 'CANCELED' && (
+            <Button onPress={handleCancel} disabled={isCancelling} style={{ backgroundColor:'#DC2626', height:44, borderRadius:12, marginTop:8, opacity: isCancelling ? 0.8 : 1 }}>
+              <Text style={{ color:'#fff', fontFamily:'Nunito-Bold' }}>{isCancelling ? 'Cancelando...' : 'Cancelar Vaga'}</Text>
+            </Button>
+          )}
         </VStack>
         ) : (
           <VStack style={{ gap:16 }}>
-            <Text style={{ color:'#64748B' }}>Inscrições em breve.</Text>
+            {/* Header - Número de Inscritos */}
+            <HStack 
+              style={{ 
+                alignItems:'center', 
+                paddingVertical:20,
+                paddingHorizontal:32,
+                gap:16,
+                backgroundColor:'#FFFFFF',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 2,
+                elevation: 3,
+                borderRadius:12,
+              }}
+            >
+              <View style={{ 
+                width:40, 
+                height:40, 
+                backgroundColor:'#1BAF71', 
+                borderRadius:4,
+                alignItems:'center',
+                justifyContent:'center'
+              }}>
+                <Users size={24} color="#FFFFFF" strokeWidth={2} />
+              </View>
+              <Text style={{ 
+                fontSize:24, 
+                fontFamily:'Nunito-Bold', 
+                color:'#000000',
+              }}>
+                Inscritos: {data?.participantsCount ?? 0}/{data?.maxVolunteers || 0}
+              </Text>
+            </HStack>
+
+            {/* Filtros */}
+            <HStack style={{ gap:12, justifyContent:'center', alignItems:'center', flexWrap:'wrap' }}>
+              <Pressable
+                onPress={() => setSubscriptionFilter('all')}
+                style={{
+                  paddingVertical:8,
+                  paddingHorizontal:16,
+                  minWidth:100,
+                  borderRadius:12,
+                  backgroundColor: subscriptionFilter === 'all' ? '#173663' : '#FFFFFF',
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 2,
+                  elevation: 3,
+                  justifyContent:'center',
+                  alignItems:'center',
+                }}
+              >
+                <Text style={{ 
+                  fontFamily:'Nunito-Bold', 
+                  fontSize:16,
+                  color: subscriptionFilter === 'all' ? '#FFFFFF' : '#173663' 
+                }}>
+                  Todas
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setSubscriptionFilter('pending')}
+                style={{
+                  paddingVertical:8,
+                  paddingHorizontal:16,
+                  minWidth:100,
+                  borderRadius:12,
+                  backgroundColor: subscriptionFilter === 'pending' ? '#173663' : '#FFFFFF',
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 2,
+                  elevation: 3,
+                  justifyContent:'center',
+                  alignItems:'center',
+                }}
+              >
+                <Text style={{ 
+                  fontFamily:'Nunito-Bold', 
+                  fontSize:16,
+                  color: subscriptionFilter === 'pending' ? '#FFFFFF' : '#173663' 
+                }}>
+                  Pendentes
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setSubscriptionFilter('confirmed')}
+                style={{
+                  paddingVertical:8,
+                  paddingHorizontal:16,
+                  minWidth:100,
+                  borderRadius:12,
+                  backgroundColor: subscriptionFilter === 'confirmed' ? '#173663' : '#FFFFFF',
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 2,
+                  elevation: 3,
+                  justifyContent:'center',
+                  alignItems:'center',
+                }}
+              >
+                <Text style={{ 
+                  fontFamily:'Nunito-Bold', 
+                  fontSize:16,
+                  color: subscriptionFilter === 'confirmed' ? '#FFFFFF' : '#173663' 
+                }}>
+                  Confirmados
+                </Text>
+              </Pressable>
+            </HStack>
+
+            {/* Lista de Participantes */}
+            {filteredParticipants.length === 0 ? (
+              <Text style={{ color:'#9CA3AF', textAlign:'center', marginTop:20, fontSize:16 }}>
+                Nenhuma inscrição {subscriptionFilter !== 'all' ? `com status "${subscriptionFilter === 'pending' ? 'Pendente' : 'Confirmado'}"` : ''} encontrada.
+              </Text>
+            ) : (
+              <VStack style={{ gap:20 }}>
+                {filteredParticipants.map((participant) => {
+                  const location = [participant.voluntary.city, participant.voluntary.state]
+                    .filter(Boolean)
+                    .join(', ');
+                  
+                  const statusConfig = {
+                    PENDING: { label: 'Pendente', bg: '#F98B26', icon: Clock },
+                    CONFIRMED: { label: 'Confirmado', bg: '#1BAF71', icon: Check },
+                    REJECTED: { label: 'Recusado', bg: '#E43A3A', icon: X },
+                  };
+                  const statusStyle = statusConfig[participant.status];
+                  const StatusIcon = statusStyle.icon;
+
+                  const isExpanded = expandedObservation[participant.id] || false;
+                  const shouldTruncate = participant.observation && participant.observation.length > 50;
+
+                  // Habilidades do voluntário
+                  const voluntarySkills = participant.voluntary.skills?.map(s => s.skill) || [];
+
+                  return (
+                    <Box 
+                      key={participant.id}
+                      style={{
+                        backgroundColor:'#FFFFFF',
+                        borderRadius:12,
+                        padding:16,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 2,
+                        elevation: 3,
+                        gap:12,
+                      }}
+                    >
+                      {/* Nome e Status */}
+                      <HStack style={{ alignItems:'flex-start', justifyContent:'space-between', gap:12 }}>
+                        <Text style={{ 
+                          fontSize:20, 
+                          fontFamily:'Nunito-Bold', 
+                          color:'#173663',
+                          flex:1,
+                          flexShrink:1
+                        }}>
+                          {participant.voluntary.name}
+                        </Text>
+                        <HStack style={{
+                          paddingVertical:6,
+                          paddingHorizontal:12,
+                          gap:4,
+                          backgroundColor: statusStyle.bg,
+                          borderRadius:12,
+                          alignItems:'center',
+                          justifyContent:'center',
+                        }}>
+                          <StatusIcon size={12} color="#FFFFFF" strokeWidth={2} />
+                          <Text style={{ 
+                            fontSize:12, 
+                            fontFamily:'Nunito-Bold', 
+                            color:'#FFFFFF',
+                          }}>
+                            {statusStyle.label}
+                          </Text>
+                        </HStack>
+                      </HStack>
+
+                      {/* Cidade e Estado */}
+                      {location && (
+                        <HStack style={{ gap:6, alignItems:'center' }}>
+                          <MapPin size={14} color="#B7B7B7" />
+                          <Text style={{ 
+                            fontSize:14, 
+                            fontFamily:'Nunito-Regular', 
+                            color:'#64748B' 
+                          }}>
+                            {location}
+                          </Text>
+                        </HStack>
+                      )}
+
+                      {/* Habilidades */}
+                      {voluntarySkills.length > 0 && (
+                        <VStack style={{ gap:8 }}>
+                          <Text style={{ 
+                            fontSize:14, 
+                            fontFamily:'Nunito-Bold', 
+                            color:'#173663' 
+                          }}>
+                            Habilidades:
+                          </Text>
+                          <HStack style={{ flexWrap:'wrap', gap:8 }}>
+                            {voluntarySkills.map((skill, index) => {
+                              const label = SKILL_GROUPS.flatMap(g => g.skills).find(k => k.value === skill)?.label || skill;
+                              const isMatchingSkill = data?.skills?.includes(skill);
+                              return (
+                                <Box 
+                                  key={`${participant.id}-skill-${skill}-${index}`}
+                                  style={{
+                                    backgroundColor: isMatchingSkill ? '#1BAF71' : '#173663',
+                                    paddingHorizontal:12,
+                                    paddingVertical:6,
+                                    borderRadius:16,
+                                    alignSelf:'flex-start',
+                                  }}
+                                >
+                                  <Text 
+                                    style={{ 
+                                      color:'#FFFFFF',
+                                      fontSize:13, 
+                                      fontFamily:'Nunito-SemiBold',
+                                    }}
+                                  >
+                                    {label}
+                                  </Text>
+                                </Box>
+                              );
+                            })}
+                          </HStack>
+                        </VStack>
+                      )}
+
+                      {/* Observação */}
+                      {participant.observation && (
+                        <VStack style={{ gap:2 }}>
+                          <Text style={{ 
+                            fontSize:14, 
+                            lineHeight:19,
+                            fontFamily:'Nunito-Regular', 
+                            color:'#000000' 
+                          }} numberOfLines={isExpanded ? undefined : 1}>
+                            Obs: {participant.observation}
+                          </Text>
+                          {shouldTruncate && (
+                            <Pressable onPress={() => {
+                              setExpandedObservation(prev => ({
+                                ...prev,
+                                [participant.id]: !prev[participant.id]
+                              }));
+                            }}>
+                              <Text style={{ 
+                                fontSize:14, 
+                                lineHeight:19,
+                                fontFamily:'Nunito-Bold', 
+                                color:'#173663' 
+                              }}>
+                                {isExpanded ? 'Ver menos' : 'Ver mais'}
+                              </Text>
+                            </Pressable>
+                          )}
+                        </VStack>
+                      )}
+
+                      {/* Botões de Ação - só mostrar se PENDING */}
+                      {participant.status === 'PENDING' && (
+                        <HStack style={{ gap:12, justifyContent:'space-between', alignItems:'center' }}>
+                          <Pressable
+                            onPress={() => handleApprove(participant.id)}
+                            style={{
+                              flex:1,
+                              flexDirection:'row',
+                              justifyContent:'center',
+                              alignItems:'center',
+                              paddingVertical:10,
+                              paddingHorizontal:16,
+                              gap:6,
+                              backgroundColor:'#1BAF71',
+                              borderRadius:12,
+                            }}
+                          >
+                            <Check size={16} color="#FFFFFF" strokeWidth={2} />
+                            <Text style={{ 
+                              fontSize:14, 
+                              fontFamily:'Nunito-Bold', 
+                              color:'#FFFFFF' 
+                            }}>
+                              Confirmar
+                            </Text>
+                          </Pressable>
+                          <Pressable
+                            onPress={() => handleReject(participant.id)}
+                            style={{
+                              flex:1,
+                              flexDirection:'row',
+                              justifyContent:'center',
+                              alignItems:'center',
+                              paddingVertical:10,
+                              paddingHorizontal:16,
+                              gap:6,
+                              borderWidth:1,
+                              borderColor:'#E43A3A',
+                              backgroundColor:'#FFFFFF',
+                              borderRadius:12,
+                            }}
+                          >
+                            <X size={16} color="#E43A3A" strokeWidth={2} />
+                            <Text style={{ 
+                              fontSize:14, 
+                              fontFamily:'Nunito-Bold', 
+                              color:'#E43A3A' 
+                            }}>
+                              Recusar
+                            </Text>
+                          </Pressable>
+                        </HStack>
+                      )}
+                    </Box>
+                  );
+                })}
+              </VStack>
+            )}
           </VStack>
         )}
       </ScrollView>

@@ -20,7 +20,7 @@ type CardItem = {
   description?: string | null;
   banner?: string | null;
   startAt: string;
-  endAt: string;
+  duration: number; // em minutos
   isOnline: boolean;
   city?: string | null;
   state?: string | null;
@@ -107,9 +107,9 @@ export default function InstitutionHubScreen() {
     return cards.filter(c => c.status === filter);
   }, [cards, filter]);
 
-  function formatDateRange(startISO: string, endISO: string) {
+  function formatDateRange(startISO: string, duration: number) {
     const s = new Date(startISO);
-    const e = new Date(endISO);
+    const e = new Date(s.getTime() + duration * 60000);
     const sDate = s.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
     const eDate = e.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
     return `${sDate} • ${eDate}`;
@@ -180,7 +180,7 @@ export default function InstitutionHubScreen() {
                     </HStack>
                     <HStack style={{ alignItems:'center', gap:8 }}>
                       <Calendar size={16} color="#173663" />
-                      <Text style={{ fontSize:12, color:'#334155' }}>{formatDateRange(c.startAt, c.endAt)}</Text>
+                      <Text style={{ fontSize:12, color:'#334155' }}>{formatDateRange(c.startAt, c.duration)}</Text>
                     </HStack>
                     <HStack style={{ alignItems:'center', gap:8 }}>
                       <Users size={16} color="#173663" />

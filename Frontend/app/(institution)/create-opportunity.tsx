@@ -26,7 +26,8 @@ export default function CreateOpportunityScreen(){
 
   const [title, setTitle] = useState('');
   const [startAt, setStartAt] = useState<Date | null>(null);
-  const [endAt, setEndAt] = useState<Date | null>(null);
+  const [durationHours, setDurationHours] = useState('');
+  const [durationMinutes, setDurationMinutes] = useState('');
   const [isOnline, setIsOnline] = useState(false);
   const [useInstitutionAddress, setUseInstitutionAddress] = useState(true);
   const [cep, setCep] = useState('');
@@ -45,8 +46,6 @@ export default function CreateOpportunityScreen(){
   const [redirecting, setRedirecting] = useState(false);
   const [showStartDate, setShowStartDate] = useState(false);
   const [showStartTime, setShowStartTime] = useState(false);
-  const [showEndDate, setShowEndDate] = useState(false);
-  const [showEndTime, setShowEndTime] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   async function pickBanner(){
@@ -57,9 +56,31 @@ export default function CreateOpportunityScreen(){
     }
   }
 
+  // Calcula a duração máxima permitida (até 23:59 do mesmo dia)
+  const maxDurationMinutes = useMemo(() => {
+    if (!startAt) return 1439; // 23h59m
+    const endOfDay = new Date(startAt);
+    endOfDay.setHours(23, 59, 0, 0);
+    const diffMs = endOfDay.getTime() - startAt.getTime();
+    return Math.floor(diffMs / 60000); // converte ms para minutos
+  }, [startAt]);
+
+  // Validação de duração
+  const durationError = useMemo(() => {
+    const duration = (Number(durationHours) || 0) * 60 + (Number(durationMinutes) || 0);
+    if (duration === 0) return null;
+    if (duration > maxDurationMinutes) {
+      const maxHours = Math.floor(maxDurationMinutes / 60);
+      const maxMins = maxDurationMinutes % 60;
+      return `A duração não pode ultrapassar o mesmo dia. Máximo: ${maxHours}h${maxMins > 0 ? ` ${maxMins}min` : ''}`;
+    }
+    return null;
+  }, [durationHours, durationMinutes, maxDurationMinutes]);
+
   const canSubmit = useMemo(()=>{
-    return !!(title && startAt && endAt && (isOnline || useInstitutionAddress || (city && state)) && maxVolunteers && skills.length>=1 && skills.length<=3);
-  },[title, startAt, endAt, isOnline, useInstitutionAddress, city, state, maxVolunteers, skills]);
+    const duration = (Number(durationHours) || 0) * 60 + (Number(durationMinutes) || 0);
+    return !!(title && startAt && duration > 0 && !durationError && (isOnline || useInstitutionAddress || (city && state)) && maxVolunteers && skills.length>=1 && skills.length<=3);
+  },[title, startAt, durationHours, durationMinutes, durationError, isOnline, useInstitutionAddress, city, state, maxVolunteers, skills]);
 
   // poll helper to give backend time to persist
   async function waitForCreation(delayMs = 1500){
@@ -69,13 +90,22 @@ export default function CreateOpportunityScreen(){
   async function handleCreate(){
     if(!token) return;
     if(skills.length === 0 || skills.length > 3) return;
+    
+    const duration = (Number(durationHours) || 0) * 60 + (Number(durationMinutes) || 0);
+    
+    // Valida duração
+    if (duration > maxDurationMinutes) {
+      alert('A duração não pode ultrapassar 23:59 do mesmo dia.');
+      return;
+    }
+    
     try{
       setSaving(true);
       const payload: any = {
         title,
         description: description || undefined,
         startAt: (startAt as Date).toISOString(),
-        endAt: (endAt as Date).toISOString(),
+        duration,
         isOnline,
         maxVolunteers: Number(maxVolunteers),
         skills,
@@ -88,7 +118,8 @@ export default function CreateOpportunityScreen(){
       // reset form before redirecting so next creation starts clean
       setTitle('');
       setStartAt(null);
-      setEndAt(null);
+      setDurationHours('');
+      setDurationMinutes('');
       setIsOnline(false);
       setUseInstitutionAddress(true);
       setCep('');
@@ -180,31 +211,35 @@ export default function CreateOpportunityScreen(){
           </View>
 
           <View style={{ width:'100%' }}>
-            <Text style={{ fontSize:16, fontFamily:'Nunito-Bold', color:'#173663', marginBottom:8 }}>Fim</Text>
-            {Platform.OS === 'web' ? (
-              <Input style={{ height:56, backgroundColor:'#FDFDFD', borderColor:'#B7B7B7', borderWidth:1, borderRadius:12 }}>
-                <InputField
-                  value={endAt ? (endAt as Date).toISOString().slice(0,16).replace('T',' ') : ''}
-                  onChangeText={(v)=> setEndAt(v ? new Date(v) : null)}
-                  placeholder='YYYY-MM-DD HH:mm'
-                  style={{ fontSize:16 }}
-                />
-              </Input>
-            ) : (
-              <VStack style={{ gap:10 }}>
-                <Pressable onPress={()=> setShowEndDate(true)} accessibilityRole='button' hitSlop={10}>
-                  <Input pointerEvents='none' style={{ height:56, backgroundColor:'#FDFDFD', borderColor:'#B7B7B7', borderWidth:1, borderRadius:12, paddingRight:44 }}>
-                    <InputField editable={false} value={endAt ? endAt.toLocaleDateString() : ''} placeholder='Data' style={{ paddingRight: 10, fontSize:16 }} />
-                  </Input>
-                  <Calendar size={20} color="#173663" pointerEvents='none' style={{ position:'absolute', right:12, top:'50%', marginTop:-10 }} />
-                </Pressable>
-                <Pressable onPress={()=> setShowEndTime(true)} accessibilityRole='button' hitSlop={10}>
-                  <Input pointerEvents='none' style={{ height:56, backgroundColor:'#FDFDFD', borderColor:'#B7B7B7', borderWidth:1, borderRadius:12, paddingRight:44 }}>
-                    <InputField editable={false} value={endAt ? endAt.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) : ''} placeholder='Hora' style={{ paddingRight: 10, fontSize:16 }} />
-                  </Input>
-                  <Clock size={20} color="#173663" pointerEvents='none' style={{ position:'absolute', right:12, top:'50%', marginTop:-10 }} />
-                </Pressable>
-              </VStack>
+            <Text style={{ fontSize:16, fontFamily:'Nunito-Bold', color:'#173663', marginBottom:8 }}>Duração</Text>
+            <HStack style={{ gap:12 }}>
+              <View style={{ flex:1 }}>
+                <Input style={{ height:56, backgroundColor:'#FDFDFD', borderColor: durationError ? '#DC2626' : '#B7B7B7', borderWidth:1, borderRadius:12 }}>
+                  <InputField
+                    value={durationHours}
+                    onChangeText={setDurationHours}
+                    placeholder='Horas'
+                    keyboardType='number-pad'
+                    style={{ fontSize:16, textAlign:'center' }}
+                  />
+                </Input>
+              </View>
+              <View style={{ flex:1 }}>
+                <Input style={{ height:56, backgroundColor:'#FDFDFD', borderColor: durationError ? '#DC2626' : '#B7B7B7', borderWidth:1, borderRadius:12 }}>
+                  <InputField
+                    value={durationMinutes}
+                    onChangeText={setDurationMinutes}
+                    placeholder='Minutos'
+                    keyboardType='number-pad'
+                    style={{ fontSize:16, textAlign:'center' }}
+                  />
+                </Input>
+              </View>
+            </HStack>
+            {durationError && (
+              <Text style={{ fontSize:12, color:'#DC2626', marginTop:6, lineHeight:16 }}>
+                {durationError}
+              </Text>
             )}
           </View>
         </VStack>
@@ -226,23 +261,6 @@ export default function CreateOpportunityScreen(){
                  is24Hour
                  display={Platform.OS === 'android' ? 'clock' : 'default'}
                 onChange={(event: DateTimePickerEvent, d?: Date)=>{ setShowStartTime(false); if(d) setStartAt(prev=>{ const base = prev || d; const res = new Date(base); res.setHours(d.getHours(), d.getMinutes(), 0, 0); return res; }); }}
-               />
-             )}
-            {showEndDate && (
-               <DateTimePicker
-                 value={endAt || new Date()}
-                 mode='date'
-                 display={Platform.OS === 'android' ? 'calendar' : 'default'}
-                onChange={(event: DateTimePickerEvent, d?: Date)=>{ setShowEndDate(false); if(d) setEndAt(prev=>{ const base = prev || d; const res = new Date(base); res.setFullYear(d.getFullYear(), d.getMonth(), d.getDate()); return res; }); }}
-               />
-             )}
-            {showEndTime && (
-               <DateTimePicker
-                 value={endAt || new Date()}
-                 mode='time'
-                 is24Hour
-                 display={Platform.OS === 'android' ? 'clock' : 'default'}
-                onChange={(event: DateTimePickerEvent, d?: Date)=>{ setShowEndTime(false); if(d) setEndAt(prev=>{ const base = prev || d; const res = new Date(base); res.setHours(d.getHours(), d.getMinutes(), 0, 0); return res; }); }}
                />
              )}
           </>

@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { createCardHandler, getMyCardsHandler, getFeedCardsHandler, getMyCardDetailHandler, cancelCardHandler } from "../controllers/card.controller";
+import { createCardHandler, getMyCardsHandler, getFeedCardsHandler, getMyCardDetailHandler, getCardDetailHandler, cancelCardHandler, searchCardsHandler, getAllCardsHandler } from "../controllers/card.controller";
 import { $ref } from "../schemas/card.schema";
 
 async function cardRoutes(server: FastifyInstance){
@@ -26,6 +26,24 @@ async function cardRoutes(server: FastifyInstance){
     "/feed",
     { preHandler: [server.authenticate] },
     getFeedCardsHandler
+  )
+
+  server.get(
+    "/search",
+    { preHandler: [server.authenticate] },
+    searchCardsHandler
+  )
+
+  server.get(
+    "/all",
+    { preHandler: [server.authenticate] },
+    getAllCardsHandler
+  )
+
+  server.get(
+    "/:id/detail",
+    { preHandler: [server.authenticate] },
+    getCardDetailHandler
   )
 
   server.get(

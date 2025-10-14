@@ -37,7 +37,7 @@ export async function createCard(ownerId: number, input: createCardInput) {
       title: rest.title,
       description: rest.description,
       startAt: new Date(rest.startAt),
-      endAt: new Date(rest.endAt),
+      duration: rest.duration,
       isOnline: rest.isOnline,
       maxVolunteers: rest.maxVolunteers,
       ownerId,
@@ -69,10 +69,30 @@ export async function findCardsForVoluntary(voluntaryId: number){
   return prisma.card.findMany({
     where: {
       status: 'ACTIVE',
-      endAt: { gte: new Date() },
       skills: { some: { name: { in: skillNames } } }
     },
-    include: { skills: true, owner: { select: { id: true, name: true, city: true, state: true } } },
+    include: { skills: true, owner: { select: { id: true, name: true, city: true, state: true } }, participants: true },
+    orderBy: { startAt: 'asc' }
+  })
+}
+
+export async function searchCardsByTitle(searchQuery: string){
+  return prisma.card.findMany({
+    where: {
+      status: 'ACTIVE',
+      title: { contains: searchQuery, mode: 'insensitive' }
+    },
+    include: { skills: true, owner: { select: { id: true, name: true, city: true, state: true } }, participants: true },
+    orderBy: { startAt: 'asc' }
+  })
+}
+
+export async function findAllActiveCards(){
+  return prisma.card.findMany({
+    where: {
+      status: 'ACTIVE'
+    },
+    include: { skills: true, owner: { select: { id: true, name: true, city: true, state: true } }, participants: true },
     orderBy: { startAt: 'asc' }
   })
 }
@@ -84,9 +104,28 @@ export async function findCardByIdForOwner(id: number, ownerId: number){
       skills: true,
       participants: {
         include: {
-          voluntary: { select: { id: true, name: true, city: true, state: true } }
+          voluntary: { 
+            select: { 
+              id: true, 
+              name: true, 
+              city: true, 
+              state: true,
+              skills: true
+            } 
+          }
         }
       }
+    }
+  })
+}
+
+export async function findCardById(id: number){
+  return prisma.card.findUnique({
+    where: { id },
+    include: {
+      skills: true,
+      owner: { select: { id: true, name: true, city: true, state: true } },
+      participants: true
     }
   })
 }

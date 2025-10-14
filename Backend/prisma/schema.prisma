@@ -46,7 +46,7 @@ model Card {
   ownerId      Int
   banner       String?
   startAt      DateTime
-  endAt        DateTime
+  duration     Int             // duração em minutos (max 1439 = 23h59m)
   isOnline     Boolean         @default(false)
   cep          String?
   neighborhood String?
