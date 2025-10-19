@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ScrollView, RefreshControl, StyleSheet, Image as RNImage, Pressable } from 'react-native';
+import { ScrollView, RefreshControl, StyleSheet, Image as RNImage, Pressable, View } from 'react-native';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
@@ -13,6 +13,7 @@ import { Bell, Calendar, Users, Check } from 'lucide-react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAuth } from '@/providers/AuthProvider';
 import api from '@/services/api';
+import { useNotifications } from '@/hooks/useNotifications';
 
 type CardItem = {
   id: number;
@@ -54,6 +55,7 @@ export default function InstitutionHubScreen() {
   const params = useLocalSearchParams<{ filter?: string }>();
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight ? useBottomTabBarHeight() : 70;
+  const { unreadCount } = useNotifications(token);
 
   const [cards, setCards] = useState<CardItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -112,7 +114,15 @@ export default function InstitutionHubScreen() {
     const e = new Date(s.getTime() + duration * 60000);
     const sDate = s.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
     const eDate = e.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-    return `${sDate} • ${eDate}`;
+    const sTime = s.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const eTime = e.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    
+    // Se for no mesmo dia, mostra: "dd/mm • HH:mm - HH:mm"
+    if (sDate === eDate) {
+      return `${sDate} • ${sTime} - ${eTime}`;
+    }
+    // Se for em dias diferentes: "dd/mm HH:mm - dd/mm HH:mm"
+    return `${sDate} ${sTime} - ${eDate} ${eTime}`;
   }
 
   const onRefresh = async () => {
@@ -130,9 +140,29 @@ export default function InstitutionHubScreen() {
         {/* Header */}
         <HStack style={{ alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <Text style={{ fontSize: 24, fontFamily: 'Nunito-Bold', color: '#173663' }}>Minhas Vagas</Text>
-          <Button style={{ height: 36, width: 36, borderRadius: 18, backgroundColor: '#E2E8F0', alignItems:'center', justifyContent:'center', padding:0 }}>
-            <Bell size={18} color="#173663" />
-          </Button>
+          <Pressable onPress={() => router.push('/(institution)/notifications')} style={{ position: 'relative' }}>
+            <View style={{ height: 36, width: 36, borderRadius: 18, backgroundColor: '#E2E8F0', alignItems:'center', justifyContent:'center' }}>
+              <Bell size={18} color="#173663" />
+            </View>
+            {unreadCount > 0 && (
+              <View style={{ 
+                position: 'absolute', 
+                top: -4, 
+                right: -4, 
+                minWidth: 20, 
+                height: 20, 
+                borderRadius: 10, 
+                backgroundColor: '#DC2626', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                paddingHorizontal: 6
+              }}>
+                <Text style={{ color: '#FFFFFF', fontSize: 11, fontFamily: 'Nunito-Bold' }}>
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </Text>
+              </View>
+            )}
+          </Pressable>
         </HStack>
 
         {/* Stats */}
@@ -180,7 +210,7 @@ export default function InstitutionHubScreen() {
                     </HStack>
                     <HStack style={{ alignItems:'center', gap:8 }}>
                       <Calendar size={16} color="#173663" />
-                      <Text style={{ fontSize:12, color:'#334155' }}>{formatDateRange(c.startAt, c.duration)}</Text>
+                      <Text style={{ fontSize:11, color:'#334155', flex:1 }} numberOfLines={1}>{formatDateRange(c.startAt, c.duration)}</Text>
                     </HStack>
                     <HStack style={{ alignItems:'center', gap:8 }}>
                       <Users size={16} color="#173663" />

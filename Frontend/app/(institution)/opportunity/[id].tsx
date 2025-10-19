@@ -110,6 +110,15 @@ export default function OpportunityDetail(){
   const [subscriptionFilter, setSubscriptionFilter] = useState<'all' | 'pending' | 'confirmed'>('all');
   const [expandedObservation, setExpandedObservation] = useState<{[key: number]: boolean}>({});
 
+  function handleBack() {
+    // Se conseguir voltar, volta. Senão, vai para o hub
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(institution)');
+    }
+  }
+
   // wait until backend reflects canceled status
   async function waitForCancellation(maxTries = 14, delayMs = 900){
     for (let i=0; i<maxTries; i++){
@@ -166,6 +175,21 @@ export default function OpportunityDetail(){
     return activeParticipants;
   }, [data?.participants, subscriptionFilter]);
 
+  // Verifica se a vaga está em andamento ou já terminou
+  const opportunityState = useMemo(() => {
+    if (!data) return { isFinalized: false, isInProgress: false, isStarted: false };
+    
+    const now = new Date();
+    const startDate = new Date(data.startAt);
+    const endDate = new Date(startDate.getTime() + data.duration * 60000);
+    
+    const isStarted = now >= startDate;
+    const isFinalized = now >= endDate;
+    const isInProgress = isStarted && !isFinalized;
+    
+    return { isFinalized, isInProgress, isStarted };
+  }, [data]);
+
   // cancel handler
   const handleCancel = async () => {
     Alert.alert(
@@ -179,7 +203,9 @@ export default function OpportunityDetail(){
           onPress: async () => {
             try {
               setIsCancelling(true);
-              await api.post(`/cards/${id}/cancel`);
+              await api.post(`/cards/${id}/cancel`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+              });
               router.back();
             } catch (error: any) {
               Alert.alert('Erro', error.response?.data?.message || 'Não foi possível cancelar a vaga.');
@@ -250,7 +276,7 @@ export default function OpportunityDetail(){
       <ScrollView contentContainerStyle={{ paddingHorizontal:20, paddingTop: insets.top + 8, paddingBottom: (tabBarHeight || 70) + 24 }}>
         {/* Header */}
         <HStack style={{ alignItems:'center', gap:8, marginBottom:16 }}>
-          <Pressable onPress={()=> router.replace({ pathname: '/(institution)', params: { filter: 'ALL' } } as any)} hitSlop={10} style={{ padding:6 }}>
+          <Pressable onPress={handleBack} hitSlop={10} style={{ padding:6 }}>
             <ChevronLeft size={22} color="#173663" />
           </Pressable>
           <Text style={{ fontSize:22, lineHeight:30, fontFamily:'Nunito-Bold', color:'#173663' }}>Gerenciamento da Vaga</Text>
@@ -310,6 +336,22 @@ export default function OpportunityDetail(){
               <Text style={{ fontSize:18, fontFamily:'Nunito-Bold', color:'#173663' }}>Local</Text>
             </HStack>
             <Text style={{ color:'#1F2937' }}>{data.isOnline ? 'Online' : address}</Text>
+            
+            {/* Complemento */}
+            {!data.isOnline && data.complement && (
+              <VStack style={{ gap:4, marginTop:8, paddingLeft:26 }}>
+                <Text style={{ fontSize:14, fontFamily:'Nunito-SemiBold', color:'#173663' }}>Complemento:</Text>
+                <Text style={{ color:'#1F2937', fontSize:14 }}>{data.complement}</Text>
+              </VStack>
+            )}
+            
+            {/* Observação do local */}
+            {!data.isOnline && data.locationNote && (
+              <VStack style={{ gap:4, marginTop:8, paddingLeft:26 }}>
+                <Text style={{ fontSize:14, fontFamily:'Nunito-SemiBold', color:'#173663' }}>Como chegar:</Text>
+                <Text style={{ color:'#1F2937', fontSize:14 }}>{data.locationNote}</Text>
+              </VStack>
+            )}
           </VStack>
 
           {/* Descrição */}
@@ -342,8 +384,29 @@ export default function OpportunityDetail(){
             </VStack>
           )}
 
-          {/* Cancelar vaga */}
-          {data.status !== 'CANCELED' && (
+          {/* Status ou botão de cancelar */}
+          {data.status === 'CANCELED' ? (
+            <Box style={{ backgroundColor:'#FEE2E2', borderRadius:12, paddingVertical:12, paddingHorizontal:16, marginTop:8 }}>
+              <HStack style={{ alignItems:'center', justifyContent:'center', gap:8 }}>
+                <X size={18} color="#DC2626" strokeWidth={2} />
+                <Text style={{ color:'#DC2626', fontFamily:'Nunito-Bold', fontSize:16 }}>Esta vaga foi cancelada</Text>
+              </HStack>
+            </Box>
+          ) : data.status === 'FINALIZED' || opportunityState.isFinalized ? (
+            <Box style={{ backgroundColor:'#E2E8F0', borderRadius:12, paddingVertical:12, paddingHorizontal:16, marginTop:8 }}>
+              <HStack style={{ alignItems:'center', justifyContent:'center', gap:8 }}>
+                <Check size={18} color="#64748B" strokeWidth={2} />
+                <Text style={{ color:'#64748B', fontFamily:'Nunito-Bold', fontSize:16 }}>Vaga finalizada</Text>
+              </HStack>
+            </Box>
+          ) : opportunityState.isInProgress ? (
+            <Box style={{ backgroundColor:'#FEF9C3', borderRadius:12, paddingVertical:12, paddingHorizontal:16, marginTop:8 }}>
+              <HStack style={{ alignItems:'center', justifyContent:'center', gap:8 }}>
+                <Clock size={18} color="#D97706" strokeWidth={2} />
+                <Text style={{ color:'#D97706', fontFamily:'Nunito-Bold', fontSize:16 }}>Vaga em andamento</Text>
+              </HStack>
+            </Box>
+          ) : (
             <Button onPress={handleCancel} disabled={isCancelling} style={{ backgroundColor:'#DC2626', height:44, borderRadius:12, marginTop:8, opacity: isCancelling ? 0.8 : 1 }}>
               <Text style={{ color:'#fff', fontFamily:'Nunito-Bold' }}>{isCancelling ? 'Cancelando...' : 'Cancelar Vaga'}</Text>
             </Button>

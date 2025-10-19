@@ -99,6 +99,18 @@ model Participation {
   @@unique([voluntaryId, cardId])
 }
 
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int              // ID do voluntário ou instituição
+  userType  UserType         // VOLUNTARY ou INSTITUTION
+  type      NotificationType // Tipo da notificação
+  title     String
+  message   String
+  cardId    Int?             // Opcional: referência ao card relacionado
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+}
+
 enum CardStatus {
   ACTIVE
   PENDING
@@ -110,4 +122,18 @@ enum ParticipationStatus {
   PENDING
   CONFIRMED
   REJECTED
+}
+
+enum UserType {
+  VOLUNTARY
+  INSTITUTION
+}
+
+enum NotificationType {
+  NEW_OPPORTUNITY          // Nova oportunidade criada (para voluntários)
+  NEW_APPLICATION          // Nova inscrição recebida (para instituição)
+  APPLICATION_APPROVED     // Inscrição aprovada (para voluntário)
+  APPLICATION_REJECTED     // Inscrição rejeitada (para voluntário)
+  OPPORTUNITY_CANCELED     // Oportunidade cancelada (para voluntário)
+  OPPORTUNITY_STARTING     // Oportunidade começando em 1h (para voluntário)
 }

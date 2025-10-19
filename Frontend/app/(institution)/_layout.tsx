@@ -22,7 +22,7 @@ export default () => {
     const checkAccess = async () => {
       const type = await SecureStore.getItemAsync("type");
 
-      if (type !== "institution") {
+      if (type !== "INSTITUTION") {
         router.replace("/(auth)/signin");
       } else {
         setIsAuthorized(true);
@@ -71,8 +71,10 @@ export default () => {
       <Tabs.Screen name="index" options={{ title: 'Hub', tabBarIcon: ({color}) => <House size={22} color={color} /> }} />
       <Tabs.Screen name="create-opportunity" options={{ title: 'Criar Vaga', tabBarIcon: ({color}) => <Plus size={24} color={color} /> }} />
       <Tabs.Screen name="profile" options={{ title: 'Perfil', tabBarIcon: ({color}) => <User size={22} color={color} /> }} />
-      {/* Hide nested stack for opportunity detail from tab bar */}
+      
+      {/* Hidden from tabs */}
       <Tabs.Screen name="opportunity" options={{ href: null }} />
+      <Tabs.Screen name="notifications" options={{ href: null }} />
     </Tabs>
   );
 };

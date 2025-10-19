@@ -60,12 +60,12 @@ export default () => {
             const response = await api.post("/institution/login", data);
             const token = response.data.accessToken;
 
-            const decoded = jwtDecode<{ type: "institution" | "voluntary" }>(
+            const decoded = jwtDecode<{ type: "INSTITUTION" | "VOLUNTARY" }>(
                 token
             );
             const type = decoded?.type;
 
-            if (type === "institution" || type === "voluntary") {
+            if (type === "INSTITUTION" || type === "VOLUNTARY") {
                 await login(token, type);
             } else {
                 throw new Error("Tipo de conta desconhecido.");

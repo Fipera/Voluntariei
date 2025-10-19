@@ -2,13 +2,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ScrollView, View, StyleSheet, Image as RNImage, Pressable, TextInput, Modal, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
 import { Box } from '@/components/ui/box';
 import { Spinner } from '@/components/ui/spinner';
-import { Calendar, ChevronLeft, MapPin, Tag, BookOpen, Info } from 'lucide-react-native';
+import { Calendar, ChevronLeft, MapPin, Tag, BookOpen, Info, Check } from 'lucide-react-native';
 import api from '@/services/api';
 import { useAuth } from '@/providers/AuthProvider';
 import { SKILL_IMAGE_MAP, DEFAULT_SKILL_IMAGE } from '@/utils/constants/voluntarySkillImages';
@@ -24,16 +25,23 @@ interface CardDetail {
   isOnline: boolean;
   city?: string;
   state?: string;
+  street?: string;
+  numberHouse?: string;
+  neighborhood?: string;
+  cep?: string;
+  complement?: string;
+  locationNote?: string;
   maxVolunteers: number;
   status: 'ACTIVE' | 'PENDING' | 'FINALIZED' | 'CANCELED';
   skills: string[];
   participantsCount?: number;
   institution?: string;
   isApplied?: boolean;
+  participationStatus?: 'PENDING' | 'CONFIRMED' | 'REJECTED' | null;
 }
 
 export default function VoluntaryOpportunityDetail(){
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
   const { token } = useAuth();
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -44,25 +52,44 @@ export default function VoluntaryOpportunityDetail(){
   const [observation, setObservation] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [isApplied, setIsApplied] = useState(false);
+  const [participationStatus, setParticipationStatus] = useState<'PENDING' | 'CONFIRMED' | 'REJECTED' | null>(null);
 
-  useEffect(() => {
-    async function load(){
-      if(!token || !id) return;
-      try{
-        setLoading(true);
-        const response = await api.get<CardDetail>(`/cards/${id}/detail`, { 
-          headers: { Authorization: `Bearer ${token}` } 
-        });
-        setData(response.data);
-        setIsApplied(response.data.isApplied || false);
-      }catch(error: any){
-        console.error('Error loading card detail:', error.response?.data || error.message);
-      }finally{
-        setLoading(false);
-      }
+  function handleBack() {
+    // Volta diretamente para a tela de origem
+    if (from === 'schedule') {
+      router.push('/(voluntary)/schedule');
+    } else {
+      // Se veio do hub ou outra tela, volta para o hub
+      router.push('/(voluntary)');
     }
-    load();
-  }, [token, id]);
+  }
+
+  // Recarrega dados quando a tela recebe foco
+  useFocusEffect(
+    React.useCallback(() => {
+      loadData();
+    }, [token, id])
+  );
+
+  async function loadData() {
+    if (!token || !id) return;
+    try {
+      setLoading(true);
+      const response = await api.get<CardDetail>(`/cards/${id}/detail`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      console.log('Card detail response:', response.data);
+      console.log('isApplied:', response.data.isApplied);
+      console.log('participationStatus:', response.data.participationStatus);
+      setData(response.data);
+      setIsApplied(response.data.isApplied || false);
+      setParticipationStatus(response.data.participationStatus || null);
+    } catch (error: any) {
+      console.error('Error loading card detail:', error.response?.data || error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   function formatDate(dt: string){
     const d = new Date(dt);
@@ -108,10 +135,36 @@ export default function VoluntaryOpportunityDetail(){
     return participantsCount < data.maxVolunteers && data.status === 'ACTIVE';
   }, [data]);
 
+  // Verifica se a vaga está finalizada, cancelada ou já começou
+  const opportunityState = useMemo(() => {
+    if (!data) return { isFinalized: false, isInProgress: false, isCanceled: false, isStarted: false };
+    
+    const now = new Date();
+    const startDate = new Date(data.startAt);
+    const endDate = new Date(startDate.getTime() + data.duration * 60000);
+    
+    const isStarted = now >= startDate;
+    const isFinalized = now >= endDate || data.status === 'FINALIZED';
+    const isInProgress = isStarted && !isFinalized;
+    const isCanceled = data.status === 'CANCELED';
+    
+    return { isFinalized, isInProgress, isCanceled, isStarted };
+  }, [data]);
+
   const location = useMemo(()=>{
     if(data?.isOnline) return 'Online';
-    const parts = [data?.city, data?.state].filter(Boolean);
-    return parts.join(', ') || 'Local não especificado';
+    
+    const parts: string[] = [];
+    if (data?.street) parts.push(data.street);
+    if (data?.numberHouse) parts.push(data.numberHouse);
+    if (data?.neighborhood) parts.push(data.neighborhood);
+    
+    const cityState = [data?.city, data?.state].filter(Boolean).join(', ');
+    if (cityState) parts.push(cityState);
+    
+    if (data?.cep) parts.push(`CEP: ${data.cep}`);
+    
+    return parts.length > 0 ? parts.join(', ') : 'Local não especificado';
   }, [data]);
 
   if(loading){
@@ -139,7 +192,7 @@ export default function VoluntaryOpportunityDetail(){
           
           {/* Back Button */}
           <Pressable 
-            onPress={()=> router.back()} 
+            onPress={handleBack} 
             style={{ 
               position:'absolute', 
               top: insets.top + 16, 
@@ -207,6 +260,22 @@ export default function VoluntaryOpportunityDetail(){
               <Text style={{ fontSize:20, fontFamily:'Nunito-Bold', color:'#173663', lineHeight:27 }}>Local</Text>
             </HStack>
             <Text style={{ fontSize:14, color:'#000000', lineHeight:19 }}>{location}</Text>
+            
+            {/* Complemento */}
+            {data.complement && (
+              <VStack style={{ gap:4, marginTop:8, paddingLeft:36 }}>
+                <Text style={{ fontSize:14, fontFamily:'Nunito-SemiBold', color:'#173663' }}>Complemento:</Text>
+                <Text style={{ fontSize:14, color:'#000000', lineHeight:19 }}>{data.complement}</Text>
+              </VStack>
+            )}
+            
+            {/* Observação do local */}
+            {data.locationNote && (
+              <VStack style={{ gap:4, marginTop:8, paddingLeft:36 }}>
+                <Text style={{ fontSize:14, fontFamily:'Nunito-SemiBold', color:'#173663' }}>Como chegar:</Text>
+                <Text style={{ fontSize:14, color:'#000000', lineHeight:19 }}>{data.locationNote}</Text>
+              </VStack>
+            )}
           </VStack>
 
           {/* Description */}
@@ -242,8 +311,82 @@ export default function VoluntaryOpportunityDetail(){
             </VStack>
           )}
 
-          {/* Subscribe Button */}
-          {isApplied ? (
+          {/* Subscribe Button / Status */}
+          {opportunityState.isCanceled ? (
+            // Vaga cancelada
+            <HStack 
+              style={{ 
+                backgroundColor:'#FEE2E2', 
+                borderWidth: 2,
+                borderColor: '#DC2626',
+                height:52, 
+                borderRadius:12, 
+                marginTop:8,
+                marginBottom:32,
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8
+              }}
+            >
+              <Text style={{ color:'#DC2626', fontFamily:'Nunito-Bold', fontSize:16 }}>Esta vaga foi cancelada</Text>
+            </HStack>
+          ) : opportunityState.isFinalized ? (
+            // Vaga finalizada
+            <HStack 
+              style={{ 
+                backgroundColor:'#E2E8F0', 
+                borderWidth: 2,
+                borderColor: '#64748B',
+                height:52, 
+                borderRadius:12, 
+                marginTop:8,
+                marginBottom:32,
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8
+              }}
+            >
+              <Text style={{ color:'#64748B', fontFamily:'Nunito-Bold', fontSize:16 }}>Esta vaga foi finalizada</Text>
+            </HStack>
+          ) : opportunityState.isInProgress ? (
+            // Vaga em andamento
+            <HStack 
+              style={{ 
+                backgroundColor:'#FEF9C3', 
+                borderWidth: 2,
+                borderColor: '#D97706',
+                height:52, 
+                borderRadius:12, 
+                marginTop:8,
+                marginBottom:32,
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8
+              }}
+            >
+              <Text style={{ color:'#D97706', fontFamily:'Nunito-Bold', fontSize:16 }}>Esta vaga já está em andamento</Text>
+            </HStack>
+          ) : isApplied && participationStatus === 'CONFIRMED' ? (
+            // Confirmado - Botão verde com check
+            <HStack 
+              style={{ 
+                backgroundColor:'#D1FAE5', 
+                borderWidth: 2,
+                borderColor: '#1BAF71',
+                height:52, 
+                borderRadius:12, 
+                marginTop:8,
+                marginBottom:32,
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8
+              }}
+            >
+              <Check size={24} color="#1BAF71" strokeWidth={3} />
+              <Text style={{ color:'#1BAF71', fontFamily:'Nunito-Bold', fontSize:16 }}>Você está inscrito!</Text>
+            </HStack>
+          ) : isApplied ? (
+            // Pendente ou Rejeitado - Botão "Ver Status"
             <Button 
               onPress={handleViewStatus} 
               style={{ 
@@ -256,7 +399,26 @@ export default function VoluntaryOpportunityDetail(){
             >
               <Text style={{ color:'#fff', fontFamily:'Nunito-Bold', fontSize:16 }}>Ver Status</Text>
             </Button>
+          ) : !isOpen ? (
+            // Vaga fechada (lotada)
+            <HStack 
+              style={{ 
+                backgroundColor:'#FEE2E2', 
+                borderWidth: 2,
+                borderColor: '#DC2626',
+                height:52, 
+                borderRadius:12, 
+                marginTop:8,
+                marginBottom:32,
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8
+              }}
+            >
+              <Text style={{ color:'#DC2626', fontFamily:'Nunito-Bold', fontSize:16 }}>Vagas esgotadas</Text>
+            </HStack>
           ) : (
+            // Não inscrito e vaga aberta - Botão "Quero me Inscrever"
             <Button 
               onPress={()=> setShowModal(true)} 
               style={{ 

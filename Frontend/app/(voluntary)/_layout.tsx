@@ -27,7 +27,7 @@ export default () => {
     const checkAccess = async () => {
       const type = await SecureStore.getItemAsync("type");
 
-      if (type !== "voluntary") {
+      if (type !== "VOLUNTARY") {
         router.replace("/(auth)/signin");
       } else {
         setIsAuthorized(true);
@@ -77,8 +77,9 @@ export default () => {
       <Tabs.Screen name="schedule" options={{ title: 'Agenda', tabBarIcon: ({color}) => <Calendar size={22} color={color} /> }} />
       <Tabs.Screen name="profile" options={{ title: 'Perfil', tabBarIcon: ({color}) => <User size={22} color={color} /> }} />
       
-      {/* Opportunity detail - hidden from tabs */}
+      {/* Hidden from tabs */}
       <Tabs.Screen name="opportunity" options={{ href: null }} />
+      <Tabs.Screen name="notifications" options={{ href: null }} />
     </Tabs>
   );
 };

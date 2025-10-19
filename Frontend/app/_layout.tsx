@@ -30,9 +30,9 @@ function AppRoutes() {
     return (
         <Stack
             initialRouteName={
-                type === "institution"
+                type === "INSTITUTION"
                     ? "(institution)"
-                    : type === "voluntary"
+                    : type === "VOLUNTARY"
                     ? "(voluntary)"
                     : "(auth)"
             }

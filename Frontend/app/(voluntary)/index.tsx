@@ -9,10 +9,12 @@ import { Button } from '@/components/ui/button';
 import { Box } from '@/components/ui/box';
 import { Input, InputField } from '@/components/ui/input';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useFocusEffect } from '@react-navigation/native';
 import { Bell, Calendar, Users, Check, Search, MapPin } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/providers/AuthProvider';
 import api from '@/services/api';
+import { useNotifications } from '@/hooks/useNotifications';
 
 type CardItem = {
   id: number;
@@ -62,6 +64,7 @@ export default function VoluntaryHubScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight ? useBottomTabBarHeight() : 70;
+  const { unreadCount } = useNotifications(token);
 
   const [userName, setUserName] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -83,6 +86,13 @@ export default function VoluntaryHubScreen() {
     loadUserName();
   }, [token]);
 
+  // Recarrega dados quando a tela recebe foco
+  useFocusEffect(
+    React.useCallback(() => {
+      loadData();
+    }, [token])
+  );
+
   async function loadData() {
     if (!token) return;
     try {
@@ -101,11 +111,6 @@ export default function VoluntaryHubScreen() {
       setLoading(false);
     }
   }
-
-  useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
 
   async function handleSearch(query: string){
     setSearchQuery(query);
@@ -152,7 +157,18 @@ export default function VoluntaryHubScreen() {
     setRefreshing(false);
   };
 
-  const displayCards = searchQuery.trim() ? searchResults : allCards;
+  // Cards a exibir: se houver busca, mostra resultados da busca
+  // Se não houver busca, mostra apenas cards que NÃO estão em recomendados
+  const displayCards = useMemo(() => {
+    if (searchQuery.trim()) {
+      return searchResults;
+    }
+    
+    // Remove cards recomendados de "Novas Oportunidades"
+    const recommendedIds = new Set(recommended.map(c => c.id));
+    return allCards.filter(c => !recommendedIds.has(c.id));
+  }, [searchQuery, searchResults, allCards, recommended]);
+  
   const showRecommended = !searchQuery.trim() && recommended.length > 0;
 
   return (
@@ -164,9 +180,29 @@ export default function VoluntaryHubScreen() {
         {/* Header */}
         <HStack style={{ alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <Text style={{ fontSize: 30, fontFamily: 'Nunito-Bold', color: '#173663', lineHeight: 41 }}>Olá, {userName}</Text>
-          <Button style={{ height: 36, width: 36, borderRadius: 18, backgroundColor: '#E2E8F0', alignItems:'center', justifyContent:'center', padding:0 }}>
-            <Bell size={18} color="#173663" />
-          </Button>
+          <Pressable onPress={() => router.push('/(voluntary)/notifications')} style={{ position: 'relative' }}>
+            <View style={{ height: 36, width: 36, borderRadius: 18, backgroundColor: '#E2E8F0', alignItems:'center', justifyContent:'center' }}>
+              <Bell size={18} color="#173663" />
+            </View>
+            {unreadCount > 0 && (
+              <View style={{ 
+                position: 'absolute', 
+                top: -4, 
+                right: -4, 
+                minWidth: 20, 
+                height: 20, 
+                borderRadius: 10, 
+                backgroundColor: '#DC2626', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                paddingHorizontal: 6
+              }}>
+                <Text style={{ color: '#FFFFFF', fontSize: 11, fontFamily: 'Nunito-Bold' }}>
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </Text>
+              </View>
+            )}
+          </Pressable>
         </HStack>
 
         <Text style={{ fontSize: 16, fontFamily: 'Nunito-Regular', color: '#000000', marginBottom: 16, lineHeight: 22 }}>Encontre a oportunidade certa e transforme vidas com suas habilidades</Text>

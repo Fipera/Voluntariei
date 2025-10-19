@@ -47,6 +47,46 @@ export default function CreateOpportunityScreen(){
   const [showStartDate, setShowStartDate] = useState(false);
   const [showStartTime, setShowStartTime] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [loadingCep, setLoadingCep] = useState(false);
+
+  // Formata CEP: 12345-678
+  function formatCep(value: string) {
+    const nums = value.replace(/\D/g, '');
+    if (nums.length <= 5) return nums;
+    return `${nums.slice(0, 5)}-${nums.slice(5, 8)}`;
+  }
+
+  // Busca CEP na API ViaCEP
+  async function handleCepChange(value: string) {
+    const formatted = formatCep(value);
+    setCep(formatted);
+    
+    const nums = formatted.replace(/\D/g, '');
+    if (nums.length === 8) {
+      try {
+        setLoadingCep(true);
+        const response = await fetch(`https://viacep.com.br/ws/${nums}/json/`);
+        const data = await response.json();
+        
+        if (!data.erro) {
+          setCity(data.localidade || '');
+          setState(data.uf || '');
+          setStreet(data.logradouro || '');
+          setNeighborhood(data.bairro || '');
+          setComplement(data.complemento || '');
+        }
+      } catch (error) {
+        console.warn('Erro ao buscar CEP:', error);
+      } finally {
+        setLoadingCep(false);
+      }
+    }
+  }
+
+  // Permite apenas números
+  function onlyNumbers(value: string) {
+    return value.replace(/\D/g, '');
+  }
 
   async function pickBanner(){
     const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.8 });
@@ -68,8 +108,10 @@ export default function CreateOpportunityScreen(){
   // Validação de duração
   const durationError = useMemo(() => {
     const duration = (Number(durationHours) || 0) * 60 + (Number(durationMinutes) || 0);
-    if (duration === 0) return null;
-    if (duration > maxDurationMinutes) {
+    if (duration === 0 && (durationHours !== '' || durationMinutes !== '')) {
+      return 'A duração deve ser maior que 0 minutos';
+    }
+    if (duration > 0 && duration > maxDurationMinutes) {
       const maxHours = Math.floor(maxDurationMinutes / 60);
       const maxMins = maxDurationMinutes % 60;
       return `A duração não pode ultrapassar o mesmo dia. Máximo: ${maxHours}h${maxMins > 0 ? ` ${maxMins}min` : ''}`;
@@ -77,10 +119,21 @@ export default function CreateOpportunityScreen(){
     return null;
   }, [durationHours, durationMinutes, maxDurationMinutes]);
 
+  // Validação de horário de início (não pode ser depois de 23:30)
+  const startTimeError = useMemo(() => {
+    if (!startAt) return null;
+    const hours = startAt.getHours();
+    const minutes = startAt.getMinutes();
+    if (hours > 23 || (hours === 23 && minutes > 30)) {
+      return 'O horário de início não pode ser após 23:30';
+    }
+    return null;
+  }, [startAt]);
+
   const canSubmit = useMemo(()=>{
     const duration = (Number(durationHours) || 0) * 60 + (Number(durationMinutes) || 0);
-    return !!(title && startAt && duration > 0 && !durationError && (isOnline || useInstitutionAddress || (city && state)) && maxVolunteers && skills.length>=1 && skills.length<=3);
-  },[title, startAt, durationHours, durationMinutes, durationError, isOnline, useInstitutionAddress, city, state, maxVolunteers, skills]);
+    return !!(title && startAt && duration > 0 && !durationError && !startTimeError && (isOnline || useInstitutionAddress || (city && state)) && maxVolunteers && skills.length>=1 && skills.length<=3);
+  },[title, startAt, durationHours, durationMinutes, durationError, startTimeError, isOnline, useInstitutionAddress, city, state, maxVolunteers, skills]);
 
   // poll helper to give backend time to persist
   async function waitForCreation(delayMs = 1500){
@@ -94,9 +147,24 @@ export default function CreateOpportunityScreen(){
     const duration = (Number(durationHours) || 0) * 60 + (Number(durationMinutes) || 0);
     
     // Valida duração
+    if (duration === 0) {
+      alert('A duração deve ser maior que 0 minutos.');
+      return;
+    }
+    
     if (duration > maxDurationMinutes) {
       alert('A duração não pode ultrapassar 23:59 do mesmo dia.');
       return;
+    }
+
+    // Valida horário de início
+    if (startAt) {
+      const hours = startAt.getHours();
+      const minutes = startAt.getMinutes();
+      if (hours > 23 || (hours === 23 && minutes > 30)) {
+        alert('O horário de início não pode ser após 23:30.');
+        return;
+      }
     }
     
     try{
@@ -184,7 +252,7 @@ export default function CreateOpportunityScreen(){
           <View style={{ width:'100%' }}>
             <Text style={{ fontSize:16, fontFamily:'Nunito-Bold', color:'#173663', marginBottom:8 }}>Início</Text>
             {Platform.OS === 'web' ? (
-              <Input style={{ height:56, backgroundColor:'#FDFDFD', borderColor:'#B7B7B7', borderWidth:1, borderRadius:12 }}>
+              <Input style={{ height:56, backgroundColor:'#FDFDFD', borderColor: startTimeError ? '#DC2626' : '#B7B7B7', borderWidth:1, borderRadius:12 }}>
                 <InputField
                   value={startAt ? (startAt as Date).toISOString().slice(0,16).replace('T',' ') : ''}
                   onChangeText={(v)=> setStartAt(v ? new Date(v) : null)}
@@ -195,18 +263,23 @@ export default function CreateOpportunityScreen(){
             ) : (
               <VStack style={{ gap:10 }}>
                 <Pressable onPress={()=> setShowStartDate(true)} accessibilityRole='button' hitSlop={10}>
-                  <Input pointerEvents='none' style={{ height:56, backgroundColor:'#FDFDFD', borderColor:'#B7B7B7', borderWidth:1, borderRadius:12, paddingRight:44 }}>
+                  <Input pointerEvents='none' style={{ height:56, backgroundColor:'#FDFDFD', borderColor: startTimeError ? '#DC2626' : '#B7B7B7', borderWidth:1, borderRadius:12, paddingRight:44 }}>
                     <InputField editable={false} value={startAt ? startAt.toLocaleDateString() : ''} placeholder='Data' style={{ paddingRight: 10, fontSize:16 }} />
                   </Input>
                   <Calendar size={20} color="#173663" pointerEvents='none' style={{ position:'absolute', right:12, top:'50%', marginTop:-10 }} />
                 </Pressable>
                 <Pressable onPress={()=> setShowStartTime(true)} accessibilityRole='button' hitSlop={10}>
-                  <Input pointerEvents='none' style={{ height:56, backgroundColor:'#FDFDFD', borderColor:'#B7B7B7', borderWidth:1, borderRadius:12, paddingRight:44 }}>
+                  <Input pointerEvents='none' style={{ height:56, backgroundColor:'#FDFDFD', borderColor: startTimeError ? '#DC2626' : '#B7B7B7', borderWidth:1, borderRadius:12, paddingRight:44 }}>
                     <InputField editable={false} value={startAt ? startAt.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) : ''} placeholder='Hora' style={{ paddingRight: 10, fontSize:16 }} />
                   </Input>
                   <Clock size={20} color="#173663" pointerEvents='none' style={{ position:'absolute', right:12, top:'50%', marginTop:-10 }} />
                 </Pressable>
               </VStack>
+            )}
+            {startTimeError && (
+              <Text style={{ fontSize:12, color:'#DC2626', marginTop:6, lineHeight:16 }}>
+                {startTimeError}
+              </Text>
             )}
           </View>
 
@@ -214,26 +287,70 @@ export default function CreateOpportunityScreen(){
             <Text style={{ fontSize:16, fontFamily:'Nunito-Bold', color:'#173663', marginBottom:8 }}>Duração</Text>
             <HStack style={{ gap:12 }}>
               <View style={{ flex:1 }}>
-                <Input style={{ height:56, backgroundColor:'#FDFDFD', borderColor: durationError ? '#DC2626' : '#B7B7B7', borderWidth:1, borderRadius:12 }}>
-                  <InputField
-                    value={durationHours}
-                    onChangeText={setDurationHours}
-                    placeholder='Horas'
-                    keyboardType='number-pad'
-                    style={{ fontSize:16, textAlign:'center' }}
-                  />
-                </Input>
+                <Text style={{ fontSize:14, color:'#64748B', marginBottom:4 }}>Horas</Text>
+                <ScrollView 
+                  horizontal 
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ gap:8 }}
+                  style={{ maxHeight:60 }}
+                >
+                  {[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23].map(h => (
+                    <Pressable
+                      key={h}
+                      onPress={() => setDurationHours(String(h))}
+                      style={{
+                        paddingHorizontal:16,
+                        paddingVertical:12,
+                        borderRadius:8,
+                        backgroundColor: durationHours === String(h) ? '#173663' : '#F1F5F9',
+                        borderWidth:1,
+                        borderColor: durationHours === String(h) ? '#173663' : '#CBD5E1',
+                      }}
+                    >
+                      <Text style={{ 
+                        fontSize:16, 
+                        fontFamily:'Nunito-Bold',
+                        color: durationHours === String(h) ? '#FFFFFF' : '#334155'
+                      }}>
+                        {h}h
+                      </Text>
+                    </Pressable>
+                  ))}
+                </ScrollView>
               </View>
+            </HStack>
+            <HStack style={{ gap:12, marginTop:12 }}>
               <View style={{ flex:1 }}>
-                <Input style={{ height:56, backgroundColor:'#FDFDFD', borderColor: durationError ? '#DC2626' : '#B7B7B7', borderWidth:1, borderRadius:12 }}>
-                  <InputField
-                    value={durationMinutes}
-                    onChangeText={setDurationMinutes}
-                    placeholder='Minutos'
-                    keyboardType='number-pad'
-                    style={{ fontSize:16, textAlign:'center' }}
-                  />
-                </Input>
+                <Text style={{ fontSize:14, color:'#64748B', marginBottom:4 }}>Minutos</Text>
+                <ScrollView 
+                  horizontal 
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ gap:8 }}
+                  style={{ maxHeight:60 }}
+                >
+                  {[0,15,30,45].map(m => (
+                    <Pressable
+                      key={m}
+                      onPress={() => setDurationMinutes(String(m))}
+                      style={{
+                        paddingHorizontal:16,
+                        paddingVertical:12,
+                        borderRadius:8,
+                        backgroundColor: durationMinutes === String(m) ? '#173663' : '#F1F5F9',
+                        borderWidth:1,
+                        borderColor: durationMinutes === String(m) ? '#173663' : '#CBD5E1',
+                      }}
+                    >
+                      <Text style={{ 
+                        fontSize:16, 
+                        fontFamily:'Nunito-Bold',
+                        color: durationMinutes === String(m) ? '#FFFFFF' : '#334155'
+                      }}>
+                        {m}min
+                      </Text>
+                    </Pressable>
+                  ))}
+                </ScrollView>
               </View>
             </HStack>
             {durationError && (
@@ -298,9 +415,22 @@ export default function CreateOpportunityScreen(){
                 <HStack style={{ gap:16 }}>
                   <View style={{ flex:1 }}>
                     <Text style={{ fontSize:16, fontFamily:'Nunito-Bold', color:'#173663', marginBottom:8 }}>CEP</Text>
-                    <Input style={{ height:43, backgroundColor:'#FDFDFD', borderColor:'#B7B7B7', borderWidth:1, borderRadius:8 }}>
-                      <InputField value={cep} onChangeText={setCep} placeholder='00000000' keyboardType='number-pad' />
-                    </Input>
+                    <View style={{ position:'relative' }}>
+                      <Input style={{ height:43, backgroundColor:'#FDFDFD', borderColor:'#B7B7B7', borderWidth:1, borderRadius:8 }}>
+                        <InputField 
+                          value={cep} 
+                          onChangeText={handleCepChange} 
+                          placeholder='00000-000' 
+                          keyboardType='number-pad' 
+                          maxLength={9}
+                        />
+                      </Input>
+                      {loadingCep && (
+                        <View style={{ position:'absolute', right:12, top:'50%', marginTop:-10 }}>
+                          <Spinner size="small" />
+                        </View>
+                      )}
+                    </View>
                   </View>
                   <View style={{ flex:1 }}>
                     <Text style={{ fontSize:16, fontFamily:'Nunito-Bold', color:'#173663', marginBottom:8 }}>Bairro</Text>
@@ -319,7 +449,12 @@ export default function CreateOpportunityScreen(){
                   <View style={{ flex:1 }}>
                     <Text style={{ fontSize:16, fontFamily:'Nunito-Bold', color:'#173663', marginBottom:8 }}>Número</Text>
                     <Input style={{ height:43, backgroundColor:'#FDFDFD', borderColor:'#B7B7B7', borderWidth:1, borderRadius:8 }}>
-                      <InputField value={numberHouse} onChangeText={setNumberHouse} placeholder='Número' />
+                      <InputField 
+                        value={numberHouse} 
+                        onChangeText={(v) => setNumberHouse(onlyNumbers(v))} 
+                        placeholder='Número' 
+                        keyboardType='number-pad'
+                      />
                     </Input>
                   </View>
                 </HStack>
@@ -338,7 +473,12 @@ export default function CreateOpportunityScreen(){
 
         <Text style={{ fontSize:16, fontFamily:'Nunito-Bold', color:'#173663', marginBottom:8, marginTop:12 }}>Quantidade de Voluntários</Text>
         <Input style={{ height:43, backgroundColor:'#FDFDFD', borderColor:'#B7B7B7', borderWidth:1, borderRadius:8, marginBottom:8 }}>
-          <InputField value={maxVolunteers} onChangeText={setMaxVolunteers} placeholder='0' keyboardType='number-pad' />
+          <InputField 
+            value={maxVolunteers} 
+            onChangeText={(v) => setMaxVolunteers(onlyNumbers(v))} 
+            placeholder='0' 
+            keyboardType='number-pad' 
+          />
         </Input>
 
         <Text style={{ fontSize:16, fontFamily:'Nunito-Bold', color:'#173663', marginBottom:8 }}>Descrição</Text>

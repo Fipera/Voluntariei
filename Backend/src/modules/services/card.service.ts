@@ -1,5 +1,6 @@
 import prisma from "../../utils/prisma";
 import { createCardInput } from "../schemas/card.schema";
+import { notifyVolunteersAboutNewOpportunity, notifyVolunteersAboutCancellation } from "./notification.service";
 
 export async function createCard(ownerId: number, input: createCardInput) {
   const { skills, banner, useInstitutionAddress, ...rest } = input;
@@ -48,6 +49,9 @@ export async function createCard(ownerId: number, input: createCardInput) {
     include: { skills: true },
   });
 
+  // Notifica voluntários com skills matching
+  await notifyVolunteersAboutNewOpportunity(card.id, skills);
+
   return card;
 }
 
@@ -69,7 +73,8 @@ export async function findCardsForVoluntary(voluntaryId: number){
   return prisma.card.findMany({
     where: {
       status: 'ACTIVE',
-      skills: { some: { name: { in: skillNames } } }
+      skills: { some: { name: { in: skillNames } } },
+      startAt: { gte: new Date() } // Apenas cards com data futura
     },
     include: { skills: true, owner: { select: { id: true, name: true, city: true, state: true } }, participants: true },
     orderBy: { startAt: 'asc' }
@@ -80,7 +85,8 @@ export async function searchCardsByTitle(searchQuery: string){
   return prisma.card.findMany({
     where: {
       status: 'ACTIVE',
-      title: { contains: searchQuery, mode: 'insensitive' }
+      title: { contains: searchQuery, mode: 'insensitive' },
+      startAt: { gte: new Date() } // Apenas cards com data futura
     },
     include: { skills: true, owner: { select: { id: true, name: true, city: true, state: true } }, participants: true },
     orderBy: { startAt: 'asc' }
@@ -90,7 +96,8 @@ export async function searchCardsByTitle(searchQuery: string){
 export async function findAllActiveCards(){
   return prisma.card.findMany({
     where: {
-      status: 'ACTIVE'
+      status: 'ACTIVE',
+      startAt: { gte: new Date() } // Apenas cards com data futura
     },
     include: { skills: true, owner: { select: { id: true, name: true, city: true, state: true } }, participants: true },
     orderBy: { startAt: 'asc' }
@@ -133,8 +140,46 @@ export async function findCardById(id: number){
 export async function cancelCard(id: number, ownerId: number){
   const exists = await prisma.card.findFirst({ where: { id, ownerId } });
   if (!exists) return null;
-  return prisma.card.update({
+  
+  const updated = await prisma.card.update({
     where: { id },
     data: { status: 'CANCELED' },
-  })
+  });
+
+  // Notifica voluntários confirmados sobre o cancelamento
+  await notifyVolunteersAboutCancellation(id);
+
+  return updated;
+}
+
+// Finaliza automaticamente cards que já passaram da data final (startAt + duration)
+export async function finalizeExpiredCards(){
+  const now = new Date();
+  
+  // Busca todos os cards ACTIVE ou PENDING
+  const activeCards = await prisma.card.findMany({
+    where: {
+      status: { in: ['ACTIVE', 'PENDING'] }
+    }
+  });
+
+  // Filtra cards que já expiraram
+  const expiredCards = activeCards.filter(card => {
+    const endTime = new Date(card.startAt.getTime() + card.duration * 60000);
+    return endTime < now;
+  });
+
+  // Atualiza todos os cards expirados para FINALIZED
+  if (expiredCards.length > 0) {
+    await prisma.card.updateMany({
+      where: {
+        id: { in: expiredCards.map(c => c.id) }
+      },
+      data: {
+        status: 'FINALIZED'
+      }
+    });
+  }
+
+  return expiredCards.length;
 }

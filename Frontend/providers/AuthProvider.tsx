@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
 
-type UserType = "institution" | "voluntary" | null;
+type UserType = "INSTITUTION" | "VOLUNTARY" | null;
 
 interface AuthContextProps {
     type: UserType;
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const storedToken = await SecureStore.getItemAsync("token");
             const storedType = await SecureStore.getItemAsync("type");
 
-            if (storedToken && (storedType === "institution" || storedType === "voluntary")) {
+            if (storedToken && (storedType === "INSTITUTION" || storedType === "VOLUNTARY")) {
                 setToken(storedToken);
                 setType(storedType as UserType);
             }
@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setToken(token);
         setType(userType);
 
-        router.replace(`/${userType === "institution" ? "(institution)" : "(voluntary)"}`);
+        router.replace(`/${userType === "INSTITUTION" ? "(institution)" : "(voluntary)"}`);
     };
 
     const logout = async () => {

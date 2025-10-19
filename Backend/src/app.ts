@@ -10,6 +10,7 @@ import cardRoutes from "./modules/routes/card.route";
 import { cardSchemas } from "./modules/schemas/card.schema";
 import participationRoutes from "./modules/routes/participation.route";
 import { participationSchemas } from "./modules/schemas/participation.schema";
+import notificationRoutes from "./modules/routes/notification.route";
 export const server = Fastify();
 
 server.get("/healthcheck", async function () {
@@ -45,6 +46,7 @@ async function main() {
     server.register(voluntaryRoutes, { prefix: "/voluntary" });
     server.register(cardRoutes, { prefix: "/cards" });
     server.register(participationRoutes, { prefix: "/" });
+    server.register(notificationRoutes, { prefix: "/" });
 
     try {
         await server.listen({ port: 3000, host: "0.0.0.0" });

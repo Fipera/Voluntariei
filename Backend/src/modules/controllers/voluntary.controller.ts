@@ -95,8 +95,8 @@ export async function loginVoluntaryHandler(
         if (isCorrectPassword) {
             const { password: _, ...payload } = institution;
 
-            const token = server.jwt.sign({ ...payload, type: "institution" });
-            const decoded = server.jwt.decode<{ type: "institution" }>(token);
+            const token = server.jwt.sign({ ...payload, type: "INSTITUTION" });
+            const decoded = server.jwt.decode<{ type: "INSTITUTION" }>(token);
 
             return reply.send({
                 accessToken: token,
@@ -115,8 +115,8 @@ export async function loginVoluntaryHandler(
         if (isCorrectPassword) {
             const { password: _, ...payload } = voluntary;
 
-            const token = server.jwt.sign({ ...payload, type: "voluntary" });
-            const decoded = server.jwt.decode<{ type: "voluntary" }>(token);
+            const token = server.jwt.sign({ ...payload, type: "VOLUNTARY" });
+            const decoded = server.jwt.decode<{ type: "VOLUNTARY" }>(token);
 
             return reply.send({
                 accessToken: token,

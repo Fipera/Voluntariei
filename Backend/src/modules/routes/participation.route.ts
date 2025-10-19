@@ -4,6 +4,8 @@ import {
   approveParticipationHandler,
   rejectParticipationHandler,
   getMyParticipationsHandler,
+  getMyCommitmentsHandler,
+  getMyHistoryHandler,
 } from "../controllers/participation.controller";
 import { $ref } from "../schemas/participation.schema";
 
@@ -38,13 +40,31 @@ async function participationRoutes(server: FastifyInstance) {
     rejectParticipationHandler
   );
 
-  // Voluntário visualiza seu histórico de inscrições
+  // Voluntário visualiza todas as inscrições
   server.get(
     "/participations/me",
     {
       preHandler: [server.authenticate],
     },
     getMyParticipationsHandler
+  );
+
+  // Voluntário visualiza compromissos futuros (AGENDA)
+  server.get(
+    "/participations/commitments",
+    {
+      preHandler: [server.authenticate],
+    },
+    getMyCommitmentsHandler
+  );
+
+  // Voluntário visualiza histórico (finalizados, cancelados, rejeitados)
+  server.get(
+    "/participations/history",
+    {
+      preHandler: [server.authenticate],
+    },
+    getMyHistoryHandler
   );
 }
 
