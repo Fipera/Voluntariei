@@ -16,12 +16,16 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import SplashScreenCustom from "@/screens/SplashScreenCustom";
 import { useAuth } from "@/providers/AuthProvider";
 import { Redirect } from "expo-router";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 function AppRoutes() {
-    const { isLoading, type } = useAuth();
+    const { isLoading, type, token } = useAuth();
+
+    // Registrar push notifications
+    usePushNotifications(token, type);
 
     if (isLoading) {
         return <SplashScreenCustom />;

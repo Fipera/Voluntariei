@@ -4,7 +4,8 @@ import {
     loginInstitutionHandler,
     registerInstitutionHandler,
     updateInstitutionHandler,
-    getInstitutionMeHandler
+    getInstitutionMeHandler,
+    registerInstitutionPushTokenHandler
 } from "../controllers/institution.controller";
 import { $ref } from "../schemas/institution.schema";
 
@@ -67,6 +68,18 @@ async function institutionRoutes(server: FastifyInstance) {
         },
         updateInstitutionHandler
     )
+
+    server.post(
+        "/register-push-token",
+        {
+            preHandler: [server.authenticate],
+            schema: {
+                body: $ref("registerPushTokenSchema"),
+                response: { 200: $ref("registerPushTokenResponseSchema") }
+            }
+        },
+        registerInstitutionPushTokenHandler
+    );
 }
 
 export default institutionRoutes;

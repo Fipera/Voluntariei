@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { checkVoluntaryUniquenessHandler, loginVoluntaryHandler, registerVoluntaryHandler, updateVoluntaryHandler, getVoluntaryMeHandler } from "../controllers/voluntary.controller";
+import { checkVoluntaryUniquenessHandler, loginVoluntaryHandler, registerVoluntaryHandler, updateVoluntaryHandler, getVoluntaryMeHandler, registerVoluntaryPushTokenHandler } from "../controllers/voluntary.controller";
 import { $ref } from "../schemas/voluntary.schema";
 
 async function voluntaryRoutes(server: FastifyInstance) {
@@ -58,6 +58,18 @@ async function voluntaryRoutes(server: FastifyInstance) {
         { preHandler: [server.authenticate] },
         getVoluntaryMeHandler
     )
+
+    server.post(
+        "/register-push-token",
+        {
+            preHandler: [server.authenticate],
+            schema: {
+                body: $ref("registerPushTokenSchema"),
+                response: { 200: $ref("registerPushTokenResponseSchema") }
+            }
+        },
+        registerVoluntaryPushTokenHandler
+    );
 }
 
 export default voluntaryRoutes;

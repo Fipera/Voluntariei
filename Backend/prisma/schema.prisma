@@ -30,6 +30,8 @@ model Institution {
   numberHouse  String
   street       String
 
+  pushToken String? // Token do Expo para push notifications
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -37,29 +39,29 @@ model Institution {
 }
 
 model Card {
-  id           Int             @id @default(autoincrement())
-  createAt     DateTime        @default(now())
-  updateAt     DateTime        @updatedAt
-  title        String          @db.VarChar(255)
-  description  String?
-  owner        Institution     @relation(fields: [ownerId], references: [id])
-  ownerId      Int
-  banner       String?
-  startAt      DateTime
-  duration     Int             // duração em minutos (max 1439 = 23h59m)
-  isOnline     Boolean         @default(false)
-  cep          String?
-  neighborhood String?
-  city         String?
-  state        String?
-  numberHouse  String?
-  street       String?
-  complement   String?
-  locationNote String?
+  id            Int             @id @default(autoincrement())
+  createAt      DateTime        @default(now())
+  updateAt      DateTime        @updatedAt
+  title         String          @db.VarChar(255)
+  description   String?
+  owner         Institution     @relation(fields: [ownerId], references: [id])
+  ownerId       Int
+  banner        String?
+  startAt       DateTime
+  duration      Int // duração em minutos (max 1439 = 23h59m)
+  isOnline      Boolean         @default(false)
+  cep           String?
+  neighborhood  String?
+  city          String?
+  state         String?
+  numberHouse   String?
+  street        String?
+  complement    String?
+  locationNote  String?
   maxVolunteers Int
-  status       CardStatus      @default(ACTIVE)
-  skills       Skill[]
-  participants Participation[]
+  status        CardStatus      @default(ACTIVE)
+  skills        Skill[]
+  participants  Participation[]
 }
 
 model Voluntary {
@@ -72,6 +74,8 @@ model Voluntary {
   cep   String
   city  String
   state String
+
+  pushToken String? // Token do Expo para push notifications
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -88,10 +92,10 @@ model Skill {
 }
 
 model Participation {
-  id          Int       @id @default(autoincrement())
-  voluntary   Voluntary @relation(fields: [voluntaryId], references: [id])
+  id          Int                 @id @default(autoincrement())
+  voluntary   Voluntary           @relation(fields: [voluntaryId], references: [id])
   voluntaryId Int
-  card        Card      @relation(fields: [cardId], references: [id])
+  card        Card                @relation(fields: [cardId], references: [id])
   cardId      Int
   status      ParticipationStatus @default(PENDING)
   observation String?
@@ -101,12 +105,12 @@ model Participation {
 
 model Notification {
   id        Int              @id @default(autoincrement())
-  userId    Int              // ID do voluntário ou instituição
-  userType  UserType         // VOLUNTARY ou INSTITUTION
+  userId    Int // ID do voluntário ou instituição
+  userType  UserType // VOLUNTARY ou INSTITUTION
   type      NotificationType // Tipo da notificação
   title     String
   message   String
-  cardId    Int?             // Opcional: referência ao card relacionado
+  cardId    Int? // Opcional: referência ao card relacionado
   read      Boolean          @default(false)
   createdAt DateTime         @default(now())
 }
@@ -130,10 +134,10 @@ enum UserType {
 }
 
 enum NotificationType {
-  NEW_OPPORTUNITY          // Nova oportunidade criada (para voluntários)
-  NEW_APPLICATION          // Nova inscrição recebida (para instituição)
-  APPLICATION_APPROVED     // Inscrição aprovada (para voluntário)
-  APPLICATION_REJECTED     // Inscrição rejeitada (para voluntário)
-  OPPORTUNITY_CANCELED     // Oportunidade cancelada (para voluntário)
-  OPPORTUNITY_STARTING     // Oportunidade começando em 1h (para voluntário)
+  NEW_OPPORTUNITY // Nova oportunidade criada (para voluntários)
+  NEW_APPLICATION // Nova inscrição recebida (para instituição)
+  APPLICATION_APPROVED // Inscrição aprovada (para voluntário)
+  APPLICATION_REJECTED // Inscrição rejeitada (para voluntário)
+  OPPORTUNITY_CANCELED // Oportunidade cancelada (para voluntário)
+  OPPORTUNITY_STARTING // Oportunidade começando em 1h (para voluntário)
 }

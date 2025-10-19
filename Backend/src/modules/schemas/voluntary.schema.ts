@@ -85,12 +85,22 @@ const updateVoluntaryResponseSchema = z.object({
     skills: z.array(z.string())
 });
 
+const registerPushTokenSchema = z.object({
+    pushToken: z.string({ required_error: "Push token is required" })
+});
+
+const registerPushTokenResponseSchema = z.object({
+    success: z.boolean(),
+    message: z.string()
+});
+
 export type createVoluntaryInput = z.infer<typeof createVoluntarySchema>;
 export type loginVoluntaryInput = z.infer<typeof loginVoluntarySchema>;
 export type checkUniquenessVoluntaryInput = z.infer<
     typeof checkUniquenessVoluntarySchema
 >;
 export type updateVoluntaryInput = z.infer<typeof updateVoluntarySchema>;
+export type registerPushTokenInput = z.infer<typeof registerPushTokenSchema>;
 
 export const { schemas: voluntarySchemas, $ref } = buildJsonSchemas(
     {
@@ -101,7 +111,9 @@ export const { schemas: voluntarySchemas, $ref } = buildJsonSchemas(
         checkUniquenessVoluntarySchema,
         checkUniquenessVoluntaryResponseSchema,
         updateVoluntarySchema,
-        updateVoluntaryResponseSchema
+        updateVoluntaryResponseSchema,
+        registerPushTokenSchema,
+        registerPushTokenResponseSchema
     },
     {
         $id: "voluntarySchemas",

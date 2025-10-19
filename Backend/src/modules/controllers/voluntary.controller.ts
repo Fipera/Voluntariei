@@ -5,6 +5,7 @@ import {
     findVoluntaryByPhone,
     updateVoluntary,
     findVoluntaryById,
+    registerVoluntaryPushToken,
 } from "../services/voluntary.service";
 import {
     checkUniquenessVoluntaryInput,
@@ -12,6 +13,7 @@ import {
     createVoluntarySchema,
     loginVoluntaryInput,
     updateVoluntaryInput,
+    registerPushTokenInput,
 } from "../schemas/voluntary.schema";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { AccountAlreadyExistsError } from "../../errors/email.already.exists";
@@ -198,4 +200,27 @@ export async function getVoluntaryMeHandler(request: any, reply: FastifyReply){
         state: me.state,
         skills: me.skills.map(s=>s.name)
     })
+}
+
+export async function registerVoluntaryPushTokenHandler(
+    request: FastifyRequest<{ Body: registerPushTokenInput }>,
+    reply: FastifyReply
+) {
+    try {
+        const { pushToken } = request.body;
+        const userId = (request.user as any).id;
+
+        await registerVoluntaryPushToken(userId, pushToken);
+
+        return reply.code(200).send({
+            success: true,
+            message: "Push token registered successfully",
+        });
+    } catch (err) {
+        console.error("Error registering push token:", err);
+        return reply.code(500).send({
+            success: false,
+            message: "Failed to register push token",
+        });
+    }
 }

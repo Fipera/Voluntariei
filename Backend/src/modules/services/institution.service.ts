@@ -57,3 +57,10 @@ export async function updateInstitution(id: number, data: updateInstitutionInput
 export async function findInstitutionById(id: number){
     return prisma.institution.findUnique({ where: { id } })
 }
+
+export async function registerInstitutionPushToken(id: number, pushToken: string) {
+    return prisma.institution.update({
+        where: { id },
+        data: { pushToken },
+    });
+}

@@ -20,7 +20,12 @@
         "android.permission.RECORD_AUDIO",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.anonymous.Voluntariei"
+      "package": "com.anonymous.Voluntariei",
+      "useNextNotificationsApi": true
+    },
+    "notification": {
+      "icon": "./assets/images/notification-icon.png",
+      "color": "#173663"
     },
     "web": {
       "bundler": "metro",
@@ -46,7 +51,15 @@
       ],
       "expo-font",
       "expo-web-browser",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#173663",
+          "sounds": []
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

@@ -56,3 +56,10 @@ export async function findVoluntaryById(id: number) {
         include: { skills: true },
     });
 }
+
+export async function registerVoluntaryPushToken(id: number, pushToken: string) {
+    return prisma.voluntary.update({
+        where: { id },
+        data: { pushToken },
+    });
+}

@@ -79,12 +79,22 @@ const updateInstitutionResponseSchema = z.object({
     reason: z.string()
 });
 
+const registerPushTokenSchema = z.object({
+    pushToken: z.string({ required_error: "Push token is required" })
+});
+
+const registerPushTokenResponseSchema = z.object({
+    success: z.boolean(),
+    message: z.string()
+});
+
 export type createInstitutionInput = z.infer<typeof createInstitutionSchema>;
 
 export type LoginInstitutionInput = z.infer<typeof loginInstitutionSchema>;
 
 export type checkUniquenessInstitutionInput = z.infer<typeof checkUniquenessInstitutionSchema>;
 export type updateInstitutionInput = z.infer<typeof updateInstitutionSchema>;
+export type registerPushTokenInput = z.infer<typeof registerPushTokenSchema>;
 
 export const { schemas: institutionSchemas, $ref } = buildJsonSchemas(
     {
@@ -95,7 +105,9 @@ export const { schemas: institutionSchemas, $ref } = buildJsonSchemas(
         checkUniquenessInstitutionSchema,
         checkUniquenessInstitutionResponseSchema,
         updateInstitutionSchema,
-        updateInstitutionResponseSchema
+        updateInstitutionResponseSchema,
+        registerPushTokenSchema,
+        registerPushTokenResponseSchema
     },
     {
         $id: "institutionSchemas",

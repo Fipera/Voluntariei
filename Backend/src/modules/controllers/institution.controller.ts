@@ -7,6 +7,7 @@ import {
     findInstitutions,
     updateInstitution,
     findInstitutionById,
+    registerInstitutionPushToken,
 } from "../services/institution.service";
 import {
     checkUniquenessInstitutionInput,
@@ -14,6 +15,7 @@ import {
     createInstitutionSchema,
     LoginInstitutionInput,
     updateInstitutionInput,
+    registerPushTokenInput,
 } from "../schemas/institution.schema";
 import { verifyPassword } from "../../utils/hash";
 import { server } from "../../app";
@@ -189,4 +191,27 @@ export async function getInstitutionMeHandler(request: any, reply: FastifyReply)
         state: me.state,
         reason: me.reason
     })
+}
+
+export async function registerInstitutionPushTokenHandler(
+    request: FastifyRequest<{ Body: registerPushTokenInput }>,
+    reply: FastifyReply
+) {
+    try {
+        const { pushToken } = request.body;
+        const userId = (request.user as any).id;
+
+        await registerInstitutionPushToken(userId, pushToken);
+
+        return reply.code(200).send({
+            success: true,
+            message: "Push token registered successfully",
+        });
+    } catch (err) {
+        console.error("Error registering push token:", err);
+        return reply.code(500).send({
+            success: false,
+            message: "Failed to register push token",
+        });
+    }
 }

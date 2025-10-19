@@ -1,4 +1,9 @@
 import prisma from "../../utils/prisma";
+import {
+  notifyVoluntariesPush,
+  notifyInstitutionPush,
+  notifyVoluntaryPush,
+} from "../../services/push.service";
 
 type UserType = "VOLUNTARY" | "INSTITUTION";
 type NotificationType =
@@ -131,16 +136,28 @@ export async function notifyVolunteersAboutNewOpportunity(cardId: number, skillN
 
   if (!card || volunteers.length === 0) return;
 
+  const title = "Nova oportunidade disponível!";
+  const message = `A oportunidade "${card.title}" foi criada e combina com suas habilidades.`;
+
   const notifications = volunteers.map((v) => ({
     userId: v.id,
     userType: "VOLUNTARY" as UserType,
     type: "NEW_OPPORTUNITY" as NotificationType,
-    title: "Nova oportunidade disponível!",
-    message: `A oportunidade "${card.title}" foi criada e combina com suas habilidades.`,
+    title,
+    message,
     cardId,
   }));
 
+  // Cria notificações in-app
   await createBulkNotifications(notifications);
+
+  // Envia push notifications
+  await notifyVoluntariesPush(
+    volunteers.map((v) => v.id),
+    title,
+    message,
+    { cardId, type: "NEW_OPPORTUNITY" }
+  );
 }
 
 // Notifica instituição sobre nova inscrição
@@ -150,13 +167,23 @@ export async function notifyInstitutionAboutNewApplication(
   cardTitle: string,
   cardId: number
 ) {
+  const title = "Nova inscrição recebida";
+  const message = `${voluntaryName} se inscreveu em "${cardTitle}".`;
+
+  // Cria notificação in-app
   await createNotification({
     userId: institutionId,
     userType: "INSTITUTION",
     type: "NEW_APPLICATION",
-    title: "Nova inscrição recebida",
-    message: `${voluntaryName} se inscreveu em "${cardTitle}".`,
+    title,
+    message,
     cardId,
+  });
+
+  // Envia push notification
+  await notifyInstitutionPush(institutionId, title, message, {
+    cardId,
+    type: "NEW_APPLICATION",
   });
 }
 
@@ -166,13 +193,23 @@ export async function notifyVoluntaryAboutApproval(
   cardTitle: string,
   cardId: number
 ) {
+  const title = "Inscrição aprovada! 🎉";
+  const message = `Sua inscrição em "${cardTitle}" foi aprovada!`;
+
+  // Cria notificação in-app
   await createNotification({
     userId: voluntaryId,
     userType: "VOLUNTARY",
     type: "APPLICATION_APPROVED",
-    title: "Inscrição aprovada! 🎉",
-    message: `Sua inscrição em "${cardTitle}" foi aprovada!`,
+    title,
+    message,
     cardId,
+  });
+
+  // Envia push notification
+  await notifyVoluntaryPush(voluntaryId, title, message, {
+    cardId,
+    type: "APPLICATION_APPROVED",
   });
 }
 
@@ -182,13 +219,23 @@ export async function notifyVoluntaryAboutRejection(
   cardTitle: string,
   cardId: number
 ) {
+  const title = "Inscrição não aprovada";
+  const message = `Sua inscrição em "${cardTitle}" não foi aprovada desta vez.`;
+
+  // Cria notificação in-app
   await createNotification({
     userId: voluntaryId,
     userType: "VOLUNTARY",
     type: "APPLICATION_REJECTED",
-    title: "Inscrição não aprovada",
-    message: `Sua inscrição em "${cardTitle}" não foi aprovada desta vez.`,
+    title,
+    message,
     cardId,
+  });
+
+  // Envia push notification
+  await notifyVoluntaryPush(voluntaryId, title, message, {
+    cardId,
+    type: "APPLICATION_REJECTED",
   });
 }
 
@@ -206,14 +253,26 @@ export async function notifyVolunteersAboutCancellation(cardId: number) {
 
   if (participations.length === 0) return;
 
+  const title = "Oportunidade cancelada";
+  const message = `A oportunidade "${participations[0].card.title}" foi cancelada pela instituição.`;
+
   const notifications = participations.map((p) => ({
     userId: p.voluntaryId,
     userType: "VOLUNTARY" as UserType,
     type: "OPPORTUNITY_CANCELED" as NotificationType,
-    title: "Oportunidade cancelada",
-    message: `A oportunidade "${p.card.title}" foi cancelada pela instituição.`,
+    title,
+    message,
     cardId,
   }));
 
+  // Cria notificações in-app
   await createBulkNotifications(notifications);
+
+  // Envia push notifications
+  await notifyVoluntariesPush(
+    participations.map((p) => p.voluntaryId),
+    title,
+    message,
+    { cardId, type: "OPPORTUNITY_CANCELED" }
+  );
 }
