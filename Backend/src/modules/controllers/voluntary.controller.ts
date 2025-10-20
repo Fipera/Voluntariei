@@ -6,6 +6,7 @@ import {
     updateVoluntary,
     findVoluntaryById,
     registerVoluntaryPushToken,
+    unregisterVoluntaryPushToken,
 } from "../services/voluntary.service";
 import {
     checkUniquenessVoluntaryInput,
@@ -221,6 +222,28 @@ export async function registerVoluntaryPushTokenHandler(
         return reply.code(500).send({
             success: false,
             message: "Failed to register push token",
+        });
+    }
+}
+
+export async function unregisterVoluntaryPushTokenHandler(
+    request: FastifyRequest,
+    reply: FastifyReply
+) {
+    try {
+        const userId = (request.user as any).id;
+
+        await unregisterVoluntaryPushToken(userId);
+
+        return reply.code(200).send({
+            success: true,
+            message: "Push token unregistered successfully",
+        });
+    } catch (err) {
+        console.error("Error unregistering push token:", err);
+        return reply.code(500).send({
+            success: false,
+            message: "Failed to unregister push token",
         });
     }
 }

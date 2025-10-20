@@ -105,12 +105,12 @@ model Participation {
 
 model Notification {
   id        Int              @id @default(autoincrement())
-  userId    Int // ID do voluntário ou instituição
+  userId    Int 
   userType  UserType // VOLUNTARY ou INSTITUTION
   type      NotificationType // Tipo da notificação
   title     String
   message   String
-  cardId    Int? // Opcional: referência ao card relacionado
+  cardId    Int? 
   read      Boolean          @default(false)
   createdAt DateTime         @default(now())
 }

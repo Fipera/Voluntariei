@@ -94,6 +94,11 @@ const registerPushTokenResponseSchema = z.object({
     message: z.string()
 });
 
+const unregisterPushTokenResponseSchema = z.object({
+    success: z.boolean(),
+    message: z.string()
+});
+
 export type createVoluntaryInput = z.infer<typeof createVoluntarySchema>;
 export type loginVoluntaryInput = z.infer<typeof loginVoluntarySchema>;
 export type checkUniquenessVoluntaryInput = z.infer<
@@ -113,7 +118,8 @@ export const { schemas: voluntarySchemas, $ref } = buildJsonSchemas(
         updateVoluntarySchema,
         updateVoluntaryResponseSchema,
         registerPushTokenSchema,
-        registerPushTokenResponseSchema
+        registerPushTokenResponseSchema,
+        unregisterPushTokenResponseSchema
     },
     {
         $id: "voluntarySchemas",

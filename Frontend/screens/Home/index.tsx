@@ -84,7 +84,7 @@ export default () => {
                             marginTop: 10,
                         }}
                     >
-                        <ButtonIcon as={Home} color="#FFFFFF" style={{ marginRight: 8 }} />
+                        <Home color="#FFFFFF" size={20} style={{ marginRight: 8 }} />
                         <Text
                             style={{
                                 fontFamily: "Nunito-Bold",
@@ -114,7 +114,7 @@ export default () => {
                             marginTop: 16,
                         }}
                     >
-                        <ButtonIcon as={User} color="#173663" style={{ marginRight: 8 }} />
+                        <User color="#173663" size={24} style={{ marginRight: 8 }} />
                         <Text
                             style={{
                                 fontFamily: "Nunito-Bold",

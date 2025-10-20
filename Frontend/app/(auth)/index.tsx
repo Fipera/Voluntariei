@@ -8,4 +8,4 @@ import { SignupVoluntaryFirstStage } from "@/screens/SignupVoluntary/FirstStage"
 import { SignupVoluntarySecondStage } from "@/screens/SignupVoluntary/SecondStage";
 import { SignupVoluntaryThirdStage } from "@/screens/SignupVoluntary/ThirdStage";
 
-export default () => <Signin/>
+export default () => <Introduction/>

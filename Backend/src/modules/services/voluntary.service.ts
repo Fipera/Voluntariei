@@ -63,3 +63,10 @@ export async function registerVoluntaryPushToken(id: number, pushToken: string) 
         data: { pushToken },
     });
 }
+
+export async function unregisterVoluntaryPushToken(id: number) {
+    return prisma.voluntary.update({
+        where: { id },
+        data: { pushToken: null },
+    });
+}

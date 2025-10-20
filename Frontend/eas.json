@@ -8,7 +8,8 @@
       "distribution": "internal",
       "android": {
         "gradleCommand": ":app:assembleDebug",
-        "buildType": "apk"
+        "buildType": "apk",
+        "withoutCredentials": false
       },
       "ios": {
         "simulator": false
@@ -17,12 +18,14 @@
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "withoutCredentials": false
       }
     },
     "production": {
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "withoutCredentials": false
       }
     }
   },

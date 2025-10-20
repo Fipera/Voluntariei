@@ -64,3 +64,10 @@ export async function registerInstitutionPushToken(id: number, pushToken: string
         data: { pushToken },
     });
 }
+
+export async function unregisterInstitutionPushToken(id: number) {
+    return prisma.institution.update({
+        where: { id },
+        data: { pushToken: null },
+    });
+}

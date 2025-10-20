@@ -15,7 +15,7 @@ import { AuthProvider } from "@/providers/AuthProvider";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import SplashScreenCustom from "@/screens/SplashScreenCustom";
 import { useAuth } from "@/providers/AuthProvider";
-import { Redirect } from "expo-router";
+import { Redirect, useRouter, useSegments } from "expo-router";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -23,24 +23,37 @@ SplashScreen.preventAutoHideAsync();
 
 function AppRoutes() {
     const { isLoading, type, token } = useAuth();
+    const segments = useSegments();
+    const router = useRouter();
 
     // Registrar push notifications
     usePushNotifications(token, type);
+
+    useEffect(() => {
+        if (isLoading) return;
+
+        const inAuthGroup = segments[0] === "(auth)";
+        const inInstitutionGroup = segments[0] === "(institution)";
+        const inVoluntaryGroup = segments[0] === "(voluntary)";
+
+        if (!token && !inAuthGroup) {
+            // Usuário não logado e não está na área de autenticação
+            router.replace("/(auth)/home");
+        } else if (token && type === "INSTITUTION" && !inInstitutionGroup) {
+            // Usuário instituição logado mas não está na área de instituição
+            router.replace("/(institution)");
+        } else if (token && type === "VOLUNTARY" && !inVoluntaryGroup) {
+            // Usuário voluntário logado mas não está na área de voluntário
+            router.replace("/(voluntary)");
+        }
+    }, [isLoading, token, type, segments]);
 
     if (isLoading) {
         return <SplashScreenCustom />;
     }
 
     return (
-        <Stack
-            initialRouteName={
-                type === "INSTITUTION"
-                    ? "(institution)"
-                    : type === "VOLUNTARY"
-                    ? "(voluntary)"
-                    : "(auth)"
-            }
-        >
+        <Stack>
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen
                 name="(institution)"

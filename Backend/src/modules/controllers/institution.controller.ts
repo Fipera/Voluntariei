@@ -8,6 +8,7 @@ import {
     updateInstitution,
     findInstitutionById,
     registerInstitutionPushToken,
+    unregisterInstitutionPushToken,
 } from "../services/institution.service";
 import {
     checkUniquenessInstitutionInput,
@@ -212,6 +213,28 @@ export async function registerInstitutionPushTokenHandler(
         return reply.code(500).send({
             success: false,
             message: "Failed to register push token",
+        });
+    }
+}
+
+export async function unregisterInstitutionPushTokenHandler(
+    request: FastifyRequest,
+    reply: FastifyReply
+) {
+    try {
+        const userId = (request.user as any).id;
+
+        await unregisterInstitutionPushToken(userId);
+
+        return reply.code(200).send({
+            success: true,
+            message: "Push token unregistered successfully",
+        });
+    } catch (err) {
+        console.error("Error unregistering push token:", err);
+        return reply.code(500).send({
+            success: false,
+            message: "Failed to unregister push token",
         });
     }
 }

@@ -88,6 +88,11 @@ const registerPushTokenResponseSchema = z.object({
     message: z.string()
 });
 
+const unregisterPushTokenResponseSchema = z.object({
+    success: z.boolean(),
+    message: z.string()
+});
+
 export type createInstitutionInput = z.infer<typeof createInstitutionSchema>;
 
 export type LoginInstitutionInput = z.infer<typeof loginInstitutionSchema>;
@@ -107,7 +112,8 @@ export const { schemas: institutionSchemas, $ref } = buildJsonSchemas(
         updateInstitutionSchema,
         updateInstitutionResponseSchema,
         registerPushTokenSchema,
-        registerPushTokenResponseSchema
+        registerPushTokenResponseSchema,
+        unregisterPushTokenResponseSchema
     },
     {
         $id: "institutionSchemas",

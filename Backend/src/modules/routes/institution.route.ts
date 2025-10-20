@@ -5,7 +5,8 @@ import {
     registerInstitutionHandler,
     updateInstitutionHandler,
     getInstitutionMeHandler,
-    registerInstitutionPushTokenHandler
+    registerInstitutionPushTokenHandler,
+    unregisterInstitutionPushTokenHandler
 } from "../controllers/institution.controller";
 import { $ref } from "../schemas/institution.schema";
 
@@ -79,6 +80,17 @@ async function institutionRoutes(server: FastifyInstance) {
             }
         },
         registerInstitutionPushTokenHandler
+    );
+
+    server.delete(
+        "/unregister-push-token",
+        {
+            preHandler: [server.authenticate],
+            schema: {
+                response: { 200: $ref("unregisterPushTokenResponseSchema") }
+            }
+        },
+        unregisterInstitutionPushTokenHandler
     );
 }
 

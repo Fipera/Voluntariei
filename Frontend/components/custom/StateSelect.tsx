@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Modal, View, Pressable, TouchableWithoutFeedback, FlatList } from 'react-native';
+import { Modal, View, Pressable, TouchableWithoutFeedback, FlatList, KeyboardAvoidingView, Platform } from 'react-native';
 import { BRAZIL_STATES } from '@/utils/constants/states';
 import { Text } from '@/components/ui/text';
 import { Input, InputField } from '@/components/ui/input';
@@ -82,30 +82,37 @@ export const StateSelect: React.FC<Props> = ({
       </Pressable>
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
-        <TouchableWithoutFeedback onPress={() => setOpen(false)}>
-          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.25)', justifyContent: 'flex-end' }}>
-            <TouchableWithoutFeedback>
-              <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '70%', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 24 }}>
-                <Text style={{ fontSize: 16, fontFamily: 'Nunito-Bold', marginBottom: 8, color: '#173663', textAlign: 'center' }}>Selecione o Estado</Text>
-                <Input className="w-full rounded-lg border-[#D9D9D9] mb-3" style={{ height: 44 }}>
-                  <InputField value={search} onChangeText={setSearch} placeholder="Buscar" className="text-sm" />
-                </Input>
-                <FlatList
-                  data={options}
-                  keyExtractor={(item) => item.code}
-                  keyboardShouldPersistTaps="handled"
-                  renderItem={({ item }) => (
-                    <Pressable onPress={() => handleSelect(item.code)} style={{ paddingVertical: 10, flexDirection: 'row', alignItems: 'center' }}>
-                      <Text style={{ fontSize: 14, fontFamily: 'Nunito-Regular', color: '#1a202c' }}>{item.code} - {item.name}</Text>
-                    </Pressable>
-                  )}
-                  ItemSeparatorComponent={() => <View style={{ height: 1, backgroundColor: '#E2E8F0' }} />}
-                  style={{ borderRadius: 12 }}
-                />
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
+        <KeyboardAvoidingView 
+          style={{ flex: 1 }} 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <TouchableWithoutFeedback onPress={() => setOpen(false)}>
+            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.25)', justifyContent: 'flex-end' }}>
+              <TouchableWithoutFeedback>
+                <View style={{ backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '85%', paddingHorizontal: 16, paddingTop: 16, paddingBottom: Platform.OS === 'ios' ? 40 : 24 }}>
+                  <Text style={{ fontSize: 16, fontFamily: 'Nunito-Bold', marginBottom: 8, color: '#173663', textAlign: 'center' }}>Selecione o Estado</Text>
+                  <Input className="w-full rounded-lg border-[#D9D9D9] mb-3" style={{ height: 44 }}>
+                    <InputField value={search} onChangeText={setSearch} placeholder="Buscar" className="text-sm" />
+                  </Input>
+                  <FlatList
+                    data={options}
+                    keyExtractor={(item) => item.code}
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={true}
+                    contentContainerStyle={{ paddingBottom: 20 }}
+                    renderItem={({ item }) => (
+                      <Pressable onPress={() => handleSelect(item.code)} style={{ paddingVertical: 12, flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 14, fontFamily: 'Nunito-Regular', color: '#1a202c' }}>{item.code} - {item.name}</Text>
+                      </Pressable>
+                    )}
+                    ItemSeparatorComponent={() => <View style={{ height: 1, backgroundColor: '#E2E8F0' }} />}
+                    style={{ borderRadius: 12 }}
+                  />
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </Modal>
     </>
   );

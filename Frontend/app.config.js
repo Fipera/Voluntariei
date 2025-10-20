@@ -21,7 +21,8 @@ export default {
         "android.permission.RECORD_AUDIO"
       ],
       package: "com.voluntariei.app",
-      useNextNotificationsApi: true
+      useNextNotificationsApi: true,
+      googleServicesFile: "./google-services.json"
     },
     notification: {
       icon: "./assets/images/notification-icon.png",
@@ -37,7 +38,7 @@ export default {
       [
         "expo-splash-screen",
         {
-          image: "./assets/images/splash-icon.png",
+          image: "./assets/images/signin/logo-voluntariei.png",
           imageWidth: 200,
           resizeMode: "contain",
           backgroundColor: "#ffffff"
@@ -57,7 +58,8 @@ export default {
         {
           icon: "./assets/images/notification-icon.png",
           color: "#173663",
-          sounds: []
+          sounds: [],
+          mode: "production"
         }
       ]
     ],
@@ -66,7 +68,7 @@ export default {
     },
     extra: {
       eas: {
-        projectId: process.env.EAS_PROJECT_ID || "your-project-id-here"
+        projectId: "7eb71a26-8b6f-472c-bbc5-93ccafbe7e63"
       }
     }
   }

@@ -234,7 +234,7 @@ export function SignupInstitutionSecondStage() {
                                 className="flex-row"
                                 style={{ width: "100%", gap: 12 }}
                             >
-                                <FormControl isInvalid={!!errors.street} style={{ width: "70%" }}>
+                                <FormControl isInvalid={!!errors.street} style={{ flex: 1 }}>
                                     <Text
                                         style={{
                                             fontFamily: "Nunito-Bold",
@@ -338,17 +338,17 @@ export function SignupInstitutionSecondStage() {
                                                     />
                                                 </HStack>
                                             </Input>
-                                        )}
-                                    />
-                                    {errors.numberHouse && (
-                                        <FormControlError>
-                                            <FormControlErrorIcon as={AlertCircle} />
-                                            <FormControlErrorText>
-                                                {errors.numberHouse.message}
-                                            </FormControlErrorText>
-                                        </FormControlError>
                                     )}
-                                </FormControl>
+                                />
+                                {errors.numberHouse && (
+                                    <FormControlError>
+                                        <FormControlErrorIcon as={AlertCircle} />
+                                        <FormControlErrorText>
+                                            {errors.numberHouse.message}
+                                        </FormControlErrorText>
+                                    </FormControlError>
+                                )}
+                            </FormControl>
                             </HStack>
 
                             {/* Bairro */}
@@ -415,7 +415,7 @@ export function SignupInstitutionSecondStage() {
                                 className="flex-row"
                                 style={{ width: "100%", gap: 12, marginBottom: 8 }}
                             >
-                                <FormControl isInvalid={!!errors.city} style={{ width: "70%" }}>
+                                <FormControl isInvalid={!!errors.city} style={{ flex: 1 }}>
                                     <Text
                                         style={{
                                             fontFamily: "Nunito-Bold",
@@ -473,7 +473,7 @@ export function SignupInstitutionSecondStage() {
                                     )}
                                 </FormControl>
 
-                                <FormControl isInvalid={!!errors.state} style={{ width: "30%" }}>
+                                <FormControl isInvalid={!!errors.state} style={{ width: 85 }}>
                                     <Text
                                         style={{
                                             fontFamily: "Nunito-Bold",
