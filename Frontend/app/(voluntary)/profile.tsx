@@ -196,8 +196,8 @@ export default function VoluntaryProfileScreen() {
               <View style={{ backgroundColor:'#FFFFFF', borderTopLeftRadius:24, borderTopRightRadius:24, paddingHorizontal:24, paddingTop:24, paddingBottom: insets.bottom + 16 }}>
                 <Text style={{ fontSize:18, fontFamily:'Nunito-Bold', color:'#173663', textAlign:'center', marginBottom:20 }}>Configurações</Text>
 
-                <SettingsItem icon={FileText} label="Política de Uso" onPress={()=>{ /* abrir link/placeholder */ }} />
-                <SettingsItem icon={Info} label="Ajuda / Fale Conosco" onPress={()=>{ /* abrir ajuda */ }} />
+                <SettingsItem icon={FileText} label="Política de Uso" onPress={() => {}} />
+                <SettingsItem icon={Info} label="Ajuda / Fale Conosco" onPress={() => {}} />
 
                 <View style={{ height:1, backgroundColor:'#E2E8F0', marginVertical:16 }} />
 
@@ -212,7 +212,7 @@ export default function VoluntaryProfileScreen() {
 }
 
 function FieldGroup({ label, children, containerStyle }: { label: string; children: React.ReactNode; containerStyle?: any }) {
-  // Layout: label (22) + gap (14) + input (43)
+  
   return (
     <View style={[{ marginBottom: 24 }, containerStyle]}> 
       <Text style={{ fontSize: 16, fontFamily: 'Nunito-Bold', marginBottom: 14, color: '#173663', lineHeight:22 }}>{label}</Text>

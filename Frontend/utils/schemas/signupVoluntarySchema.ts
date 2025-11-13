@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const signupVoluntarySchema = z.object({
-    // Somente números
+    
 
     phoneNumber: z
         .string({ required_error: "O telefone é obrigatório" })
@@ -11,7 +11,7 @@ export const signupVoluntarySchema = z.object({
         .string({ required_error: "O CEP é obrigatório" })
         .regex(/^\d{8}$/, "CEP deve conter exatamente 8 números"),
 
-    // Somente texto
+    
     name: z
         .string({ required_error: "O nome é obrigatório" })
         .min(2, "Nome muito curto")

@@ -13,6 +13,7 @@ import { Calendar, ChevronLeft, MapPin, Tag, BookOpen, Info, Check } from 'lucid
 import api from '@/services/api';
 import { useAuth } from '@/providers/AuthProvider';
 import { SKILL_IMAGE_MAP, DEFAULT_SKILL_IMAGE } from '@/utils/constants/voluntarySkillImages';
+import SkillIcon from '@/components/custom/voluntaryskills/SkillIcon';
 import { SKILL_GROUPS } from '@/utils/constants/voluntarySkills';
 
 interface CardDetail {
@@ -21,7 +22,7 @@ interface CardDetail {
   description?: string;
   banner?: string | null;
   startAt: string;
-  duration: number; // em minutos
+  duration: number; 
   isOnline: boolean;
   city?: string;
   state?: string;
@@ -55,16 +56,16 @@ export default function VoluntaryOpportunityDetail(){
   const [participationStatus, setParticipationStatus] = useState<'PENDING' | 'CONFIRMED' | 'REJECTED' | null>(null);
 
   function handleBack() {
-    // Volta diretamente para a tela de origem
+    
     if (from === 'schedule') {
       router.push('/(voluntary)/schedule');
     } else {
-      // Se veio do hub ou outra tela, volta para o hub
+      
       router.push('/(voluntary)');
     }
   }
 
-  // Recarrega dados quando a tela recebe foco
+  
   useFocusEffect(
     React.useCallback(() => {
       loadData();
@@ -107,7 +108,7 @@ export default function VoluntaryOpportunityDetail(){
 
   function calculateEndDate(startAt: string, duration: number): string {
     const start = new Date(startAt);
-    const end = new Date(start.getTime() + duration * 60000); // duration em minutos
+    const end = new Date(start.getTime() + duration * 60000); 
     return end.toISOString();
   }
 
@@ -135,7 +136,7 @@ export default function VoluntaryOpportunityDetail(){
     return participantsCount < data.maxVolunteers && data.status === 'ACTIVE';
   }, [data]);
 
-  // Verifica se a vaga está finalizada, cancelada ou já começou
+  
   const opportunityState = useMemo(() => {
     if (!data) return { isFinalized: false, isInProgress: false, isCanceled: false, isStarted: false };
     
@@ -184,13 +185,13 @@ export default function VoluntaryOpportunityDetail(){
   return (
     <SafeAreaView style={{ flex:1, backgroundColor:'#fff' }} edges={['top','left','right','bottom']}>
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        {/* Header Image with Back Button */}
+        
         <Box style={{ width:'100%', height:220, backgroundColor:'#e5e7eb', position:'relative' }}>
           {data.banner ? (
             <RNImage source={{ uri: data.banner }} style={StyleSheet.absoluteFillObject} resizeMode='cover' />
           ) : null}
           
-          {/* Back Button */}
+          
           <Pressable 
             onPress={handleBack} 
             style={{ 
@@ -215,7 +216,7 @@ export default function VoluntaryOpportunityDetail(){
         </Box>
 
         <VStack style={{ paddingHorizontal:21, paddingTop:20, gap:32 }}>
-          {/* Title + Status Tag (lado a lado) */}
+          
           <HStack style={{ alignItems:'center', justifyContent:'space-between', gap:12 }}>
             <Text style={{ fontSize:28, fontFamily:'Nunito-Bold', color:'#173663', lineHeight:38, flex:1 }}>{data.title}</Text>
             <View style={{ 
@@ -237,12 +238,12 @@ export default function VoluntaryOpportunityDetail(){
             </View>
           </HStack>
 
-          {/* Institution Name */}
+          
           {data.institution && (
             <Text style={{ fontSize:16, color:'#B8B8B8', lineHeight:22, marginTop:-24 }}>{data.institution}</Text>
           )}
 
-          {/* Dates */}
+          
           <VStack style={{ gap:8 }}>
             <HStack style={{ gap:12, alignItems:'center' }}>
               <Calendar size={24} color="#173663" />
@@ -253,7 +254,7 @@ export default function VoluntaryOpportunityDetail(){
             </Text>
           </VStack>
 
-          {/* Location */}
+          
           <VStack style={{ gap:8 }}>
             <HStack style={{ gap:12, alignItems:'center' }}>
               <MapPin size={24} color="#173663" />
@@ -261,7 +262,7 @@ export default function VoluntaryOpportunityDetail(){
             </HStack>
             <Text style={{ fontSize:14, color:'#000000', lineHeight:19 }}>{location}</Text>
             
-            {/* Complemento */}
+            
             {data.complement && (
               <VStack style={{ gap:4, marginTop:8, paddingLeft:36 }}>
                 <Text style={{ fontSize:14, fontFamily:'Nunito-SemiBold', color:'#173663' }}>Complemento:</Text>
@@ -269,7 +270,7 @@ export default function VoluntaryOpportunityDetail(){
               </VStack>
             )}
             
-            {/* Observação do local */}
+            
             {data.locationNote && (
               <VStack style={{ gap:4, marginTop:8, paddingLeft:36 }}>
                 <Text style={{ fontSize:14, fontFamily:'Nunito-SemiBold', color:'#173663' }}>Como chegar:</Text>
@@ -278,7 +279,7 @@ export default function VoluntaryOpportunityDetail(){
             )}
           </VStack>
 
-          {/* Description */}
+          
           {data.description && (
             <VStack style={{ gap:8 }}>
               <HStack style={{ gap:12, alignItems:'center' }}>
@@ -289,7 +290,7 @@ export default function VoluntaryOpportunityDetail(){
             </VStack>
           )}
 
-          {/* Skills */}
+          
           {!!data.skills?.length && (
             <VStack style={{ gap:16, alignItems:'center' }}>
               <HStack style={{ gap:12, alignItems:'center', alignSelf:'flex-start' }}>
@@ -302,7 +303,7 @@ export default function VoluntaryOpportunityDetail(){
                   const label = SKILL_GROUPS.flatMap(g=> g.skills).find(k=> k.value === s)?.label || s;
                   return (
                     <VStack key={s} style={{ width:64, alignItems:'center' }}>
-                      <RNImage source={img} style={{ width: 64, height: 64, borderRadius: 9999 }} />
+                      <SkillIcon source={img} size={64} />
                       <Text style={{ marginTop:8, fontSize:12, color:'#000000', textAlign:'center', lineHeight:16 }} numberOfLines={2}>{label}</Text>
                     </VStack>
                   );
@@ -311,9 +312,9 @@ export default function VoluntaryOpportunityDetail(){
             </VStack>
           )}
 
-          {/* Subscribe Button / Status */}
+          
           {opportunityState.isCanceled ? (
-            // Vaga cancelada
+            
             <HStack 
               style={{ 
                 backgroundColor:'#FEE2E2', 
@@ -328,10 +329,10 @@ export default function VoluntaryOpportunityDetail(){
                 gap: 8
               }}
             >
-              <Text style={{ color:'#DC2626', fontFamily:'Nunito-Bold', fontSize:16 }}>Esta vaga foi cancelada</Text>
+              <Text style={{ color:'#DC2626', fontFamily:'Nunito-Bold', fontSize:16 }}>Esta demanda foi cancelada</Text>
             </HStack>
           ) : opportunityState.isFinalized ? (
-            // Vaga finalizada
+            
             <HStack 
               style={{ 
                 backgroundColor:'#E2E8F0', 
@@ -346,10 +347,10 @@ export default function VoluntaryOpportunityDetail(){
                 gap: 8
               }}
             >
-              <Text style={{ color:'#64748B', fontFamily:'Nunito-Bold', fontSize:16 }}>Esta vaga foi finalizada</Text>
+              <Text style={{ color:'#64748B', fontFamily:'Nunito-Bold', fontSize:16 }}>Esta demanda foi finalizada</Text>
             </HStack>
           ) : opportunityState.isInProgress ? (
-            // Vaga em andamento
+            
             <HStack 
               style={{ 
                 backgroundColor:'#FEF9C3', 
@@ -364,10 +365,10 @@ export default function VoluntaryOpportunityDetail(){
                 gap: 8
               }}
             >
-              <Text style={{ color:'#D97706', fontFamily:'Nunito-Bold', fontSize:16 }}>Esta vaga já está em andamento</Text>
+              <Text style={{ color:'#D97706', fontFamily:'Nunito-Bold', fontSize:16 }}>Esta demanda já está em andamento</Text>
             </HStack>
           ) : isApplied && participationStatus === 'CONFIRMED' ? (
-            // Confirmado - Botão verde com check
+            
             <HStack 
               style={{ 
                 backgroundColor:'#D1FAE5', 
@@ -386,7 +387,7 @@ export default function VoluntaryOpportunityDetail(){
               <Text style={{ color:'#1BAF71', fontFamily:'Nunito-Bold', fontSize:16 }}>Você está inscrito!</Text>
             </HStack>
           ) : isApplied ? (
-            // Pendente ou Rejeitado - Botão "Ver Status"
+            
             <Button 
               onPress={handleViewStatus} 
               style={{ 
@@ -400,7 +401,7 @@ export default function VoluntaryOpportunityDetail(){
               <Text style={{ color:'#fff', fontFamily:'Nunito-Bold', fontSize:16 }}>Ver Status</Text>
             </Button>
           ) : !isOpen ? (
-            // Vaga fechada (lotada)
+            
             <HStack 
               style={{ 
                 backgroundColor:'#FEE2E2', 
@@ -415,10 +416,10 @@ export default function VoluntaryOpportunityDetail(){
                 gap: 8
               }}
             >
-              <Text style={{ color:'#DC2626', fontFamily:'Nunito-Bold', fontSize:16 }}>Vagas esgotadas</Text>
+              <Text style={{ color:'#DC2626', fontFamily:'Nunito-Bold', fontSize:16 }}>Demandas esgotadas</Text>
             </HStack>
           ) : (
-            // Não inscrito e vaga aberta - Botão "Quero me Inscrever"
+            
             <Button 
               onPress={()=> setShowModal(true)} 
               style={{ 
@@ -435,7 +436,7 @@ export default function VoluntaryOpportunityDetail(){
         </VStack>
       </ScrollView>
 
-      {/* Modal de Inscrição */}
+      
       <Modal
         visible={showModal}
         transparent
@@ -456,22 +457,22 @@ export default function VoluntaryOpportunityDetail(){
             shadowRadius:2,
             elevation:4
           }}>
-            {/* Título */}
+            
             <Text style={{ fontSize:28, fontFamily:'Nunito-Bold', color:'#173663', lineHeight:38, textAlign:'center' }}>
               Realizar Inscrição
             </Text>
 
-            {/* Subtítulo com nome do projeto e data */}
+            
             <Text style={{ fontSize:16, color:'#000000', lineHeight:22, textAlign:'center' }}>
               {data?.title} - {data?.institution}, {data ? formatShortDate(data.startAt) : ''}
             </Text>
 
-            {/* Label Observações */}
+            
             <Text style={{ fontSize:16, fontFamily:'Nunito-Bold', color:'#173663', lineHeight:22, marginTop:8 }}>
               Observações (opcional)
             </Text>
 
-            {/* Campo de Observação */}
+            
             <TextInput
               value={observation}
               onChangeText={setObservation}
@@ -499,7 +500,7 @@ export default function VoluntaryOpportunityDetail(){
               }}
             />
 
-            {/* Aviso com ícone Info */}
+            
             <HStack style={{ gap:10, alignItems:'flex-start' }}>
               <Info size={24} color="#173663" style={{ marginTop:2 }} />
               <Text style={{ flex:1, fontSize:14, color:'#000000', lineHeight:19, textAlign:'justify' }}>
@@ -507,7 +508,7 @@ export default function VoluntaryOpportunityDetail(){
               </Text>
             </HStack>
 
-            {/* Botão Confirmar */}
+            
             <Pressable
               onPress={handleApply}
               disabled={submitting}
@@ -526,7 +527,7 @@ export default function VoluntaryOpportunityDetail(){
               </Text>
             </Pressable>
 
-            {/* Botão Cancelar */}
+            
             <Pressable onPress={()=> setShowModal(false)}>
               <Text style={{ fontSize:18, fontFamily:'Nunito-Bold', color:'#173663', lineHeight:25, textAlign:'center' }}>
                 Cancelar

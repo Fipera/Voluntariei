@@ -12,15 +12,15 @@ export default () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  // Altura base da tab bar
+  
   const BASE_HEIGHT = 60;
 
-  // Padding inferior adicional para garantir clique acima da navigation bar (Android gestural / 3-button)
+  
   const extraBottom = useMemo(() => {
-    // Se o inset bottom já é grande (gestures), só usa ele
+    
     if (insets.bottom >= 16) return insets.bottom;
-    // Caso contrário adiciona um espaçamento mínimo
-    return insets.bottom + 16; // 16px mínimo para área clicável
+    
+    return insets.bottom + 16; 
   }, [insets.bottom]);
 
   useEffect(() => {
@@ -72,12 +72,12 @@ export default () => {
         tabBarLabelStyle: { fontSize: 12, fontFamily: 'Nunito-SemiBold', marginBottom: 4 },
       }}
     >
-      {/* Index is the Hub */}
+      
       <Tabs.Screen name="index" options={{ title: 'Hub', tabBarIcon: ({color}) => <House size={22} color={color} /> }} />
       <Tabs.Screen name="schedule" options={{ title: 'Agenda', tabBarIcon: ({color}) => <Calendar size={22} color={color} /> }} />
       <Tabs.Screen name="profile" options={{ title: 'Perfil', tabBarIcon: ({color}) => <User size={22} color={color} /> }} />
       
-      {/* Hidden from tabs */}
+      
       <Tabs.Screen name="opportunity" options={{ href: null }} />
       <Tabs.Screen name="notifications" options={{ href: null }} />
     </Tabs>

@@ -139,7 +139,7 @@ export function SignupVoluntaryFirstStage() {
                             gap: 16,
                         }}
                     >
-                        {/* Top Section */}
+                        
                         <View style={{ width: "100%", alignItems: "center" }}>
                             <Image
                                 source={require("@/assets/images/signin/icone-voluntario.png")}
@@ -175,7 +175,7 @@ export function SignupVoluntaryFirstStage() {
                             </Text>
                         </View>
 
-                        {/* Form Section */}
+                        
                         <View
                             style={{
                                 width: "100%",
@@ -393,7 +393,7 @@ export function SignupVoluntaryFirstStage() {
                             </FormControl>
                         </View>
 
-                        {/* Bottom Section */}
+                        
                         <View style={{ width: "100%", alignItems: "center", gap: 10, marginTop: 4 }}>
                             <Button
                                 onPress={handleSubmit(onSubmit)}

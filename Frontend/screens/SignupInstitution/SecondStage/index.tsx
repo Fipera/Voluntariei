@@ -229,7 +229,7 @@ export function SignupInstitutionSecondStage() {
                                 )}
                             </FormControl>
 
-                            {/* Endereço + Nº */}
+                            
                             <HStack
                                 className="flex-row"
                                 style={{ width: "100%", gap: 12 }}
@@ -351,7 +351,7 @@ export function SignupInstitutionSecondStage() {
                             </FormControl>
                             </HStack>
 
-                            {/* Bairro */}
+                            
                             <FormControl isInvalid={!!errors.neighborhood}>
                                 <Text
                                     style={{
@@ -410,7 +410,7 @@ export function SignupInstitutionSecondStage() {
                                 )}
                             </FormControl>
 
-                            {/* Cidade + Estado */}
+                            
                             <HStack
                                 className="flex-row"
                                 style={{ width: "100%", gap: 12, marginBottom: 8 }}
@@ -507,7 +507,7 @@ export function SignupInstitutionSecondStage() {
                         </View>
 
                         <View style={{ width: "100%", alignItems: "center", gap: 12, marginTop: 4 }}>
-                            {/* Button */}
+                            
                             <Button
                                 onPress={handleSubmit(onSubmit)}
                                 disabled={isLoading}
@@ -538,7 +538,7 @@ export function SignupInstitutionSecondStage() {
                                 )}
                             </Button>
 
-                            {/* Footer image + helper */}
+                            
                             <View style={{ alignItems: "center", gap: 8 }}>
                                 <Image
                                     alt="local"

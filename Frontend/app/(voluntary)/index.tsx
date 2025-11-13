@@ -22,7 +22,7 @@ type CardItem = {
   description?: string | null;
   banner?: string | null;
   startAt: string;
-  duration: number; // em minutos
+  duration: number; 
   isOnline: boolean;
   city?: string | null;
   state?: string | null;
@@ -86,7 +86,7 @@ export default function VoluntaryHubScreen() {
     loadUserName();
   }, [token]);
 
-  // Recarrega dados quando a tela recebe foco
+  
   useFocusEffect(
     React.useCallback(() => {
       loadData();
@@ -106,7 +106,7 @@ export default function VoluntaryHubScreen() {
       setRecommended(Array.isArray(feedRes.data) ? feedRes.data : []);
       setAllCards(Array.isArray(allRes.data) ? allRes.data : []);
     } catch (e: any) {
-      console.warn('Falha ao carregar vagas:', e?.message || e);
+      console.warn('Falha ao carregar demandas:', e?.message || e);
     } finally {
       setLoading(false);
     }
@@ -157,14 +157,14 @@ export default function VoluntaryHubScreen() {
     setRefreshing(false);
   };
 
-  // Cards a exibir: se houver busca, mostra resultados da busca
-  // Se não houver busca, mostra apenas cards que NÃO estão em recomendados
+  
+  
   const displayCards = useMemo(() => {
     if (searchQuery.trim()) {
       return searchResults;
     }
     
-    // Remove cards recomendados de "Novas Oportunidades"
+    
     const recommendedIds = new Set(recommended.map(c => c.id));
     return allCards.filter(c => !recommendedIds.has(c.id));
   }, [searchQuery, searchResults, allCards, recommended]);
@@ -177,7 +177,7 @@ export default function VoluntaryHubScreen() {
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: insets.top + 8, paddingBottom: tabBarHeight + insets.bottom + 24 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
-        {/* Header */}
+        
         <HStack style={{ alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <Text style={{ fontSize: 30, fontFamily: 'Nunito-Bold', color: '#173663', lineHeight: 41 }}>Olá, {userName}</Text>
           <Pressable onPress={() => router.push('/(voluntary)/notifications')} style={{ position: 'relative' }}>
@@ -205,15 +205,15 @@ export default function VoluntaryHubScreen() {
           </Pressable>
         </HStack>
 
-        <Text style={{ fontSize: 16, fontFamily: 'Nunito-Regular', color: '#000000', marginBottom: 16, lineHeight: 22 }}>Encontre a oportunidade certa e transforme vidas com suas habilidades</Text>
+        <Text style={{ fontSize: 16, fontFamily: 'Nunito-Regular', color: '#000000', marginBottom: 16, lineHeight: 22 }}>Encontre a demanda certa e transforme vidas com suas habilidades</Text>
 
-        {/* Search Bar */}
+        
         <HStack style={{ backgroundColor:'#F9F9F9', borderRadius:12, paddingHorizontal:16, height:48, marginBottom:16, alignItems:'center', gap:12, shadowColor:'#000', shadowOffset:{width:0,height:2}, shadowOpacity:0.25, shadowRadius:2, elevation:2 }}>
           <Search size={24} color="#173663" />
           <TextInput
             value={searchQuery}
             onChangeText={handleSearch}
-            placeholder="Buscar oportunidades"
+            placeholder="Buscar demanda"
             placeholderTextColor="#000000"
             style={{ flex:1, fontSize:16, fontFamily:'Nunito-Regular', color:'#000000', lineHeight:22 }}
           />
@@ -225,7 +225,7 @@ export default function VoluntaryHubScreen() {
           </VStack>
         ) : (
           <>
-            {/* Recommended Section */}
+            
             {showRecommended && (
               <VStack style={{ marginBottom: 24 }}>
                 <Text style={{ fontSize: 20, fontFamily: 'Nunito-Bold', color: '#173663', marginBottom: 16, lineHeight: 27 }}>Recomendados para Você</Text>
@@ -249,7 +249,7 @@ export default function VoluntaryHubScreen() {
                               )}
                             </VStack>
                             <HStack style={{ alignItems:'center', justifyContent:'space-between' }}>
-                              <Text style={{ fontSize:10, fontFamily:'Nunito-Light', color:'#000000', lineHeight:14 }}>{participantsCount}/{c.maxVolunteers} Vagas</Text>
+                              <Text style={{ fontSize:10, fontFamily:'Nunito-Light', color:'#000000', lineHeight:14 }}>{participantsCount}/{c.maxVolunteers} Demandas</Text>
                               <View style={{ backgroundColor:'#173663', paddingVertical:10, paddingHorizontal:10, borderRadius:12, justifyContent:'center', alignItems:'center' }}>
                                 <Text style={{ color:'#FFFFFF', fontSize:12, fontFamily:'Nunito-Bold', lineHeight:16 }}>Ver mais</Text>
                               </View>
@@ -263,10 +263,10 @@ export default function VoluntaryHubScreen() {
               </VStack>
             )}
 
-            {/* All/Search Results Section */}
+            
             <VStack style={{ gap: 12 }}>
               <Text style={{ fontSize: 20, fontFamily: 'Nunito-Bold', color: '#173663', lineHeight: 27 }}>
-                {searchQuery.trim() ? 'Resultados da Busca' : 'Novas Oportunidades'}
+                {searchQuery.trim() ? 'Resultados da Busca' : 'Novas Demandas'}
               </Text>
               {searchLoading ? (
                 <VStack style={{ alignItems:'center', paddingVertical: 20 }}>
@@ -274,7 +274,7 @@ export default function VoluntaryHubScreen() {
                 </VStack>
               ) : displayCards.length === 0 ? (
                 <Text style={{ color:'#64748B', textAlign:'center', paddingVertical:20 }}>
-                  {searchQuery.trim() ? 'Nenhuma oportunidade encontrada' : 'Nenhuma oportunidade disponível'}
+                  {searchQuery.trim() ? 'Nenhuma demanda encontrada' : 'Nenhuma demanda disponível'}
                 </Text>
               ) : (
                 displayCards.map((c) => {
@@ -283,13 +283,13 @@ export default function VoluntaryHubScreen() {
                   return (
                     <Pressable key={c.id} onPress={()=> router.push(`/(voluntary)/opportunity/${c.id}` as any)}>
                       <HStack style={{ backgroundColor:'#FFFFFF', borderRadius:12, overflow:'hidden', height:140, shadowColor:'#000', shadowOffset:{width:0,height:2}, shadowOpacity:0.25, shadowRadius:2, elevation:2 }}>
-                        {/* Image on the left */}
+                        
                         <Box style={{ width:120, height:140, backgroundColor:'#e5e7eb', position:'relative' }}>
                           {c.banner ? (
                             <RNImage source={{ uri: c.banner }} style={StyleSheet.absoluteFillObject} resizeMode='cover' />
                           ) : null}
                         </Box>
-                        {/* Content on the right */}
+                        
                         <VStack style={{ flex:1, padding:16, paddingRight:12, justifyContent:'space-between' }}>
                           <VStack style={{ gap:2 }}>
                             <Text style={{ fontSize:16, fontFamily:'Nunito-Bold', color:'#173663', lineHeight:22 }} numberOfLines={1}>{c.title}</Text>
@@ -311,7 +311,7 @@ export default function VoluntaryHubScreen() {
                             </HStack>
                             <HStack style={{ alignItems:'center', justifyContent:'space-between' }}>
                               <Text style={{ fontSize:10, fontFamily:'Nunito-Bold', color:'#173663', lineHeight:14 }}>
-                                {remainingSlots} {remainingSlots === 1 ? 'vaga restante' : 'vagas restantes'}
+                                {remainingSlots} {remainingSlots === 1 ? 'demanda restante' : 'demandas restantes'}
                               </Text>
                               <View style={{ backgroundColor:'#173663', paddingVertical:10, paddingHorizontal:10, borderRadius:12, justifyContent:'center', alignItems:'center' }}>
                                 <Text style={{ color:'#FFFFFF', fontSize:12, fontFamily:'Nunito-Bold', lineHeight:16 }}>Ver mais</Text>

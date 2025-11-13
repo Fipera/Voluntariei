@@ -13,7 +13,7 @@ import { cssInterop } from 'nativewind';
 import { PrimitiveIcon, UIIcon } from '@gluestack-ui/icon';
 
 const SCOPE = 'ACCORDION';
-/** Styles */
+
 
 const accordionStyle = tva({
   base: 'w-full',
@@ -88,7 +88,7 @@ const Header = (
   Platform.OS === 'web' ? H3 : View
 ) as React.ComponentType<TextProps>;
 
-/** Creator */
+
 const UIAccordion = createAccordion({
   Root: Root,
   Item: View,
@@ -159,7 +159,7 @@ type IAccordionTitleTextProps = React.ComponentPropsWithoutRef<
 > &
   VariantProps<typeof accordionTitleTextStyle>;
 
-/** Components */
+
 
 const Accordion = React.forwardRef<
   React.ComponentRef<typeof UIAccordion>,

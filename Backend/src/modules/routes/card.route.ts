@@ -8,6 +8,8 @@ async function cardRoutes(server: FastifyInstance){
     {
       preHandler: [server.authenticate],
       schema: {
+        tags: ['cards'],
+        summary: 'Criar demanda (card)',
         body: $ref("createCardSchema"),
         response: { 201: $ref("createCardResponseSchema") },
       },
@@ -18,43 +20,43 @@ async function cardRoutes(server: FastifyInstance){
 
   server.get(
     "/",
-    { preHandler: [server.authenticate] },
+    { preHandler: [server.authenticate], schema: { tags: ['cards'], summary: 'Listar meus cards' } },
     getMyCardsHandler
   )
 
   server.get(
     "/feed",
-    { preHandler: [server.authenticate] },
+    { preHandler: [server.authenticate], schema: { tags: ['cards'], summary: 'Feed de demanda' } },
     getFeedCardsHandler
   )
 
   server.get(
     "/search",
-    { preHandler: [server.authenticate] },
+    { preHandler: [server.authenticate], schema: { tags: ['cards'], summary: 'Buscar cards (filtros)' } },
     searchCardsHandler
   )
 
   server.get(
     "/all",
-    { preHandler: [server.authenticate] },
+    { preHandler: [server.authenticate], schema: { tags: ['cards'], summary: 'Listar todos os cards (admin?)' } },
     getAllCardsHandler
   )
 
   server.get(
     "/:id/detail",
-    { preHandler: [server.authenticate] },
+    { preHandler: [server.authenticate], schema: { tags: ['cards'], summary: 'Detalhe público do card' } },
     getCardDetailHandler
   )
 
   server.get(
     "/:id",
-    { preHandler: [server.authenticate] },
+    { preHandler: [server.authenticate], schema: { tags: ['cards'], summary: 'Meu card (instituição)' } },
     getMyCardDetailHandler
   )
 
   server.post(
     "/:id/cancel",
-    { preHandler: [server.authenticate] },
+    { preHandler: [server.authenticate], schema: { tags: ['cards'], summary: 'Cancelar card' } },
     cancelCardHandler
   )
 }

@@ -18,7 +18,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { Redirect, useRouter, useSegments } from "expo-router";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+
 SplashScreen.preventAutoHideAsync();
 
 function AppRoutes() {
@@ -26,7 +26,7 @@ function AppRoutes() {
     const segments = useSegments();
     const router = useRouter();
 
-    // Registrar push notifications
+    
     usePushNotifications(token, type);
 
     useEffect(() => {
@@ -37,13 +37,13 @@ function AppRoutes() {
         const inVoluntaryGroup = segments[0] === "(voluntary)";
 
         if (!token && !inAuthGroup) {
-            // Usuário não logado e não está na área de autenticação
+            
             router.replace("/(auth)/home");
         } else if (token && type === "INSTITUTION" && !inInstitutionGroup) {
-            // Usuário instituição logado mas não está na área de instituição
+            
             router.replace("/(institution)");
         } else if (token && type === "VOLUNTARY" && !inVoluntaryGroup) {
-            // Usuário voluntário logado mas não está na área de voluntário
+            
             router.replace("/(voluntary)");
         }
     }, [isLoading, token, type, segments]);

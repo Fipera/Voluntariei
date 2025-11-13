@@ -38,8 +38,8 @@ export default () => {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const { width: SCREEN_WIDTH } = Dimensions.get("window");
-    const H_PADDING = 24; // screen horizontal padding
-    const MAX_CONTENT_WIDTH = 310; // as per design
+    const H_PADDING = 24; 
+    const MAX_CONTENT_WIDTH = 310; 
     const contentWidth = Math.min(MAX_CONTENT_WIDTH, SCREEN_WIDTH - H_PADDING * 2);
 
     const {
@@ -161,12 +161,12 @@ export default () => {
                                                 borderWidth: 1,
                                                 borderRadius: 8,
                                                 marginTop: 8,
-                                                // shadow iOS
+                                                
                                                 shadowColor: "#000",
                                                 shadowOffset: { width: 0, height: 2 },
                                                 shadowOpacity: 0.25,
                                                 shadowRadius: 2,
-                                                // elevation Android
+                                                
                                                 elevation: 2,
                                             }}
                                         >

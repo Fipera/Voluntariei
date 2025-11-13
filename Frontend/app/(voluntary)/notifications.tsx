@@ -24,7 +24,7 @@ export default function NotificationsScreen() {
     deleteNotification,
   } = useNotifications(token);
 
-  // Recarrega notificações quando a tela recebe foco
+  
   useFocusEffect(
     React.useCallback(() => {
       fetchNotifications();
@@ -32,12 +32,12 @@ export default function NotificationsScreen() {
   );
 
   function handleNotificationClick(notification: any) {
-    // Marca como lida se ainda não estiver
+    
     if (!notification.read) {
       markAsRead(notification.id);
     }
 
-    // Navega para o card se existir
+    
     if (notification.cardId) {
       router.push(`/(voluntary)/opportunity/${notification.cardId}?from=notifications` as any);
     }
@@ -87,7 +87,7 @@ export default function NotificationsScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }} edges={['top', 'left', 'right', 'bottom']}>
-      {/* Header */}
+      
       <HStack style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <ChevronLeft size={24} color="#173663" />
@@ -96,7 +96,7 @@ export default function NotificationsScreen() {
         <View style={{ width: 40 }} />
       </HStack>
 
-      {/* Marcar todas como lidas */}
+      
       {notifications.some(n => !n.read) && (
         <HStack style={styles.actionBar}>
           <Button onPress={markAllAsRead} style={styles.markAllButton}>
@@ -106,14 +106,14 @@ export default function NotificationsScreen() {
         </HStack>
       )}
 
-      {/* Lista de Notificações */}
+      
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }}>
         {notifications.length === 0 ? (
           <VStack style={styles.emptyState}>
             <BellOff size={64} color="#B8B8B8" />
             <Text style={styles.emptyText}>Nenhuma notificação</Text>
             <Text style={styles.emptySubtext}>
-              Você receberá notificações sobre suas oportunidades aqui
+              Você receberá notificações sobre suas demanda aqui
             </Text>
           </VStack>
         ) : (
@@ -128,12 +128,12 @@ export default function NotificationsScreen() {
                 ]}
               >
                 <HStack style={{ flex: 1, gap: 12, alignItems: 'flex-start' }}>
-                  {/* Ícone */}
+                  
                   <Text style={styles.notificationEmoji}>
                     {getNotificationIcon(notification.type)}
                   </Text>
 
-                  {/* Conteúdo */}
+                  
                   <VStack style={{ flex: 1, gap: 4 }}>
                     <Text style={styles.notificationTitle}>{notification.title}</Text>
                     <Text style={styles.notificationMessage} numberOfLines={2}>
@@ -144,7 +144,7 @@ export default function NotificationsScreen() {
                     </Text>
                   </VStack>
 
-                  {/* Botão Deletar */}
+                  
                   <Pressable
                     onPress={(e) => {
                       e.stopPropagation();
@@ -156,7 +156,7 @@ export default function NotificationsScreen() {
                   </Pressable>
                 </HStack>
 
-                {/* Indicador de não lida */}
+                
                 {!notification.read && <View style={styles.unreadIndicator} />}
               </Pressable>
             ))}

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/form-control";
 import { HStack } from "@/components/ui/hstack";
 import { AddIcon, Icon } from "@/components/ui/icon";
-// Removed avatar/image picker for this step to align with institution layout
+
 import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
@@ -175,7 +175,7 @@ export function SignupVoluntaryThirdStage() {
                         </VStack>
                         <VStack style={{ width: '100%', alignItems: 'center', paddingBottom: 8, gap: 12 }}>
                             <Text style={{ marginTop: 16, fontFamily: 'Nunito-Regular', fontSize: 14, lineHeight: 20, color: '#000', width: 312, alignSelf: 'center' }}>
-                                Com sua conta, você poderá acessar funcionalidades e oportunidades alinhadas ao seu perfil de voluntário.
+                                Com sua conta, você poderá acessar funcionalidades e demanda alinhadas ao seu perfil de voluntário.
                             </Text>
                             <HStack style={{ width: 312, alignSelf: 'center', marginTop: 12 }}>
                                 <Checkbox value="terms" isChecked={termsAccepted} onChange={() => setTermsAccepted(!termsAccepted)} aria-label="terms">

@@ -58,7 +58,7 @@ export default function VoluntaryScheduleScreen() {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  // Recarrega dados quando a tela recebe foco
+  
   useFocusEffect(
     React.useCallback(() => {
       loadData();
@@ -86,7 +86,7 @@ export default function VoluntaryScheduleScreen() {
     }
   }
 
-  // Gera os dias do mês atual para o calendário (atualiza automaticamente todo mês)
+  
   const calendarDays = useMemo(() => {
     const now = new Date();
     const year = now.getFullYear();
@@ -117,7 +117,7 @@ export default function VoluntaryScheduleScreen() {
     return days;
   }, [commitments]);
 
-  // Filtra histórico apenas do mês atual
+  
   const currentMonthHistory = useMemo(() => {
     const now = new Date();
     const currentMonth = now.getMonth();
@@ -129,7 +129,7 @@ export default function VoluntaryScheduleScreen() {
     });
   }, [history]);
 
-  // Filtra compromissos do dia selecionado
+  
   const selectedDayCommitments = useMemo(() => {
     return commitments.filter((c) => {
       const cardDate = new Date(c.card.startAt);
@@ -213,11 +213,11 @@ export default function VoluntaryScheduleScreen() {
   }
 
   function getStatusColor(participation: HistoryItem) {
-    // Se foi reprovado = Amarelo
+    
     if (participation.status === 'REJECTED') return '#F98B26';
-    // Se foi cancelado = Vermelho
+    
     if (participation.card.status === 'CANCELED') return '#E43A3A';
-    // Se foi confirmado/finalizado = Verde
+    
     if (participation.status === 'CONFIRMED' || participation.card.status === 'FINALIZED') return '#1BAF71';
     return '#B8B8B8';
   }
@@ -242,13 +242,13 @@ export default function VoluntaryScheduleScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }} edges={['top', 'left', 'right', 'bottom']}>
       <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
-        {/* Título: Meus compromissos */}
+        
         <HStack style={styles.sectionTitle}>
           <Calendar size={20} color="#173663" />
           <Text style={styles.titleText}>Meus compromissos</Text>
         </HStack>
 
-        {/* Calendário horizontal scrollável */}
+        
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -271,7 +271,7 @@ export default function VoluntaryScheduleScreen() {
                 <Text style={[styles.dayNumber, isSelected && styles.dayNumberSelected]}>
                   {String(day.dayNumber).padStart(2, '0')}
                 </Text>
-                {/* Indicadores de status */}
+                
                 {(day.hasConfirmed || day.hasPending) && (
                   <HStack style={styles.indicatorContainer}>
                     {day.hasConfirmed && <Box style={[styles.indicator, { backgroundColor: '#1BAF71' }]} />}
@@ -283,7 +283,7 @@ export default function VoluntaryScheduleScreen() {
           })}
         </ScrollView>
 
-        {/* Cards dos compromissos do dia selecionado */}
+        
         <VStack style={{ paddingHorizontal: 20, gap: 16, marginTop: 16 }}>
           {selectedDayCommitments.length > 0 ? (
             selectedDayCommitments.map((commitment) => (
@@ -292,7 +292,7 @@ export default function VoluntaryScheduleScreen() {
                 onPress={() => router.push(`/(voluntary)/opportunity/${commitment.card.id}?from=schedule`)}
                 style={styles.commitmentCard}
               >
-                {/* Banner */}
+                
                 {commitment.card.banner ? (
                   <Box style={styles.cardBanner}>
                     <RNImage 
@@ -305,7 +305,7 @@ export default function VoluntaryScheduleScreen() {
                   <Box style={[styles.cardBanner, { backgroundColor: '#e5e7eb' }]} />
                 )}
 
-                {/* Conteúdo */}
+                
                 <Box style={styles.cardContent}>
                   <Text style={styles.cardTitle} numberOfLines={1}>
                     {commitment.card.title}
@@ -323,7 +323,7 @@ export default function VoluntaryScheduleScreen() {
                     </Text>
                   </VStack>
 
-                  {/* Badge de status */}
+                  
                   <HStack
                     style={[
                       styles.statusBadge,
@@ -349,7 +349,7 @@ export default function VoluntaryScheduleScreen() {
           )}
         </VStack>
 
-        {/* Histórico */}
+        
         <HStack style={[styles.sectionTitle, { marginTop: 32 }]}>
           <Clipboard size={20} color="#173663" />
           <Text style={styles.titleText}>Histórico do Mês</Text>

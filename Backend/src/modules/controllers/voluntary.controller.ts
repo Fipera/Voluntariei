@@ -129,7 +129,7 @@ export async function loginVoluntaryHandler(
         return reply.code(401).send({ message: "E-mail ou senha incorreta" });
     }
 
-    // Se não encontrou nenhum
+    
     return reply.code(401).send({ message: "E-mail ou senha incorreta" });
 }
 

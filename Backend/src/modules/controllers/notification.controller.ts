@@ -6,11 +6,12 @@ import {
   deleteNotification,
   countUnreadNotifications,
 } from "../services/notification.service";
+import { notifyInstitutionPush, notifyVoluntaryPush } from "../../services/push.service";
 
-// Busca todas as notificações do usuário
+
 export async function getNotificationsHandler(request: any, reply: FastifyReply) {
   try {
-    // request.user já contém id e type (VOLUNTARY ou INSTITUTION)
+    
     const notifications = await getUserNotifications(request.user.id, request.user.type);
 
     return reply.send(
@@ -29,7 +30,7 @@ export async function getNotificationsHandler(request: any, reply: FastifyReply)
   }
 }
 
-// Conta notificações não lidas
+
 export async function getUnreadCountHandler(request: any, reply: FastifyReply) {
   try {
     const count = await countUnreadNotifications(request.user.id, request.user.type);
@@ -39,7 +40,7 @@ export async function getUnreadCountHandler(request: any, reply: FastifyReply) {
   }
 }
 
-// Marca uma notificação como lida
+
 export async function markAsReadHandler(request: any, reply: FastifyReply) {
   const id = Number((request.params as any)?.id);
 
@@ -58,7 +59,7 @@ export async function markAsReadHandler(request: any, reply: FastifyReply) {
   }
 }
 
-// Marca todas como lidas
+
 export async function markAllAsReadHandler(request: any, reply: FastifyReply) {
   try {
     await markAllAsRead(request.user.id, request.user.type);
@@ -68,7 +69,7 @@ export async function markAllAsReadHandler(request: any, reply: FastifyReply) {
   }
 }
 
-// Deleta uma notificação
+
 export async function deleteNotificationHandler(request: any, reply: FastifyReply) {
   const id = Number((request.params as any)?.id);
 
@@ -81,5 +82,26 @@ export async function deleteNotificationHandler(request: any, reply: FastifyRepl
     return reply.code(204).send();
   } catch (err: any) {
     return reply.code(400).send({ message: err.message || "Erro ao deletar notificação" });
+  }
+}
+
+
+export async function testPushNotificationHandler(request: any, reply: FastifyReply) {
+  try {
+    const userId = request.user.id as number;
+    const userType = request.user.type as 'VOLUNTARY' | 'INSTITUTION';
+
+    const title = 'Teste de notificação';
+    const message = 'Se você recebeu isso, push está funcionando 👍';
+
+    if (userType === 'VOLUNTARY') {
+      await notifyVoluntaryPush(userId, title, message, { type: 'TEST' });
+    } else {
+      await notifyInstitutionPush(userId, title, message, { type: 'TEST' });
+    }
+
+    return reply.send({ ok: true });
+  } catch (err: any) {
+    return reply.code(400).send({ message: err.message || 'Erro ao enviar push de teste' });
   }
 }

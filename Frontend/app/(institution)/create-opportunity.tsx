@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { Platform, ScrollView, View, Pressable, Image as RNImage, StyleSheet } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Platform, ScrollView, View, Pressable, Image as RNImage, StyleSheet, KeyboardAvoidingView, Keyboard } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Text } from '@/components/ui/text';
@@ -48,8 +48,26 @@ export default function CreateOpportunityScreen(){
   const [showStartTime, setShowStartTime] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [loadingCep, setLoadingCep] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
-  // Formata CEP: 12345-678
+  // Ajusta o padding inferior enquanto o teclado está aberto para permitir scroll até o botão
+  useEffect(() => {
+    const showEvt = Platform.OS === 'android' ? 'keyboardDidShow' : 'keyboardWillShow';
+    const hideEvt = Platform.OS === 'android' ? 'keyboardDidHide' : 'keyboardWillHide';
+
+    const onShow = (e: any) => setKeyboardHeight(e?.endCoordinates?.height ?? 0);
+    const onHide = () => setKeyboardHeight(0);
+
+    const subShow = Keyboard.addListener(showEvt as any, onShow);
+    const subHide = Keyboard.addListener(hideEvt as any, onHide);
+
+    return () => {
+      subShow.remove();
+      subHide.remove();
+    };
+  }, []);
+
+  
   function formatCep(value: string) {
     const nums = value.replace(/\D/g, '');
     if (nums.length <= 5) return nums;
@@ -135,9 +153,9 @@ export default function CreateOpportunityScreen(){
     return !!(title && startAt && duration > 0 && !durationError && !startTimeError && (isOnline || useInstitutionAddress || (city && state)) && maxVolunteers && skills.length>=1 && skills.length<=3);
   },[title, startAt, durationHours, durationMinutes, durationError, startTimeError, isOnline, useInstitutionAddress, city, state, maxVolunteers, skills]);
 
-  // poll helper to give backend time to persist
+  
   async function waitForCreation(delayMs = 1500){
-    await new Promise(res=> setTimeout(res, delayMs)); // simple grace delay
+    await new Promise(res=> setTimeout(res, delayMs)); 
   }
 
   async function handleCreate(){
@@ -146,7 +164,7 @@ export default function CreateOpportunityScreen(){
     
     const duration = (Number(durationHours) || 0) * 60 + (Number(durationMinutes) || 0);
     
-    // Valida duração
+    
     if (duration === 0) {
       alert('A duração deve ser maior que 0 minutos.');
       return;
@@ -157,7 +175,7 @@ export default function CreateOpportunityScreen(){
       return;
     }
 
-    // Valida horário de início
+    
     if (startAt) {
       const hours = startAt.getHours();
       const minutes = startAt.getMinutes();
@@ -183,7 +201,7 @@ export default function CreateOpportunityScreen(){
       };
       await api.post('/cards', payload, { headers: { Authorization: `Bearer ${token}` } });
 
-      // reset form before redirecting so next creation starts clean
+      
       setTitle('');
       setStartAt(null);
       setDurationHours('');
@@ -218,14 +236,22 @@ export default function CreateOpportunityScreen(){
 
   return (
     <SafeAreaView style={{ flex:1 }} edges={['top','left','right']}> 
-      <ScrollView contentContainerStyle={{ paddingHorizontal:24, paddingTop: insets.top + 8, paddingBottom: tabBarHeight + insets.bottom + 24 }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? (insets.top + 8) : 0}
+      >
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingHorizontal:24, paddingTop: insets.top + 8, paddingBottom: tabBarHeight + insets.bottom + 24 + keyboardHeight }}
+      >
         {successMsg && (
           <View style={{ backgroundColor:'#E6FFFA', borderColor:'#2C7A7B', borderWidth:1, padding:12, borderRadius:10, flexDirection:'row', alignItems:'center', gap:8, marginBottom:12 }}>
             <Check size={18} color="#2C7A7B" />
             <Text style={{ color:'#234E52', fontFamily:'Nunito-Bold' }}>{successMsg}</Text>
           </View>
         )}
-        {/* Banner */}
+        
         <VStack style={{ alignItems:'center', marginBottom:16 }}>
           <View style={{ width:'100%', height:140, borderRadius:12, backgroundColor:'#d1d5db', overflow:'hidden', position:'relative' }}>
             {banner ? (
@@ -245,7 +271,7 @@ export default function CreateOpportunityScreen(){
 
         <Text style={{ fontSize:24, fontFamily:'Nunito-Bold', color:'#173663', marginBottom:12 }}>Digite o Título</Text>
         <Input style={{ height:43, backgroundColor:'#FDFDFD', borderColor:'#B7B7B7', borderWidth:1, borderRadius:8, marginBottom:16 }}>
-          <InputField value={title} onChangeText={setTitle} placeholder='Título da oportunidade' />
+          <InputField value={title} onChangeText={setTitle} placeholder='Título da demanda' />
         </Input>
 
         <VStack style={{ gap:16, marginBottom:16 }}>
@@ -483,7 +509,7 @@ export default function CreateOpportunityScreen(){
 
         <Text style={{ fontSize:16, fontFamily:'Nunito-Bold', color:'#173663', marginBottom:8 }}>Descrição</Text>
         <Input style={{ minHeight:90, backgroundColor:'#FDFDFD', borderColor:'#B7B7B7', borderWidth:1, borderRadius:8, paddingVertical:8, marginBottom:8 }}>
-          <InputField value={description} onChangeText={setDescription} placeholder='Descreva a oportunidade' multiline />
+          <InputField value={description} onChangeText={setDescription} placeholder='Descreva a demanda' multiline />
         </Input>
 
         <View style={{ marginTop: 8 }}>
@@ -491,15 +517,17 @@ export default function CreateOpportunityScreen(){
         </View>
 
         <Button onPress={handleCreate} disabled={!canSubmit || saving} style={{ width: 310, height: 44, borderRadius: 12, alignSelf:'center', marginTop: 16, backgroundColor: !canSubmit ? '#b7c4da' : '#173663' }}>
-          <ButtonText style={{ fontSize:18, lineHeight:25, fontFamily:'Nunito-Bold' }}>{saving ? 'Criando...' : 'Criar Vaga'}</ButtonText>
+          <ButtonText style={{ fontSize:18, lineHeight:25, fontFamily:'Nunito-Bold' }}>{saving ? 'Criando...' : 'Criar Demanda'}</ButtonText>
         </Button>
-      </ScrollView>
+  </ScrollView>
 
-      {(saving || redirecting) && (
+  </KeyboardAvoidingView>
+
+  {(saving || redirecting) && (
         <View style={{ position:'absolute', top:0, left:0, right:0, bottom:0, backgroundColor:'rgba(255,255,255,0.85)', alignItems:'center', justifyContent:'center' }}>
           <VStack style={{ alignItems:'center', gap:12 }}>
             <Spinner />
-            <Text style={{ fontFamily:'Nunito-Bold', color:'#173663' }}>{saving ? 'Criando vaga...' : 'Abrindo Hub...'}</Text>
+            <Text style={{ fontFamily:'Nunito-Bold', color:'#173663' }}>{saving ? 'Criando demanda...' : 'Abrindo Hub...'}</Text>
           </VStack>
         </View>
       )}

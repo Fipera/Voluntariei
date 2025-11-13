@@ -5,52 +5,68 @@ import {
   markAsReadHandler,
   markAllAsReadHandler,
   deleteNotificationHandler,
+  testPushNotificationHandler,
 } from "../controllers/notification.controller";
 
 async function notificationRoutes(server: FastifyInstance) {
-  // Busca todas as notificações do usuário
+  
   server.get(
     "/notifications",
     {
       preHandler: [server.authenticate],
+      schema: { tags: ['notification'], summary: 'Listar notificações' }
     },
     getNotificationsHandler
   );
 
-  // Conta notificações não lidas
+  
   server.get(
     "/notifications/unread-count",
     {
       preHandler: [server.authenticate],
+      schema: { tags: ['notification'], summary: 'Quantidade de não lidas' }
     },
     getUnreadCountHandler
   );
 
-  // Marca uma notificação como lida
+  
   server.patch(
     "/notifications/:id/read",
     {
       preHandler: [server.authenticate],
+      schema: { tags: ['notification'], summary: 'Marcar uma como lida' }
     },
     markAsReadHandler
   );
 
-  // Marca todas as notificações como lidas
+  
   server.patch(
     "/notifications/mark-all-read",
     {
       preHandler: [server.authenticate],
+      schema: { tags: ['notification'], summary: 'Marcar todas como lidas' }
     },
     markAllAsReadHandler
   );
 
-  // Deleta uma notificação
+  
   server.delete(
     "/notifications/:id",
     {
       preHandler: [server.authenticate],
+      schema: { tags: ['notification'], summary: 'Deletar notificação' }
     },
     deleteNotificationHandler
+  );
+
+  
+  server.post(
+    "/notifications/test",
+    {
+      preHandler: [server.authenticate],
+      schema: { tags: ['notification'], summary: 'Enviar push de teste' }
+    },
+    testPushNotificationHandler
   );
 }
 

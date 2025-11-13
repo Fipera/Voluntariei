@@ -7,33 +7,33 @@ import {
 } from "./notification.service";
 
 export async function applyToCard(voluntaryId: number, cardId: number, data: applyToCardInput) {
-  // Verifica se o card existe e está ativo
+  
   const card = await prisma.card.findUnique({
     where: { id: cardId },
     include: { participants: true }
   });
 
   if (!card) {
-    throw new Error("Oportunidade não encontrada");
+    throw new Error("Demanda não encontrada");
   }
 
   if (card.status !== "ACTIVE") {
-    throw new Error("Esta oportunidade não está mais ativa");
+    throw new Error("Esta demanda não está mais ativa");
   }
 
-  // Calcula se a oportunidade já passou (startAt + duration)
+  
   const endTime = new Date(card.startAt.getTime() + card.duration * 60000);
   if (endTime < new Date()) {
-    throw new Error("Esta oportunidade já expirou");
+    throw new Error("Esta demanda já expirou");
   }
 
-  // Verifica vagas disponíveis (conta CONFIRMED + PENDING)
+  
   const occupiedSlots = card.participants.filter(p => p.status === "CONFIRMED" || p.status === "PENDING").length;
   if (occupiedSlots >= card.maxVolunteers) {
-    throw new Error("Esta oportunidade não possui mais vagas disponíveis");
+    throw new Error("Esta demanda não possui mais demandas disponíveis");
   }
 
-  // Verifica se já existe uma participação
+  
   const existing = await prisma.participation.findUnique({
     where: {
       voluntaryId_cardId: {
@@ -44,10 +44,10 @@ export async function applyToCard(voluntaryId: number, cardId: number, data: app
   });
 
   if (existing) {
-    throw new Error("Você já se candidatou a esta oportunidade");
+    throw new Error("Você já se candidatou a esta demanda");
   }
 
-  // Cria a participação
+  
   const participation = await prisma.participation.create({
     data: {
       voluntaryId,
@@ -61,7 +61,7 @@ export async function applyToCard(voluntaryId: number, cardId: number, data: app
     }
   });
 
-  // Notifica instituição sobre nova inscrição
+  
   await notifyInstitutionAboutNewApplication(
     participation.card.ownerId,
     participation.voluntary.name,
@@ -77,7 +77,7 @@ export async function updateParticipationStatus(
   institutionId: number,
   status: "CONFIRMED" | "REJECTED"
 ) {
-  // Busca a participação com o card para verificar ownership
+  
   const participation = await prisma.participation.findUnique({
     where: { id: participationId },
     include: { card: true }
@@ -91,7 +91,7 @@ export async function updateParticipationStatus(
     throw new Error("Você não tem permissão para gerenciar esta inscrição");
   }
 
-  // Se está confirmando, verifica se ainda tem vaga (apenas CONFIRMED conta aqui)
+  
   if (status === "CONFIRMED") {
     const card = await prisma.card.findUnique({
       where: { id: participation.cardId },
@@ -100,7 +100,7 @@ export async function updateParticipationStatus(
 
     const confirmedCount = card!.participants.filter(p => p.status === "CONFIRMED").length;
     if (confirmedCount >= card!.maxVolunteers) {
-      throw new Error("Esta oportunidade já atingiu o número máximo de voluntários confirmados");
+      throw new Error("Esta demanda já atingiu o número máximo de voluntários confirmados");
     }
   }
 
@@ -113,7 +113,7 @@ export async function updateParticipationStatus(
     }
   });
 
-  // Notifica voluntário sobre aprovação ou rejeição
+  
   if (status === "CONFIRMED") {
     await notifyVoluntaryAboutApproval(
       updated.voluntary.id,
@@ -146,9 +146,9 @@ export async function getVoluntaryParticipations(voluntaryId: number) {
   });
 }
 
-// Retorna apenas compromissos confirmados e ativos (para agenda)
+
 export async function getVoluntaryUpcomingCommitments(voluntaryId: number) {
-  // Primeiro, rejeita automaticamente participações PENDING que já passaram da data de início
+  
   await prisma.participation.updateMany({
     where: {
       voluntaryId,
@@ -162,7 +162,7 @@ export async function getVoluntaryUpcomingCommitments(voluntaryId: number) {
     }
   });
 
-  // Depois retorna os compromissos válidos
+  
   return prisma.participation.findMany({
     where: {
       voluntaryId,
@@ -183,7 +183,7 @@ export async function getVoluntaryUpcomingCommitments(voluntaryId: number) {
   });
 }
 
-// Retorna histórico (finalizados, cancelados, rejeitados)
+
 export async function getVoluntaryHistory(voluntaryId: number) {
   return prisma.participation.findMany({
     where: {

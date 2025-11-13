@@ -2,19 +2,19 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { createCard, findCardsByOwner, findCardsForVoluntary, findCardByIdForOwner, findCardById, cancelCard, searchCardsByTitle, findAllActiveCards, finalizeExpiredCards } from "../services/card.service";
 import { createCardSchema, createCardInput } from "../schemas/card.schema";
 
-// Helper function to calculate dynamic status
+
 function getCardStatus(card: any): 'ACTIVE' | 'PENDING' | 'FINALIZED' | 'CANCELED' {
-  // If card is already CANCELED or FINALIZED, keep that status
+  
   if (card.status === 'CANCELED' || card.status === 'FINALIZED') {
     return card.status;
   }
   
-  // If card is ACTIVE and has pending participants, show as PENDING
+  
   if (card.status === 'ACTIVE' && card.participants?.some((p: any) => p.status === 'PENDING')) {
     return 'PENDING';
   }
   
-  // Otherwise return the original status
+  
   return card.status;
 }
 
@@ -54,12 +54,12 @@ export async function createCardHandler(
   } catch (err) {
     return reply
       .status(400)
-      .send({ error: "Erro ao criar oportunidade", details: err });
+      .send({ error: "Erro ao criar demanda", details: err });
   }
 }
 
 export async function getMyCardsHandler(request: any){
-  // Finaliza cards expirados antes de listar
+  
   await finalizeExpiredCards();
   
   const cards = await findCardsByOwner(request.user.id);
@@ -81,12 +81,12 @@ export async function getMyCardsHandler(request: any){
 }
 
 export async function getFeedCardsHandler(request: any){
-  // Finaliza cards expirados antes de listar
+  
   await finalizeExpiredCards();
   
   const cards = await findCardsForVoluntary(request.user.id);
   
-  // Filtra oportunidades com vagas cheias (conta CONFIRMED + PENDING)
+  
   const availableCards = cards.filter((c) => {
     const occupiedSlots = (c as any).participants?.filter((p: any) => p.status === 'CONFIRMED' || p.status === 'PENDING').length ?? 0;
     return occupiedSlots < c.maxVolunteers;
@@ -111,7 +111,7 @@ export async function getFeedCardsHandler(request: any){
 }
 
 export async function getMyCardDetailHandler(request: any, reply: FastifyReply){
-  // Finaliza cards expirados antes de exibir detalhes
+  
   await finalizeExpiredCards();
   
   const id = Number((request.params as any)?.id);
@@ -155,7 +155,7 @@ export async function getMyCardDetailHandler(request: any, reply: FastifyReply){
 }
 
 export async function getCardDetailHandler(request: any, reply: FastifyReply){
-  // Finaliza cards expirados antes de exibir detalhes
+  
   await finalizeExpiredCards();
   
   const id = Number((request.params as any)?.id);
@@ -164,7 +164,7 @@ export async function getCardDetailHandler(request: any, reply: FastifyReply){
     return reply.status(404).send({ message: "Card não encontrado" });
   }
 
-  // Verifica se o usuário é voluntário e se já está inscrito
+  
   let isApplied = false;
   let participationStatus: 'PENDING' | 'CONFIRMED' | 'REJECTED' | null = null;
   if(request.user.type === 'VOLUNTARY'){
@@ -239,12 +239,12 @@ export async function searchCardsHandler(request: any, reply: FastifyReply){
 }
 
 export async function getAllCardsHandler(request: any){
-  // Finaliza cards expirados antes de listar
+  
   await finalizeExpiredCards();
   
   const cards = await findAllActiveCards();
   
-  // Filtra oportunidades com vagas cheias (conta CONFIRMED + PENDING)
+  
   const availableCards = cards.filter((c) => {
     const occupiedSlots = (c as any).participants?.filter((p: any) => p.status === 'CONFIRMED' || p.status === 'PENDING').length ?? 0;
     return occupiedSlots < c.maxVolunteers;

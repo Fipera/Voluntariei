@@ -91,7 +91,7 @@ export function SignupInstitutionThirdStage() {
             <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}>
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
                     <VStack style={{ flex: 1, alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingBottom: 24 }}>
-                        {/* Top */}
+                        
                         <View style={{ width: "100%", alignItems: "center" }}>
                             <Stepper etapaAtual={3} />
                             <Text style={{ marginTop: 12, alignSelf: "center", fontFamily: "Nunito-Bold", fontSize: 16, lineHeight: 22, color: "#173663" }}>Etapa 3 de 3</Text>
@@ -99,7 +99,7 @@ export function SignupInstitutionThirdStage() {
                             <Text style={{ marginTop: 8, alignSelf: "center", fontFamily: "Nunito-Regular", fontSize: 16, lineHeight: 22, color: "#000", textAlign: "center", maxWidth: 350 }}>Crie seu login para acessar o sistema</Text>
                         </View>
 
-                        {/* Form */}
+                        
                         <View style={{ marginTop: 16, width: "100%", maxWidth: 312, alignSelf: "center" }}>
                             <FormControl isInvalid={!!errors.email}>
                                 <Text style={{ fontFamily: "Nunito-Bold", fontSize: 16, lineHeight: 22, color: "#173663", marginLeft: 4, marginBottom: 8 }}>E-mail</Text>
@@ -172,7 +172,7 @@ export function SignupInstitutionThirdStage() {
                             </FormControl>
                         </View>
 
-                        {/* Bottom */}
+                        
                         <View style={{ width: "100%", alignItems: "center", paddingBottom: 8, gap: 12 }}>
                             <Text style={{ marginTop: 16, fontFamily: "Nunito-Regular", fontSize: 14, lineHeight: 20, color: "#000", width: 312, alignSelf: "center" }}>
                                 Com sua conta, você poderá gerenciar sua instituição e acessar todas as funcionalidades do sistema.

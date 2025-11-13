@@ -1,7 +1,7 @@
 import Stepper from "@/components/custom/stepper";
 import { Button } from "@/components/ui/button";
 import { HStack } from "@/components/ui/hstack";
-import { Image } from "@/components/ui/image";
+
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -9,12 +9,14 @@ import { useSignupVoluntaryStore } from "@/store/useSignupVoluntaryStore";
 import { SignupVoluntarySecondStageData, signupVoluntarySecondStageSchema } from "@/utils/schemas/signupVoluntarySchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
-import { AlertCircle } from "lucide-react-native";
+import { AlertCircle, Check } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SKILL_GROUPS } from '@/utils/constants/voluntarySkills';
+import { SKILL_IMAGE_MAP, DEFAULT_SKILL_IMAGE } from '@/utils/constants/voluntarySkillImages';
+import SkillIcon from '@/components/custom/voluntaryskills/SkillIcon';
 
 export function SignupVoluntarySecondStage() {
     const router = useRouter();
@@ -71,7 +73,7 @@ export function SignupVoluntarySecondStage() {
                         <Text className="font-NunitoBold text-[16px] leading-[22px] text-[#173663] mt-4">Etapa 2 de 3</Text>
                         <Text className="font-NunitoBold text-[28px] leading-[38px] text-[#173663] mt-6">Habilidades</Text>
                         <Text className="font-NunitoRegular text-[16px] leading-[22px] text-black text-center w-[310px] mt-4">
-                            Selecione até 5 áreas em que deseja atuar. Assim poderemos indicar oportunidades de voluntariado alinhadas ao seu perfil.
+                            Selecione até 5 áreas em que deseja atuar. Assim poderemos indicar demanda de voluntariado alinhadas ao seu perfil.
                         </Text>
                         <View style={{ width: '100%', marginTop: 32, gap: 40 }}>
                             {skillGroups.map(group => (
@@ -84,19 +86,19 @@ export function SignupVoluntarySecondStage() {
                                         <HStack style={{ gap: 20 }}>
                                             {group.skills.map(skill => {
                                                 const active = selectedSkills.includes(skill.value);
+                                                const imgSrc = SKILL_IMAGE_MAP[skill.value] || DEFAULT_SKILL_IMAGE;
                                                 return (
                                                     <VStack key={skill.value} className="items-center" style={{ width: 82 }}>
-                                                        <Button
-                                                            onPress={() => toggleSkill(skill.value)}
-                                                            className={`${active ? 'bg-[#173663]' : 'bg-gray-300'} rounded-full w-[82px] h-[82px] p-0 overflow-hidden`}
-                                                        >
-                                                            {/* Static placeholder image or colored circle */}
-                                                            <Image
-                                                                alt={skill.label}
-                                                                source={require('@/assets/images/signin/local.png')}
-                                                                style={{ width: 82, height: 82, opacity: active ? 0.8 : 1 }}
-                                                            />
-                                                        </Button>
+                                                        <Pressable onPress={() => toggleSkill(skill.value)} style={{ alignItems: 'center' }}>
+                                                            <View style={{ position: 'relative' }}>
+                                                                <SkillIcon source={imgSrc} size={82} />
+                                                                {active && (
+                                                                    <View style={{ position:'absolute', top:0, left:0, right:0, bottom:0, backgroundColor:'rgba(23,54,99,0.55)', justifyContent:'center', alignItems:'center', borderRadius:41 }}>
+                                                                        <Check size={32} color="#fff" strokeWidth={3} />
+                                                                    </View>
+                                                                )}
+                                                            </View>
+                                                        </Pressable>
                                                         <Text className="font-NunitoRegular text-[12px] leading-[16px] text-black text-center mt-1" numberOfLines={2}>
                                                             {skill.label}
                                                         </Text>

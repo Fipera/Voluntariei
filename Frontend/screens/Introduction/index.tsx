@@ -14,11 +14,11 @@ import { Dimensions, View } from "react-native";
 export default () => {
     const router = useRouter();
     const { width: SCREEN_WIDTH } = Dimensions.get("window");
-    // Illustration responsive sizing (max 374 x 389.29)
-    const HORIZONTAL_PADDING = 16; // px-4
+    
+    const HORIZONTAL_PADDING = 16; 
     const maxImgWidth = 374;
     const desiredImgWidth = Math.min(maxImgWidth, SCREEN_WIDTH - HORIZONTAL_PADDING * 2);
-    const imgAspect = 389.29 / 374; // height/width
+    const imgAspect = 389.29 / 374; 
     const desiredImgHeight = desiredImgWidth * imgAspect;
     return (
         <SafeAreaView
@@ -31,7 +31,7 @@ export default () => {
                     alignItems: "center",
                     justifyContent: "space-between",
                     paddingHorizontal: HORIZONTAL_PADDING,
-                    paddingBottom: 32, // pb-8
+                    paddingBottom: 32, 
                 }}
             >
                 <VStack
@@ -102,12 +102,12 @@ export default () => {
                         padding: 0,
                         justifyContent: "center",
                         alignItems: "center",
-                        // shadow (iOS)
+                        
                         shadowColor: "#000",
                         shadowOffset: { width: 0, height: 4 },
                         shadowOpacity: 0.15,
                         shadowRadius: 8,
-                        // elevation (Android)
+                        
                         elevation: 6,
                     }}
                     onPress={() => router.push("/home")}

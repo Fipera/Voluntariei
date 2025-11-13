@@ -111,7 +111,7 @@ export async function getMyParticipationsHandler(request: any, reply: FastifyRep
 
 export async function getMyCommitmentsHandler(request: any, reply: FastifyReply) {
   try {
-    // Finaliza cards expirados antes de buscar compromissos
+    
     await finalizeExpiredCards();
     
     const commitments = await getVoluntaryUpcomingCommitments(request.user.id);
@@ -145,7 +145,7 @@ export async function getMyCommitmentsHandler(request: any, reply: FastifyReply)
 
 export async function getMyHistoryHandler(request: any, reply: FastifyReply) {
   try {
-    // Finaliza cards expirados antes de buscar histórico
+    
     await finalizeExpiredCards();
     
     const history = await getVoluntaryHistory(request.user.id);

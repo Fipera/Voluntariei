@@ -6,7 +6,7 @@ import { Platform } from 'react-native';
 import api from '@/services/api';
 import { useRouter } from 'expo-router';
 
-// Configurar como as notificações serão mostradas
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -30,7 +30,7 @@ export const usePushNotifications = (token: string | null, userType: 'INSTITUTIO
   const notificationListener = useRef<Notifications.Subscription | undefined>(undefined);
   const responseListener = useRef<Notifications.Subscription | undefined>(undefined);
 
-  // Registrar token no backend
+  
   async function registerPushToken(pushToken: string) {
     if (!token || !userType) return;
     
@@ -49,10 +49,10 @@ export const usePushNotifications = (token: string | null, userType: 'INSTITUTIO
     }
   }
 
-  // Obter permissão e registrar token
+  
   async function registerForPushNotificationsAsync() {
-    // Push notifications não funcionam no Expo Go a partir do SDK 53
-    // Retornar silenciosamente para não quebrar o app
+    
+    
     if (!Device.isDevice) {
       console.log('⚠️ Push notifications requerem dispositivo físico e Development Build');
       return;
@@ -101,27 +101,27 @@ export const usePushNotifications = (token: string | null, userType: 'INSTITUTIO
     return pushToken;
   }
 
-  // Navegar para a tela correta baseado na notificação
+  
   function handleNotificationNavigation(data: any) {
     if (!data || !data.cardId) return;
 
     const { cardId, type } = data;
 
-    // Navegar baseado no tipo de usuário e tipo de notificação
+    
     if (userType === 'VOLUNTARY') {
-      // Para voluntários, sempre vai para a tela da vaga
+      
       router.push(`/(voluntary)/opportunity/${cardId}?from=notifications` as any);
     } else if (userType === 'INSTITUTION') {
-      // Para instituições, vai para a tela de gerenciamento da vaga
+      
       router.push(`/(institution)/opportunity/${cardId}` as any);
     }
   }
 
   useEffect(() => {
-    // Só registrar se tiver token de autenticação e tipo de usuário
+    
     if (!token || !userType) return;
 
-    // Registrar para push notifications
+    
     registerForPushNotificationsAsync().then((pushToken) => {
       if (pushToken) {
         setExpoPushToken({ data: pushToken, type: 'expo' } as Notifications.ExpoPushToken);
@@ -129,22 +129,22 @@ export const usePushNotifications = (token: string | null, userType: 'INSTITUTIO
       }
     });
 
-    // Listener: notificação recebida enquanto app está aberto
+    
     notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
       console.log('📩 Notificação recebida:', notification);
       setNotification(notification);
     });
 
-    // Listener: usuário tocou na notificação
+    
     responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
       console.log('👆 Notificação tocada:', response);
       const data = response.notification.request.content.data;
       
-      // Navegar para a tela apropriada
+      
       handleNotificationNavigation(data);
     });
 
-    // Cleanup
+    
     return () => {
       if (notificationListener.current) {
         notificationListener.current.remove();

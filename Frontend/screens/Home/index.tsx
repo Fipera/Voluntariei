@@ -27,8 +27,8 @@ export default () => {
                     flex: 1,
                     alignItems: "center",
                     justifyContent: "space-between",
-                    paddingHorizontal: 16, // px-4
-                    paddingBottom: 24, // pb-6
+                    paddingHorizontal: 16, 
+                    paddingBottom: 24, 
                 }}
             >
                 <VStack
@@ -46,7 +46,7 @@ export default () => {
                             style={{
                                 width: 160,
                                 height: 160,
-                                marginTop: 60, // aproximação visual de top: 163px
+                                marginTop: 60, 
                                 marginBottom: 30,
                             }}
                         />
@@ -72,7 +72,7 @@ export default () => {
                         onPress={() => router.push("/signupInstitutionFirstStage")}
                         variant="outline"
                         style={{
-                            // btn-instituicao specs adapted responsively
+                            
                             width: buttonWidth,
                             height: 45,
                             backgroundColor: "#173663",
@@ -100,7 +100,7 @@ export default () => {
                         onPress={() => router.push("/signupVoluntaryFirstStage")}
                         variant="outline"
                         style={{
-                            // btn-voluntario specs adapted responsively
+                            
                             width: buttonWidth,
                             height: 45,
                             backgroundColor: "#FFFFFF",

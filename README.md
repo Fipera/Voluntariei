@@ -1,6 +1,6 @@
 # APLICATIVO MÓVEL PARA ALOCAÇÃO DE VOLUNTÁRIOS EM AÇÕES FILANTRÓPICAS
 
-O **Voluntari-ei** é um aplicativo móvel desenvolvido como Trabalho de Conclusão de Curso (TCC) com o objetivo de conectar instituições filantrópicas a voluntários dispostos a contribuir com causas sociais. A plataforma facilita a divulgação de oportunidades de voluntariado e a inscrição de pessoas com habilidades compatíveis.
+O **Voluntari-ei** é um aplicativo móvel desenvolvido como Trabalho de Conclusão de Curso (TCC) com o objetivo de conectar instituições filantrópicas a voluntários dispostos a contribuir com causas sociais. A plataforma facilita a divulgação de demanda de voluntariado e a inscrição de pessoas com habilidades compatíveis.
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -19,13 +19,13 @@ O **Voluntari-ei** é um aplicativo móvel desenvolvido como Trabalho de Conclus
 
 ### Para Voluntários
 - Cadastro e login com autenticação segura
-- Visualização de oportunidades disponíveis
+- Visualização de demanda disponíveis
 - Aceitação de ações filantrópicas
 - Histórico de participações
 
 ### Para Instituições
 - Cadastro institucional com CNPJ
-- Criação e gerenciamento de oportunidades
+- Criação e gerenciamento de demanda
 - Acompanhamento de voluntários inscritos
 
 ## 🧪 Validação

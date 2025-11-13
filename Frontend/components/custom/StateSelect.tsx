@@ -11,10 +11,10 @@ interface Props {
   label?: string;
   placeholder?: string;
   disabled?: boolean;
-  fullName?: boolean; // if true store full name instead of code
+  fullName?: boolean; 
   height?: number;
-  showCodeAndName?: boolean; // display e.g. SP - São Paulo inside field
-  containerStyle?: any; // override outer pressable style
+  showCodeAndName?: boolean; 
+  containerStyle?: any; 
 }
 
 export const StateSelect: React.FC<Props> = ({
@@ -65,12 +65,12 @@ export const StateSelect: React.FC<Props> = ({
           paddingHorizontal: 12,
           flexDirection: 'row',
           alignItems: 'center',
-          // shadow iOS
+          
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.25,
           shadowRadius: 2,
-          // shadow Android
+          
           elevation: 2,
         }, containerStyle]}
         android_ripple={{ color: '#E2E8F0' }}

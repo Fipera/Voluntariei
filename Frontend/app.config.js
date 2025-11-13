@@ -18,7 +18,9 @@ export default {
         backgroundColor: "#ffffff"
       },
       permissions: [
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        // Necessário no Android 13+ para exibir notificações
+        "android.permission.POST_NOTIFICATIONS"
       ],
       package: "com.voluntariei.app",
       useNextNotificationsApi: true,

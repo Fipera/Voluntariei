@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const signupInstitutionSchema = z.object({
 
-  // Somente números
+  
 
   cnpj: z.string({ required_error: "O CNPJ é obrigatório" })
     .regex(/^\d{14}$/, "CNPJ deve conter exatamente 14 números"),
@@ -16,7 +16,7 @@ export const signupInstitutionSchema = z.object({
   numberHouse: z.string({ required_error: "O número é obrigatório" })
     .regex(/^\d+$/, "Número deve conter apenas dígitos"),
 
-  // Somente texto 
+  
   name: z.string({ required_error: "O nome é obrigatório" })
     .min(2, "Nome muito curto")
     .regex(/^[A-Za-zÀ-ÿ\s]+$/, "O nome não pode conter números ou símbolos"),
@@ -30,7 +30,7 @@ export const signupInstitutionSchema = z.object({
   state: z.string({ required_error: "O estado é obrigatório" })
     .regex(/^[A-Za-zÀ-ÿ\s]+$/, "O estado não pode conter números ou símbolos"),
 
-  // Texto livre
+  
   socialReason: z.string({ required_error: "A razão social é obrigatória" })
     .min(3, "Razão social muito curta"),
 

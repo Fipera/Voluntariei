@@ -105,12 +105,12 @@ model Participation {
 
 model Notification {
   id        Int              @id @default(autoincrement())
-  userId    Int 
+  userId    Int
   userType  UserType // VOLUNTARY ou INSTITUTION
   type      NotificationType // Tipo da notificação
   title     String
   message   String
-  cardId    Int? 
+  cardId    Int?
   read      Boolean          @default(false)
   createdAt DateTime         @default(now())
 }
@@ -134,10 +134,10 @@ enum UserType {
 }
 
 enum NotificationType {
-  NEW_OPPORTUNITY // Nova oportunidade criada (para voluntários)
+  NEW_OPPORTUNITY // Nova demanda criada (para voluntários)
   NEW_APPLICATION // Nova inscrição recebida (para instituição)
   APPLICATION_APPROVED // Inscrição aprovada (para voluntário)
   APPLICATION_REJECTED // Inscrição rejeitada (para voluntário)
-  OPPORTUNITY_CANCELED // Oportunidade cancelada (para voluntário)
-  OPPORTUNITY_STARTING // Oportunidade começando em 1h (para voluntário)
+  OPPORTUNITY_CANCELED // Demanda cancelada (para voluntário)
+  OPPORTUNITY_STARTING // Demanda começando em 1h (para voluntário)
 }

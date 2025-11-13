@@ -15,9 +15,9 @@ async function institutionRoutes(server: FastifyInstance) {
         "/",
         {
             schema: {
-                response: {
-                    201: $ref("createInstitutionResponseSchema"),
-                },
+                tags: ['institution'],
+                summary: 'Registrar instituição',
+                response: { 201: $ref("createInstitutionResponseSchema") },
             },
         },
         registerInstitutionHandler
@@ -27,10 +27,10 @@ async function institutionRoutes(server: FastifyInstance) {
         "/login",
         {
             schema: {
+                tags: ['institution'],
+                summary: 'Login instituição',
                 body: $ref("loginInstitutionSchema"),
-                response: {
-                    201: $ref("loginInstitutionResponseSchema"),
-                },
+                response: { 201: $ref("loginInstitutionResponseSchema") },
             },
             attachValidation: false
         },
@@ -41,10 +41,10 @@ async function institutionRoutes(server: FastifyInstance) {
         "/check-uniqueness",
         {
             schema: {
+                tags: ['institution'],
+                summary: 'Checar unicidade (email/cnpj)',
                 body: $ref("checkUniquenessInstitutionSchema"),
-                response: {
-                    201: $ref("checkUniquenessInstitutionResponseSchema"),
-                },
+                response: { 201: $ref("checkUniquenessInstitutionResponseSchema") },
             },
             attachValidation: false
         },
@@ -53,7 +53,7 @@ async function institutionRoutes(server: FastifyInstance) {
 
     server.get(
         "/me",
-        { preHandler: [server.authenticate] },
+        { preHandler: [server.authenticate], schema: { tags: ['institution'], summary: 'Dados da própria instituição' } },
         getInstitutionMeHandler
     )
 
@@ -62,6 +62,8 @@ async function institutionRoutes(server: FastifyInstance) {
         {
             preHandler: [server.authenticate],
             schema: {
+                tags: ['institution'],
+                summary: 'Atualizar dados da instituição',
                 body: $ref("updateInstitutionSchema"),
                 response: { 200: $ref("updateInstitutionResponseSchema") }
             },
@@ -75,6 +77,8 @@ async function institutionRoutes(server: FastifyInstance) {
         {
             preHandler: [server.authenticate],
             schema: {
+                tags: ['institution'],
+                summary: 'Registrar push token',
                 body: $ref("registerPushTokenSchema"),
                 response: { 200: $ref("registerPushTokenResponseSchema") }
             }
@@ -87,6 +91,8 @@ async function institutionRoutes(server: FastifyInstance) {
         {
             preHandler: [server.authenticate],
             schema: {
+                tags: ['institution'],
+                summary: 'Remover push token',
                 response: { 200: $ref("unregisterPushTokenResponseSchema") }
             }
         },

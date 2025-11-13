@@ -6,7 +6,7 @@ const api = axios.create({
   baseURL: 'https://inartificially-unlaminated-marin.ngrok-free.dev', 
 });
 
-// Interceptor de request para adicionar token automaticamente
+
 api.interceptors.request.use(
   async (config) => {
     const token = await SecureStore.getItemAsync('token');

@@ -1,12 +1,12 @@
 import { Expo, ExpoPushMessage, ExpoPushTicket } from 'expo-server-sdk';
 import prisma from '../utils/prisma';
 
-// Cria uma instância do Expo SDK
+
 const expo = new Expo();
 
-/**
- * Envia uma notificação push para um único usuário
- */
+
+
+
 export async function sendPushNotification(
   pushToken: string,
   title: string,
@@ -21,6 +21,7 @@ export async function sendPushNotification(
   const message: ExpoPushMessage = {
     to: pushToken,
     sound: 'default',
+  channelId: 'default',
     title,
     body,
     data,
@@ -43,15 +44,15 @@ export async function sendPushNotification(
   }
 }
 
-/**
- * Envia notificações push em lote (bulk)
- */
+
+
+
 export async function sendBulkPushNotifications(
   recipients: Array<{ pushToken: string; title: string; body: string; data?: Record<string, any> }>
 ): Promise<{ success: number; failed: number }> {
   const messages: ExpoPushMessage[] = [];
 
-  // Filtra apenas tokens válidos e cria as mensagens
+  
   for (const recipient of recipients) {
     if (!Expo.isExpoPushToken(recipient.pushToken)) {
       console.error(`Push token ${recipient.pushToken} is not valid`);
@@ -61,6 +62,7 @@ export async function sendBulkPushNotifications(
     messages.push({
       to: recipient.pushToken,
       sound: 'default',
+  channelId: 'default',
       title: recipient.title,
       body: recipient.body,
       data: recipient.data,
@@ -76,7 +78,7 @@ export async function sendBulkPushNotifications(
   let failedCount = 0;
 
   try {
-    // Divide em chunks de 100 (limite do Expo)
+    
     const chunks = expo.chunkPushNotifications(messages);
 
     for (const chunk of chunks) {
@@ -99,9 +101,9 @@ export async function sendBulkPushNotifications(
   return { success: successCount, failed: failedCount };
 }
 
-/**
- * Notifica voluntário (usado quando há uma ação sobre ele)
- */
+
+
+
 export async function notifyVoluntaryPush(
   voluntaryId: number,
   title: string,
@@ -118,9 +120,9 @@ export async function notifyVoluntaryPush(
   }
 }
 
-/**
- * Notifica instituição (usado quando há uma ação sobre ela)
- */
+
+
+
 export async function notifyInstitutionPush(
   institutionId: number,
   title: string,
@@ -137,9 +139,9 @@ export async function notifyInstitutionPush(
   }
 }
 
-/**
- * Notifica múltiplos voluntários (usado para nova oportunidade ou cancelamento)
- */
+
+
+
 export async function notifyVoluntariesPush(
   voluntaryIds: number[],
   title: string,

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Modal, View, ScrollView, Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
 import { HStack } from '@/components/ui/hstack';
@@ -7,6 +8,7 @@ import { VStack } from '@/components/ui/vstack';
 import { SKILL_GROUPS } from '@/utils/constants/voluntarySkills';
 import { X, Plus, Check } from 'lucide-react-native';
 import { Image } from '@/components/ui/image';
+import SkillIcon from '../SkillIcon';
 import { SKILL_IMAGE_MAP, DEFAULT_SKILL_IMAGE } from '@/utils/constants/voluntarySkillImages';
 
 interface SkillsEditorProps {
@@ -18,19 +20,20 @@ interface SkillsEditorProps {
 
 export const SkillsEditor: React.FC<SkillsEditorProps> = ({ value, onChange, max = 5, min = 1 }) => {
   const [open, setOpen] = useState(false);
+  const insets = useSafeAreaInsets();
 
   function toggle(skill: string){
     const exists = value.includes(skill);
     if(exists){
       onChange(value.filter(s=>s!==skill));
     } else {
-      if(value.length >= max) return; // ignore if full
+      if(value.length >= max) return; 
       onChange([...value, skill]);
     }
   }
 
   function remove(skill: string){
-    if(value.length <= min) return; // enforce min on removal from chip (user can still open modal to swap)
+    if(value.length <= min) return; 
     onChange(value.filter(s=>s!==skill));
   }
 
@@ -71,7 +74,10 @@ export const SkillsEditor: React.FC<SkillsEditorProps> = ({ value, onChange, max
             <Text style={{ fontSize:18, fontFamily:'Nunito-Bold', color:'#173663' }}>Selecionar Habilidades</Text>
             <Pressable onPress={()=>setOpen(false)} hitSlop={10}><X size={22} color='#173663' /></Pressable>
           </View>
-          <ScrollView contentContainerStyle={{ padding:20, paddingBottom:120 }}>
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ padding:20, paddingBottom: 120 + Math.max(insets.bottom, 12) }}
+          >
             <VStack style={{ gap:40 }}>
               {SKILL_GROUPS.map(group=> (
                 <VStack key={group.key} style={{ gap:16 }}>
@@ -87,21 +93,10 @@ export const SkillsEditor: React.FC<SkillsEditorProps> = ({ value, onChange, max
                         const imgSrc = SKILL_IMAGE_MAP[s.value] || DEFAULT_SKILL_IMAGE;
                         return (
                           <Pressable key={s.value} onPress={()=>toggle(s.value)} disabled={full} style={{ width:82, alignItems:'center', opacity: full ? 0.35 : 1 }}>
-                            <View
-                              style={{
-                                width:82,
-                                height:82,
-                                borderRadius:41,
-                                overflow:'hidden',
-                                justifyContent:'center',
-                                alignItems:'center',
-                                backgroundColor: '#CBD5E0',
-                                position:'relative'
-                              }}
-                            >
-                              <Image alt={s.label} source={imgSrc} style={{ width:'100%', height:'100%' }} />
+                            <View style={{ position:'relative' }}>
+                              <SkillIcon source={imgSrc} size={82} />
                               {active && (
-                                <View style={{ position:'absolute', top:0, left:0, right:0, bottom:0, backgroundColor:'rgba(23,54,99,0.55)', justifyContent:'center', alignItems:'center' }}>
+                                <View style={{ position:'absolute', top:0, left:0, right:0, bottom:0, backgroundColor:'rgba(23,54,99,0.55)', justifyContent:'center', alignItems:'center', borderRadius:41 }}>
                                   <Check size={32} color="#fff" strokeWidth={3} />
                                 </View>
                               )}
@@ -116,7 +111,7 @@ export const SkillsEditor: React.FC<SkillsEditorProps> = ({ value, onChange, max
               ))}
             </VStack>
           </ScrollView>
-          <View style={{ position:'absolute', left:0, right:0, bottom:0, padding:16, backgroundColor:'#fff', borderTopWidth:1, borderColor:'#E2E8F0' }}>
+          <View style={{ position:'absolute', left:0, right:0, bottom:0, padding:16, paddingBottom: 16 + Math.max(insets.bottom, 8), backgroundColor:'#fff', borderTopWidth:1, borderColor:'#E2E8F0' }}>
             <Button onPress={()=>setOpen(false)} style={{ width:310, height:44, borderRadius:12, alignSelf:'center', backgroundColor:'#173663', flexDirection:'row', justifyContent:'center', alignItems:'center' }}>
               <Text style={{ fontSize:16, fontFamily:'Nunito-Bold', color:'#fff' }}>Concluir</Text>
             </Button>

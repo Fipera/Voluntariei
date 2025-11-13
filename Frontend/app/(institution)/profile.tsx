@@ -161,7 +161,7 @@ export default function InstitutionProfileScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <FieldGroup label="Estado">
-                {/* Substituído Input por StateSelect */}
+                
                 <StateSelect value={stateValue} onChange={setStateValue} height={43} containerStyle={{ width:'100%', backgroundColor:'#FDFDFD', borderColor:'#B7B7B7', borderWidth:1, borderRadius:8, shadowColor:'#000', shadowOffset:{width:0,height:2}, shadowOpacity:0.25, shadowRadius:2, elevation:2 }} />
               </FieldGroup>
             </View>
@@ -192,8 +192,8 @@ export default function InstitutionProfileScreen() {
               <View style={{ backgroundColor:'#FFFFFF', borderTopLeftRadius:24, borderTopRightRadius:24, paddingHorizontal:24, paddingTop:24, paddingBottom: insets.bottom + 16 }}>
                 <Text style={{ fontSize:18, fontFamily:'Nunito-Bold', color:'#173663', textAlign:'center', marginBottom:20 }}>Configurações</Text>
 
-                <SettingsItem icon={FileText} label="Política de Uso" onPress={()=>{ /* abrir link/placeholder */ }} />
-                <SettingsItem icon={Info} label="Ajuda / Fale Conosco" onPress={()=>{ /* abrir ajuda */ }} />
+                <SettingsItem icon={FileText} label="Política de Uso" onPress={() => {}} />
+                <SettingsItem icon={Info} label="Ajuda / Fale Conosco" onPress={() => {}} />
 
                 <View style={{ height:1, backgroundColor:'#E2E8F0', marginVertical:16 }} />
 
@@ -208,7 +208,7 @@ export default function InstitutionProfileScreen() {
 }
 
 function FieldGroup({ label, children, containerStyle }: { label: string; children: React.ReactNode; containerStyle?: any }) {
-  // group: label (22) + gap (14) + field (43)
+  
   return (
     <View style={[{ marginBottom: 24 }, containerStyle]}> 
       <Text style={{ fontSize: 16, fontFamily: 'Nunito-Bold', marginBottom: 14, color: '#173663', lineHeight:22 }}>{label}</Text>

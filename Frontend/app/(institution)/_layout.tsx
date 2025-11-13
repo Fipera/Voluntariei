@@ -67,12 +67,12 @@ export default () => {
         tabBarLabelStyle: { fontSize: 12, fontFamily: 'Nunito-SemiBold', marginBottom: 4 },
       }}
     >
-      {/* Index is the Hub */}
+      
       <Tabs.Screen name="index" options={{ title: 'Hub', tabBarIcon: ({color}) => <House size={22} color={color} /> }} />
-      <Tabs.Screen name="create-opportunity" options={{ title: 'Criar Vaga', tabBarIcon: ({color}) => <Plus size={24} color={color} /> }} />
+      <Tabs.Screen name="create-opportunity" options={{ title: 'Criar Demanda', tabBarIcon: ({color}) => <Plus size={24} color={color} /> }} />
       <Tabs.Screen name="profile" options={{ title: 'Perfil', tabBarIcon: ({color}) => <User size={22} color={color} /> }} />
       
-      {/* Hidden from tabs */}
+      
       <Tabs.Screen name="opportunity" options={{ href: null }} />
       <Tabs.Screen name="notifications" options={{ href: null }} />
     </Tabs>

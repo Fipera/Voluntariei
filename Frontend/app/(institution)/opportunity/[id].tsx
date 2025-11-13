@@ -12,6 +12,7 @@ import { Calendar, ChevronLeft, MapPin, Tag, Check, Users, Clock, X } from 'luci
 import api from '@/services/api';
 import { useAuth } from '@/providers/AuthProvider';
 import { SKILL_IMAGE_MAP, DEFAULT_SKILL_IMAGE } from '@/utils/constants/voluntarySkillImages';
+import SkillIcon from '@/components/custom/voluntaryskills/SkillIcon';
 import { SKILL_GROUPS } from '@/utils/constants/voluntarySkills';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
@@ -21,7 +22,7 @@ interface CardDetail {
   description?: string;
   banner?: string | null;
   startAt: string;
-  duration: number; // em minutos
+  duration: number; 
   createdAt?: string;
   isOnline: boolean;
   cep?: string;
@@ -92,7 +93,7 @@ function formatDate(dt: string){
 
 function calculateEndDate(startAt: string, duration: number): string {
   const start = new Date(startAt);
-  const end = new Date(start.getTime() + duration * 60000); // duration em minutos
+  const end = new Date(start.getTime() + duration * 60000); 
   return end.toISOString();
 }
 
@@ -111,7 +112,7 @@ export default function OpportunityDetail(){
   const [expandedObservation, setExpandedObservation] = useState<{[key: number]: boolean}>({});
 
   function handleBack() {
-    // Se conseguir voltar, volta. Senão, vai para o hub
+    
     if (router.canGoBack()) {
       router.back();
     } else {
@@ -119,7 +120,7 @@ export default function OpportunityDetail(){
     }
   }
 
-  // wait until backend reflects canceled status
+  
   async function waitForCancellation(maxTries = 14, delayMs = 900){
     for (let i=0; i<maxTries; i++){
       try{
@@ -166,7 +167,7 @@ export default function OpportunityDetail(){
 
   const filteredParticipants = useMemo(() => {
     if (!data?.participants) return [];
-    // Filtra apenas PENDING e CONFIRMED (exclui REJECTED)
+    
     const activeParticipants = data.participants.filter(p => p.status !== 'REJECTED');
     
     if (subscriptionFilter === 'all') return activeParticipants;
@@ -175,7 +176,7 @@ export default function OpportunityDetail(){
     return activeParticipants;
   }, [data?.participants, subscriptionFilter]);
 
-  // Verifica se a vaga está em andamento ou já terminou
+  
   const opportunityState = useMemo(() => {
     if (!data) return { isFinalized: false, isInProgress: false, isStarted: false };
     
@@ -190,11 +191,11 @@ export default function OpportunityDetail(){
     return { isFinalized, isInProgress, isStarted };
   }, [data]);
 
-  // cancel handler
+  
   const handleCancel = async () => {
     Alert.alert(
-      'Cancelar Vaga',
-      'Tem certeza que deseja cancelar esta vaga? Esta ação não pode ser desfeita.',
+      'Cancelar Demanda',
+      'Tem certeza que deseja cancelar esta demanda? Esta ação não pode ser desfeita.',
       [
         { text: 'Não', style: 'cancel' },
         {
@@ -208,7 +209,7 @@ export default function OpportunityDetail(){
               });
               router.back();
             } catch (error: any) {
-              Alert.alert('Erro', error.response?.data?.message || 'Não foi possível cancelar a vaga.');
+              Alert.alert('Erro', error.response?.data?.message || 'Não foi possível cancelar a demanda.');
             } finally {
               setIsCancelling(false);
             }
@@ -224,7 +225,7 @@ export default function OpportunityDetail(){
         headers: { Authorization: `Bearer ${token}` }
       });
       Alert.alert('Sucesso', 'Inscrição confirmada!');
-      load(); // Reload to update list
+      load(); 
     } catch (error: any) {
       console.error('Erro ao aprovar:', error);
       Alert.alert('Erro', error.response?.data?.message || 'Não foi possível confirmar a inscrição.');
@@ -246,7 +247,7 @@ export default function OpportunityDetail(){
                 headers: { Authorization: `Bearer ${token}` }
               });
               Alert.alert('Sucesso', 'Inscrição recusada.');
-              load(); // Reload to update list
+              load(); 
             } catch (error: any) {
               console.error('Erro ao recusar:', error);
               Alert.alert('Erro', error.response?.data?.message || 'Não foi possível recusar a inscrição.');
@@ -274,15 +275,15 @@ export default function OpportunityDetail(){
   return (
     <SafeAreaView style={{ flex:1 }} edges={['top','left','right']}>
       <ScrollView contentContainerStyle={{ paddingHorizontal:20, paddingTop: insets.top + 8, paddingBottom: (tabBarHeight || 70) + 24 }}>
-        {/* Header */}
+        
         <HStack style={{ alignItems:'center', gap:8, marginBottom:16 }}>
           <Pressable onPress={handleBack} hitSlop={10} style={{ padding:6 }}>
             <ChevronLeft size={22} color="#173663" />
           </Pressable>
-          <Text style={{ fontSize:22, lineHeight:30, fontFamily:'Nunito-Bold', color:'#173663' }}>Gerenciamento da Vaga</Text>
+          <Text style={{ fontSize:22, lineHeight:30, fontFamily:'Nunito-Bold', color:'#173663' }}>Gerenciamento da Demanda</Text>
         </HStack>
 
-        {/* Mini Card */}
+        
         <HStack style={{ gap:12, backgroundColor:'#fff', borderRadius:12, overflow:'hidden', borderWidth:1, borderColor:'#E5E7EB', padding:10, elevation:2, shadowColor:'#000', shadowOpacity:0.1, shadowRadius:4 }}>
           <Box style={{ width:140, height:84, borderRadius:8, overflow:'hidden', backgroundColor:'#e5e7eb' }}>
             {data.banner ? (
@@ -300,7 +301,7 @@ export default function OpportunityDetail(){
           </VStack>
         </HStack>
 
-        {/* Tabs header 50/50 */}
+        
         <VStack style={{ marginTop:20, marginBottom:12 }}>
           <HStack style={{ alignItems:'center' }}>
             <Pressable onPress={()=> setActiveTab('details')} style={{ flex:1, alignItems:'center', paddingVertical:8 }}>
@@ -316,10 +317,10 @@ export default function OpportunityDetail(){
           </HStack>
         </VStack>
 
-        {/* Content */}
+        
         {activeTab === 'details' ? (
         <VStack style={{ gap:20 }}>
-          {/* Datas */}
+          
           <VStack style={{ gap:8 }}>
             <HStack style={{ gap:8, alignItems:'center' }}>
               <Calendar size={18} color="#173663" />
@@ -329,7 +330,7 @@ export default function OpportunityDetail(){
             <Text style={{ color:'#1F2937' }}>{data.duration ? formatDate(calculateEndDate(data.startAt, data.duration)) : ''}</Text>
           </VStack>
 
-          {/* Local */}
+          
           <VStack style={{ gap:8 }}>
             <HStack style={{ gap:8, alignItems:'center' }}>
               <MapPin size={18} color="#173663" />
@@ -337,7 +338,7 @@ export default function OpportunityDetail(){
             </HStack>
             <Text style={{ color:'#1F2937' }}>{data.isOnline ? 'Online' : address}</Text>
             
-            {/* Complemento */}
+            
             {!data.isOnline && data.complement && (
               <VStack style={{ gap:4, marginTop:8, paddingLeft:26 }}>
                 <Text style={{ fontSize:14, fontFamily:'Nunito-SemiBold', color:'#173663' }}>Complemento:</Text>
@@ -345,7 +346,7 @@ export default function OpportunityDetail(){
               </VStack>
             )}
             
-            {/* Observação do local */}
+            
             {!data.isOnline && data.locationNote && (
               <VStack style={{ gap:4, marginTop:8, paddingLeft:26 }}>
                 <Text style={{ fontSize:14, fontFamily:'Nunito-SemiBold', color:'#173663' }}>Como chegar:</Text>
@@ -354,7 +355,7 @@ export default function OpportunityDetail(){
             )}
           </VStack>
 
-          {/* Descrição */}
+          
           {data.description && (
             <VStack style={{ gap:8 }}>
               <HStack style={{ gap:8, alignItems:'center' }}>
@@ -365,7 +366,7 @@ export default function OpportunityDetail(){
             </VStack>
           )}
 
-          {/* Habilidades */}
+          
           {!!data.skills?.length && (
             <VStack style={{ gap:8 }}>
               <Text style={{ fontSize:18, fontFamily:'Nunito-Bold', color:'#173663' }}>Habilidades</Text>
@@ -375,7 +376,7 @@ export default function OpportunityDetail(){
                   const label = SKILL_GROUPS.flatMap(g=> g.skills).find(k=> k.value === s)?.label || s;
                   return (
                     <VStack key={s} style={{ width:74, alignItems:'center' }}>
-                      <RNImage source={img} style={{ width: 62, height: 62, borderRadius: 9999 }} />
+                      <SkillIcon source={img} size={62} />
                       <Text style={{ marginTop:6, fontSize:12, color:'#1A202C', textAlign:'center' }} numberOfLines={2}>{label}</Text>
                     </VStack>
                   );
@@ -384,37 +385,37 @@ export default function OpportunityDetail(){
             </VStack>
           )}
 
-          {/* Status ou botão de cancelar */}
+          
           {data.status === 'CANCELED' ? (
             <Box style={{ backgroundColor:'#FEE2E2', borderRadius:12, paddingVertical:12, paddingHorizontal:16, marginTop:8 }}>
               <HStack style={{ alignItems:'center', justifyContent:'center', gap:8 }}>
                 <X size={18} color="#DC2626" strokeWidth={2} />
-                <Text style={{ color:'#DC2626', fontFamily:'Nunito-Bold', fontSize:16 }}>Esta vaga foi cancelada</Text>
+                <Text style={{ color:'#DC2626', fontFamily:'Nunito-Bold', fontSize:16 }}>Esta demanda foi cancelada</Text>
               </HStack>
             </Box>
           ) : data.status === 'FINALIZED' || opportunityState.isFinalized ? (
             <Box style={{ backgroundColor:'#E2E8F0', borderRadius:12, paddingVertical:12, paddingHorizontal:16, marginTop:8 }}>
               <HStack style={{ alignItems:'center', justifyContent:'center', gap:8 }}>
                 <Check size={18} color="#64748B" strokeWidth={2} />
-                <Text style={{ color:'#64748B', fontFamily:'Nunito-Bold', fontSize:16 }}>Vaga finalizada</Text>
+                <Text style={{ color:'#64748B', fontFamily:'Nunito-Bold', fontSize:16 }}>Demanda finalizada</Text>
               </HStack>
             </Box>
           ) : opportunityState.isInProgress ? (
             <Box style={{ backgroundColor:'#FEF9C3', borderRadius:12, paddingVertical:12, paddingHorizontal:16, marginTop:8 }}>
               <HStack style={{ alignItems:'center', justifyContent:'center', gap:8 }}>
                 <Clock size={18} color="#D97706" strokeWidth={2} />
-                <Text style={{ color:'#D97706', fontFamily:'Nunito-Bold', fontSize:16 }}>Vaga em andamento</Text>
+                <Text style={{ color:'#D97706', fontFamily:'Nunito-Bold', fontSize:16 }}>Demanda em andamento</Text>
               </HStack>
             </Box>
           ) : (
             <Button onPress={handleCancel} disabled={isCancelling} style={{ backgroundColor:'#DC2626', height:44, borderRadius:12, marginTop:8, opacity: isCancelling ? 0.8 : 1 }}>
-              <Text style={{ color:'#fff', fontFamily:'Nunito-Bold' }}>{isCancelling ? 'Cancelando...' : 'Cancelar Vaga'}</Text>
+              <Text style={{ color:'#fff', fontFamily:'Nunito-Bold' }}>{isCancelling ? 'Cancelando...' : 'Cancelar Demanda'}</Text>
             </Button>
           )}
         </VStack>
         ) : (
           <VStack style={{ gap:16 }}>
-            {/* Header - Número de Inscritos */}
+            
             <HStack 
               style={{ 
                 alignItems:'center', 
@@ -449,7 +450,7 @@ export default function OpportunityDetail(){
               </Text>
             </HStack>
 
-            {/* Filtros */}
+            
             <HStack style={{ gap:12, justifyContent:'center', alignItems:'center', flexWrap:'wrap' }}>
               <Pressable
                 onPress={() => setSubscriptionFilter('all')}
@@ -528,7 +529,7 @@ export default function OpportunityDetail(){
               </Pressable>
             </HStack>
 
-            {/* Lista de Participantes */}
+            
             {filteredParticipants.length === 0 ? (
               <Text style={{ color:'#9CA3AF', textAlign:'center', marginTop:20, fontSize:16 }}>
                 Nenhuma inscrição {subscriptionFilter !== 'all' ? `com status "${subscriptionFilter === 'pending' ? 'Pendente' : 'Confirmado'}"` : ''} encontrada.
@@ -551,7 +552,7 @@ export default function OpportunityDetail(){
                   const isExpanded = expandedObservation[participant.id] || false;
                   const shouldTruncate = participant.observation && participant.observation.length > 50;
 
-                  // Habilidades do voluntário
+                  
                   const voluntarySkills = participant.voluntary.skills?.map(s => s.skill) || [];
 
                   return (
@@ -569,7 +570,7 @@ export default function OpportunityDetail(){
                         gap:12,
                       }}
                     >
-                      {/* Nome e Status */}
+                      
                       <HStack style={{ alignItems:'flex-start', justifyContent:'space-between', gap:12 }}>
                         <Text style={{ 
                           fontSize:20, 
@@ -600,7 +601,7 @@ export default function OpportunityDetail(){
                         </HStack>
                       </HStack>
 
-                      {/* Cidade e Estado */}
+                      
                       {location && (
                         <HStack style={{ gap:6, alignItems:'center' }}>
                           <MapPin size={14} color="#B7B7B7" />
@@ -614,7 +615,7 @@ export default function OpportunityDetail(){
                         </HStack>
                       )}
 
-                      {/* Habilidades */}
+                      
                       {voluntarySkills.length > 0 && (
                         <VStack style={{ gap:8 }}>
                           <Text style={{ 
@@ -655,7 +656,7 @@ export default function OpportunityDetail(){
                         </VStack>
                       )}
 
-                      {/* Observação */}
+                      
                       {participant.observation && (
                         <VStack style={{ gap:2 }}>
                           <Text style={{ 
@@ -686,7 +687,7 @@ export default function OpportunityDetail(){
                         </VStack>
                       )}
 
-                      {/* Botões de Ação - só mostrar se PENDING */}
+                      
                       {participant.status === 'PENDING' && (
                         <HStack style={{ gap:12, justifyContent:'space-between', alignItems:'center' }}>
                           <Pressable
@@ -752,7 +753,7 @@ export default function OpportunityDetail(){
         <View style={{ position:'absolute', top:0, left:0, right:0, bottom:0, backgroundColor:'rgba(255,255,255,0.85)', alignItems:'center', justifyContent:'center' }} pointerEvents="auto">
           <VStack style={{ alignItems:'center', gap:12 }}>
             <Spinner />
-            <Text style={{ fontFamily:'Nunito-Bold', color:'#173663' }}>Cancelando vaga...</Text>
+            <Text style={{ fontFamily:'Nunito-Bold', color:'#173663' }}>Cancelando demanda...</Text>
           </VStack>
         </View>
       )}

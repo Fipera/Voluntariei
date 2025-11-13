@@ -17,7 +17,7 @@ export function useNotifications(token: string | null) {
   const [loading, setLoading] = useState(false);
   const prevUnreadCountRef = useRef(0);
 
-  // Buscar todas as notificações
+  
   const fetchNotifications = async () => {
     if (!token) return;
     try {
@@ -33,7 +33,7 @@ export function useNotifications(token: string | null) {
     }
   };
 
-  // Buscar contador de não lidas
+  
   const fetchUnreadCount = async () => {
     if (!token) return;
     try {
@@ -46,7 +46,7 @@ export function useNotifications(token: string | null) {
     }
   };
 
-  // Marcar como lida
+  
   const markAsRead = async (id: number) => {
     if (!token) return;
     try {
@@ -54,7 +54,7 @@ export function useNotifications(token: string | null) {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      // Atualiza estado local
+      
       setNotifications(prev =>
         prev.map(n => n.id === id ? { ...n, read: true } : n)
       );
@@ -64,7 +64,7 @@ export function useNotifications(token: string | null) {
     }
   };
 
-  // Marcar todas como lidas
+  
   const markAllAsRead = async () => {
     if (!token) return;
     try {
@@ -79,7 +79,7 @@ export function useNotifications(token: string | null) {
     }
   };
 
-  // Deletar notificação
+  
   const deleteNotification = async (id: number) => {
     if (!token) return;
     try {
@@ -90,7 +90,7 @@ export function useNotifications(token: string | null) {
       const deletedNotification = notifications.find(n => n.id === id);
       setNotifications(prev => prev.filter(n => n.id !== id));
       
-      // Se a notificação deletada não estava lida, diminui o contador
+      
       if (deletedNotification && !deletedNotification.read) {
         setUnreadCount(prev => Math.max(0, prev - 1));
       }
@@ -99,17 +99,17 @@ export function useNotifications(token: string | null) {
     }
   };
 
-  // Polling automático do contador (a cada 30s)
+  
   useEffect(() => {
     if (!token) return;
     
     fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 30000); // 30 segundos
+    const interval = setInterval(fetchUnreadCount, 30000); 
     
     return () => clearInterval(interval);
   }, [token]);
 
-  // Atualiza ref para comparação futura
+  
   useEffect(() => {
     prevUnreadCountRef.current = unreadCount;
   }, [unreadCount]);

@@ -23,7 +23,7 @@ interface CreateNotificationInput {
   cardId?: number;
 }
 
-// Cria uma notificação
+
 export async function createNotification(data: CreateNotificationInput) {
   return prisma.notification.create({
     data: {
@@ -37,14 +37,14 @@ export async function createNotification(data: CreateNotificationInput) {
   });
 }
 
-// Cria notificações em massa (para múltiplos voluntários)
+
 export async function createBulkNotifications(notifications: CreateNotificationInput[]) {
   return prisma.notification.createMany({
     data: notifications,
   });
 }
 
-// Busca notificações do usuário
+
 export async function getUserNotifications(userId: number, userType: UserType) {
   return prisma.notification.findMany({
     where: {
@@ -57,7 +57,7 @@ export async function getUserNotifications(userId: number, userType: UserType) {
   });
 }
 
-// Marca notificação como lida
+
 export async function markNotificationAsRead(id: number, userId: number) {
   const notification = await prisma.notification.findUnique({
     where: { id },
@@ -73,7 +73,7 @@ export async function markNotificationAsRead(id: number, userId: number) {
   });
 }
 
-// Marca todas como lidas
+
 export async function markAllAsRead(userId: number, userType: UserType) {
   return prisma.notification.updateMany({
     where: {
@@ -87,7 +87,7 @@ export async function markAllAsRead(userId: number, userType: UserType) {
   });
 }
 
-// Deleta notificação
+
 export async function deleteNotification(id: number, userId: number) {
   const notification = await prisma.notification.findUnique({
     where: { id },
@@ -102,7 +102,7 @@ export async function deleteNotification(id: number, userId: number) {
   });
 }
 
-// Conta notificações não lidas
+
 export async function countUnreadNotifications(userId: number, userType: UserType) {
   return prisma.notification.count({
     where: {
@@ -113,11 +113,11 @@ export async function countUnreadNotifications(userId: number, userType: UserTyp
   });
 }
 
-// ========== FUNÇÕES ESPECÍFICAS DE NEGÓCIO ==========
 
-// Notifica voluntários quando nova oportunidade é criada
+
+
 export async function notifyVolunteersAboutNewOpportunity(cardId: number, skillNames: string[]) {
-  // Busca voluntários que têm pelo menos uma das habilidades
+  
   const volunteers = await prisma.voluntary.findMany({
     where: {
       skills: {
@@ -136,8 +136,8 @@ export async function notifyVolunteersAboutNewOpportunity(cardId: number, skillN
 
   if (!card || volunteers.length === 0) return;
 
-  const title = "Nova oportunidade disponível!";
-  const message = `A oportunidade "${card.title}" foi criada e combina com suas habilidades.`;
+  const title = "Nova demanda disponível!";
+  const message = `A demanda "${card.title}" foi criada e combina com suas habilidades.`;
 
   const notifications = volunteers.map((v) => ({
     userId: v.id,
@@ -148,10 +148,10 @@ export async function notifyVolunteersAboutNewOpportunity(cardId: number, skillN
     cardId,
   }));
 
-  // Cria notificações in-app
+  
   await createBulkNotifications(notifications);
 
-  // Envia push notifications
+  
   await notifyVoluntariesPush(
     volunteers.map((v) => v.id),
     title,
@@ -160,7 +160,7 @@ export async function notifyVolunteersAboutNewOpportunity(cardId: number, skillN
   );
 }
 
-// Notifica instituição sobre nova inscrição
+
 export async function notifyInstitutionAboutNewApplication(
   institutionId: number,
   voluntaryName: string,
@@ -170,7 +170,7 @@ export async function notifyInstitutionAboutNewApplication(
   const title = "Nova inscrição recebida";
   const message = `${voluntaryName} se inscreveu em "${cardTitle}".`;
 
-  // Cria notificação in-app
+  
   await createNotification({
     userId: institutionId,
     userType: "INSTITUTION",
@@ -180,14 +180,14 @@ export async function notifyInstitutionAboutNewApplication(
     cardId,
   });
 
-  // Envia push notification
+  
   await notifyInstitutionPush(institutionId, title, message, {
     cardId,
     type: "NEW_APPLICATION",
   });
 }
 
-// Notifica voluntário sobre aprovação
+
 export async function notifyVoluntaryAboutApproval(
   voluntaryId: number,
   cardTitle: string,
@@ -196,7 +196,7 @@ export async function notifyVoluntaryAboutApproval(
   const title = "Inscrição aprovada! 🎉";
   const message = `Sua inscrição em "${cardTitle}" foi aprovada!`;
 
-  // Cria notificação in-app
+  
   await createNotification({
     userId: voluntaryId,
     userType: "VOLUNTARY",
@@ -206,14 +206,14 @@ export async function notifyVoluntaryAboutApproval(
     cardId,
   });
 
-  // Envia push notification
+  
   await notifyVoluntaryPush(voluntaryId, title, message, {
     cardId,
     type: "APPLICATION_APPROVED",
   });
 }
 
-// Notifica voluntário sobre rejeição
+
 export async function notifyVoluntaryAboutRejection(
   voluntaryId: number,
   cardTitle: string,
@@ -222,7 +222,7 @@ export async function notifyVoluntaryAboutRejection(
   const title = "Inscrição não aprovada";
   const message = `Sua inscrição em "${cardTitle}" não foi aprovada desta vez.`;
 
-  // Cria notificação in-app
+  
   await createNotification({
     userId: voluntaryId,
     userType: "VOLUNTARY",
@@ -232,14 +232,14 @@ export async function notifyVoluntaryAboutRejection(
     cardId,
   });
 
-  // Envia push notification
+  
   await notifyVoluntaryPush(voluntaryId, title, message, {
     cardId,
     type: "APPLICATION_REJECTED",
   });
 }
 
-// Notifica voluntários sobre cancelamento
+
 export async function notifyVolunteersAboutCancellation(cardId: number) {
   const participations = await prisma.participation.findMany({
     where: {
@@ -253,8 +253,8 @@ export async function notifyVolunteersAboutCancellation(cardId: number) {
 
   if (participations.length === 0) return;
 
-  const title = "Oportunidade cancelada";
-  const message = `A oportunidade "${participations[0].card.title}" foi cancelada pela instituição.`;
+  const title = "Demanda cancelada";
+  const message = `A demanda "${participations[0].card.title}" foi cancelada pela instituição.`;
 
   const notifications = participations.map((p) => ({
     userId: p.voluntaryId,
@@ -265,10 +265,10 @@ export async function notifyVolunteersAboutCancellation(cardId: number) {
     cardId,
   }));
 
-  // Cria notificações in-app
+  
   await createBulkNotifications(notifications);
 
-  // Envia push notifications
+  
   await notifyVoluntariesPush(
     participations.map((p) => p.voluntaryId),
     title,

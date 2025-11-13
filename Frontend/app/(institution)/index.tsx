@@ -4,7 +4,6 @@ import { ScrollView, RefreshControl, StyleSheet, Image as RNImage, Pressable, Vi
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
-// Using RN Image here to guarantee absolute fill cover like create-opportunity
 import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { Box } from '@/components/ui/box';
@@ -21,7 +20,7 @@ type CardItem = {
   description?: string | null;
   banner?: string | null;
   startAt: string;
-  duration: number; // em minutos
+  duration: number; 
   isOnline: boolean;
   city?: string | null;
   state?: string | null;
@@ -69,7 +68,7 @@ export default function InstitutionHubScreen() {
     } else if (incoming === 'ACTIVE' || incoming === 'PENDING' || incoming === 'FINALIZED' || incoming === 'CANCELED') {
       setFilter(incoming as FilterKey);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [params?.filter]);
 
   async function loadCards() {
@@ -79,8 +78,8 @@ export default function InstitutionHubScreen() {
       const { data } = await api.get<CardItem[]>('/cards', { headers: { Authorization: `Bearer ${token}` } });
       setCards(Array.isArray(data) ? data : []);
     } catch (e: any) {
-      // Fallback: simple alert, keep impersonal
-      console.warn('Falha ao carregar vagas:', e?.message || e);
+      
+      console.warn('Falha ao carregar demandas:', e?.message || e);
     } finally {
       setLoading(false);
     }
@@ -88,7 +87,7 @@ export default function InstitutionHubScreen() {
 
   useEffect(() => {
     loadCards();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [token]);
 
   const counts = useMemo(() => {
@@ -117,11 +116,11 @@ export default function InstitutionHubScreen() {
     const sTime = s.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     const eTime = e.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     
-    // Se for no mesmo dia, mostra: "dd/mm • HH:mm - HH:mm"
+    
     if (sDate === eDate) {
       return `${sDate} • ${sTime} - ${eTime}`;
     }
-    // Se for em dias diferentes: "dd/mm HH:mm - dd/mm HH:mm"
+    
     return `${sDate} ${sTime} - ${eDate} ${eTime}`;
   }
 
@@ -137,9 +136,9 @@ export default function InstitutionHubScreen() {
         contentContainerStyle={{ paddingHorizontal: 24, paddingTop: insets.top + 8, paddingBottom: tabBarHeight + insets.bottom + 24 }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
-        {/* Header */}
+        
         <HStack style={{ alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <Text style={{ fontSize: 24, fontFamily: 'Nunito-Bold', color: '#173663' }}>Minhas Vagas</Text>
+          <Text style={{ fontSize: 24, fontFamily: 'Nunito-Bold', color: '#173663' }}>Minhas Demandas</Text>
           <Pressable onPress={() => router.push('/(institution)/notifications')} style={{ position: 'relative' }}>
             <View style={{ height: 36, width: 36, borderRadius: 18, backgroundColor: '#E2E8F0', alignItems:'center', justifyContent:'center' }}>
               <Bell size={18} color="#173663" />
@@ -165,7 +164,7 @@ export default function InstitutionHubScreen() {
           </Pressable>
         </HStack>
 
-        {/* Stats */}
+        
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 8 }} style={{ marginBottom: 16 }}>
           <HStack style={{ gap: 12 }}>
             <StatPill label="Ativas" value={counts.ativas} color="#16A34A" />
@@ -175,7 +174,7 @@ export default function InstitutionHubScreen() {
           </HStack>
         </ScrollView>
 
-        {/* Filters */}
+        
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 8 }} style={{ marginBottom: 16 }}>
           <HStack style={{ gap: 8 }}>
             <FilterChip label="Todos" active={filter==='ALL'} onPress={() => setFilter('ALL')} />
@@ -193,7 +192,7 @@ export default function InstitutionHubScreen() {
         ) : (
           <VStack style={{ gap: 16 }}>
             {filtered.length === 0 ? (
-              <Text style={{ color:'#4B5563' }}>Nenhuma vaga para este filtro.</Text>
+              <Text style={{ color:'#4B5563' }}>Nenhuma demanda para este filtro.</Text>
             ) : (
               filtered.map((c) => (
                 <Pressable key={c.id} onPress={()=> router.push(`/(institution)/opportunity/${c.id}` as any)}>

@@ -113,7 +113,7 @@ export function SignupInstitutionFirstStage() {
             >
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
                     <VStack style={{ flex: 1, alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingBottom: 24 }}>
-                        {/* Top */}
+                        
                         <VStack style={{ alignItems: "center", width: "100%" }}>
                             <Image
                                 source={require("/assets/images/signin/icone-instituicao.png")}
@@ -128,7 +128,7 @@ export function SignupInstitutionFirstStage() {
                             </Text>
                         </VStack>
 
-                        {/* Form */}
+                        
                         <VStack style={{ width: "100%", alignItems: "center" }}>
                             <FormControl isInvalid={!!errors.cnpj}>
                                 <Text style={{ marginTop: SCREEN_HEIGHT * 0.03, marginLeft: 4, fontFamily: "Nunito-Bold", fontSize: 16, lineHeight: 22, color: "#173663" }}>
@@ -285,7 +285,7 @@ export function SignupInstitutionFirstStage() {
                             </FormControl>
                         </VStack>
 
-                        {/* Bottom */}
+                        
                         <VStack style={{ width: "100%", alignItems: "center" }}>
                             <Button onPress={handleSubmit(onSubmit)} disabled={isLoading} style={{ width: contentWidth, height: 44, backgroundColor: "#173663", borderRadius: 12, flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: SCREEN_HEIGHT * 0.025 }}>
                                 {isLoading ? <Spinner /> : <Text style={{ color: "#FFFFFF", fontFamily: "Nunito-Bold", fontSize: 18, lineHeight: 25 }}>Próximo</Text>}
