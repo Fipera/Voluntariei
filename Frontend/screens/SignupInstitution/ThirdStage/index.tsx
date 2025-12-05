@@ -7,6 +7,7 @@ import {
     FormControlErrorText,
 } from "@/components/ui/form-control";
 import { HStack } from "@/components/ui/hstack";
+import { CheckIcon } from "@/components/ui/icon";
 import { Input, InputField } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
@@ -23,7 +24,7 @@ import { useRouter } from "expo-router";
 import { AlertCircle, Eye, EyeOff } from "lucide-react-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, View, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Checkbox, CheckboxIcon, CheckboxIndicator } from "@/components/ui/checkbox";
 
@@ -180,11 +181,11 @@ export function SignupInstitutionThirdStage() {
                             <HStack style={{ width: 312, height: 44, alignSelf: "center", marginTop: 12 }}>
                                 <Checkbox value="terms" isChecked={termsAccepted} onChange={() => setTermsAccepted(!termsAccepted)} aria-label="terms">
                                     <CheckboxIndicator style={{ width: 16, height: 16 }}>
-                                        <CheckboxIcon />
+                                        <CheckboxIcon as={CheckIcon} />
                                     </CheckboxIndicator>
                                 </Checkbox>
                                 <Text style={{ marginLeft: 12, flex: 1, fontFamily: "Nunito-Regular", fontSize: 14, lineHeight: 20, color: "#000" }}>
-                                    Li e aceito os <Text style={{ color: "#173663", textDecorationLine: "underline", fontFamily: "Nunito-Bold" }}>Termos de Uso</Text> e a <Text style={{ color: "#173663", textDecorationLine: "underline", fontFamily: "Nunito-Bold" }}>Política de Privacidade</Text>
+                                    Li e aceito os <Text onPress={() => router.push('/policies' as any)} style={{ color: "#173663", textDecorationLine: "underline", fontFamily: "Nunito-Bold" }}>Termos de Uso</Text> e a <Text onPress={() => router.push('/policies' as any)} style={{ color: "#173663", textDecorationLine: "underline", fontFamily: "Nunito-Bold" }}>Política de Privacidade</Text>
                                 </Text>
                             </HStack>
                             <Button

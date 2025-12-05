@@ -8,9 +8,11 @@ import { Input, InputField } from '@/components/ui/input';
 import { Button, ButtonText } from '@/components/ui/button';
 import { useAuth } from '@/providers/AuthProvider';
 import api from '@/services/api';
+import { formatarTelefone } from '@/utils/formatters/format';
 import { Settings, LogOut, FileText, Info, Check } from 'lucide-react-native';
 import { StateSelect } from '@/components/custom/StateSelect';
 import { SkillsEditor } from '@/components/custom/voluntaryskills/skillseditor/SkillsEditor';
+import { useRouter } from 'expo-router';
 
 interface VoluntaryMeResponse {
   id: string;
@@ -24,6 +26,7 @@ interface VoluntaryMeResponse {
 
 export default function VoluntaryProfileScreen() {
   const { token, logout } = useAuth();
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight ? useBottomTabBarHeight() : 70;
   const [loading, setLoading] = useState(true);
@@ -56,11 +59,7 @@ export default function VoluntaryProfileScreen() {
   }, [token]);
 
   function formatPhone(raw: string) {
-    const digits = raw.replace(/\D/g, '').slice(0, 11);
-    if (digits.length <= 2) return `(${digits}`;
-    if (digits.length <= 6) return `(${digits.slice(0,2)}) ${digits.slice(2)}`;
-    if (digits.length <= 10) return `(${digits.slice(0,2)}) ${digits.slice(2,6)}-${digits.slice(6)}`;
-    return `(${digits.slice(0,2)}) ${digits.slice(2,7)}-${digits.slice(7)}`;
+    return formatarTelefone(raw);
   }
 
   const dirty = useMemo(() => {
@@ -196,8 +195,8 @@ export default function VoluntaryProfileScreen() {
               <View style={{ backgroundColor:'#FFFFFF', borderTopLeftRadius:24, borderTopRightRadius:24, paddingHorizontal:24, paddingTop:24, paddingBottom: insets.bottom + 16 }}>
                 <Text style={{ fontSize:18, fontFamily:'Nunito-Bold', color:'#173663', textAlign:'center', marginBottom:20 }}>Configurações</Text>
 
-                <SettingsItem icon={FileText} label="Política de Uso" onPress={() => {}} />
-                <SettingsItem icon={Info} label="Ajuda / Fale Conosco" onPress={() => {}} />
+                <SettingsItem icon={FileText} label="Política de Uso" onPress={() => { setSettingsVisible(false); router.push('/policies' as any); }} />
+                <SettingsItem icon={Info} label="Ajuda / Fale Conosco" onPress={() => { setSettingsVisible(false); router.push('/support' as any); }} />
 
                 <View style={{ height:1, backgroundColor:'#E2E8F0', marginVertical:16 }} />
 

@@ -10,7 +10,7 @@ import { SignupVoluntarySecondStageData, signupVoluntarySecondStageSchema } from
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import { AlertCircle, Check } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, ScrollView, View, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -33,11 +33,19 @@ export function SignupVoluntarySecondStage() {
         resolver: zodResolver(signupVoluntarySecondStageSchema),
     });
 
-    setValue("skills", selectedSkills);
+    // Keep RHF value in sync with UI state
+    useEffect(() => {
+        setValue("skills", selectedSkills, { shouldValidate: true, shouldDirty: true });
+    }, [selectedSkills, setValue]);
 
     const onSubmit = (formData: SignupVoluntarySecondStageData) => {
-        console.log("Form válido:", formData);
-        updateData(formData);
+        const payload: SignupVoluntarySecondStageData = {
+            ...formData,
+            // Ensure we persist the latest UI state
+            skills: selectedSkills,
+        };
+        console.log("Form válido:", payload);
+        updateData(payload);
         router.push("/signupVoluntaryThirdStage");
     };
 

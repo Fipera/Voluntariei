@@ -155,11 +155,7 @@ const AvatarImage = React.forwardRef<
         class: className,
       })}
       
-      style={
-        Platform.OS === 'web'
-          ? { height: 'revert-layer', width: 'revert-layer' }
-          : undefined
-      }
+  style={undefined}
     />
   );
 });

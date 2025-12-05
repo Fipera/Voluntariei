@@ -3,7 +3,7 @@ import { AppError } from '@/utils/AppError';
 import * as SecureStore from 'expo-secure-store';
 
 const api = axios.create({
-  baseURL: 'https://inartificially-unlaminated-marin.ngrok-free.dev', 
+  baseURL: 'https://inartificially-unlaminated-marin.ngrok-free.dev', // ngrok tunnel for production testing
 });
 
 

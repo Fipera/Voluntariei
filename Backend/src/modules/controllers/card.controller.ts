@@ -52,9 +52,19 @@ export async function createCardHandler(
       state: card.state ?? undefined,
     });
   } catch (err) {
-    return reply
-      .status(400)
-      .send({ error: "Erro ao criar demanda", details: err });
+    let details: any = err;
+    let messages: string[] = [];
+    if (err && typeof err === 'object' && (err as any).issues) {
+      // ZodError shape
+      try {
+        messages = (err as any).issues.map((i: any) => `${i.path.join('.')}: ${i.message}`);
+      } catch {}
+    }
+    return reply.status(400).send({
+      error: "Erro ao criar demanda",
+      messages: messages.length ? messages : undefined,
+      details,
+    });
   }
 }
 

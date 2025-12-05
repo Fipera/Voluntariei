@@ -44,7 +44,12 @@ export async function createCard(ownerId: number, input: createCardInput) {
       ownerId,
       banner,
       ...address,
-      skills: { connect: skills.map((name) => ({ name })) },
+      skills: {
+        connectOrCreate: skills.map((name) => ({
+          where: { name },
+          create: { name },
+        })),
+      },
     },
     include: { skills: true },
   });

@@ -148,10 +148,24 @@ export default function CreateOpportunityScreen(){
     return null;
   }, [startAt]);
 
+  // Add new derived validation states and adjust canSubmit
+  const maxVolunteersError = useMemo(() => {
+    if (!maxVolunteers) return 'Informe a quantidade de voluntários';
+    const val = Number(maxVolunteers);
+    if (isNaN(val) || val < 1) return 'Mínimo de 1 voluntário';
+    return null;
+  }, [maxVolunteers]);
+
+  const skillsError = useMemo(() => {
+    if (skills.length === 0) return 'Selecione pelo menos 1 habilidade';
+    if (skills.length > 3) return 'Máximo de 3 habilidades';
+    return null;
+  }, [skills]);
+
   const canSubmit = useMemo(()=>{
     const duration = (Number(durationHours) || 0) * 60 + (Number(durationMinutes) || 0);
-    return !!(title && startAt && duration > 0 && !durationError && !startTimeError && (isOnline || useInstitutionAddress || (city && state)) && maxVolunteers && skills.length>=1 && skills.length<=3);
-  },[title, startAt, durationHours, durationMinutes, durationError, startTimeError, isOnline, useInstitutionAddress, city, state, maxVolunteers, skills]);
+    return !!(title && startAt && duration > 0 && !durationError && !startTimeError && !maxVolunteersError && !skillsError && (isOnline || useInstitutionAddress || (city && state)));
+  },[title, startAt, durationHours, durationMinutes, durationError, startTimeError, isOnline, useInstitutionAddress, city, state, maxVolunteersError, skillsError]);
 
   
   async function waitForCreation(delayMs = 1500){
@@ -160,8 +174,7 @@ export default function CreateOpportunityScreen(){
 
   async function handleCreate(){
     if(!token) return;
-    if(skills.length === 0 || skills.length > 3) return;
-    
+    if(skillsError || maxVolunteersError) return; // guard
     const duration = (Number(durationHours) || 0) * 60 + (Number(durationMinutes) || 0);
     
     
@@ -189,7 +202,7 @@ export default function CreateOpportunityScreen(){
       setSaving(true);
       const payload: any = {
         title,
-        description: description || undefined,
+        description: description ? description : undefined,
         startAt: (startAt as Date).toISOString(),
         duration,
         isOnline,
@@ -197,7 +210,16 @@ export default function CreateOpportunityScreen(){
         skills,
         useInstitutionAddress: isOnline ? undefined : useInstitutionAddress,
         banner: banner || undefined,
-        ...(isOnline || useInstitutionAddress ? {} : { city, state, cep: cep.replace(/\D/g,''), street, numberHouse, neighborhood, complement, locationNote }),
+        ...(isOnline || useInstitutionAddress ? {} : {
+          city: city || undefined,
+          state: state || undefined,
+          cep: cep.replace(/\D/g,'') || undefined,
+          street: street || undefined,
+          numberHouse: numberHouse || undefined,
+          neighborhood: neighborhood || undefined,
+          complement: complement || undefined,
+          locationNote: locationNote || undefined,
+        }),
       };
       await api.post('/cards', payload, { headers: { Authorization: `Bearer ${token}` } });
 
@@ -227,7 +249,12 @@ export default function CreateOpportunityScreen(){
       router.replace({ pathname: '/(institution)', params: { filter: 'ALL' } } as any);
       return;
     }catch(e: any){
-      alert(e?.response?.data?.error || 'Erro ao criar');
+      const backendMessages: string[] | undefined = e?.response?.data?.messages;
+      if (backendMessages && backendMessages.length) {
+        alert(backendMessages.join('\n'));
+      } else {
+        alert(e?.response?.data?.error || 'Erro ao criar');
+      }
     }finally{
       setSaving(false);
       setRedirecting(false);
@@ -506,6 +533,9 @@ export default function CreateOpportunityScreen(){
             keyboardType='number-pad' 
           />
         </Input>
+        {maxVolunteersError && (
+          <Text style={{ fontSize:12, color:'#DC2626', marginTop:4 }}>{maxVolunteersError}</Text>
+        )}
 
         <Text style={{ fontSize:16, fontFamily:'Nunito-Bold', color:'#173663', marginBottom:8 }}>Descrição</Text>
         <Input style={{ minHeight:90, backgroundColor:'#FDFDFD', borderColor:'#B7B7B7', borderWidth:1, borderRadius:8, paddingVertical:8, marginBottom:8 }}>
@@ -515,6 +545,9 @@ export default function CreateOpportunityScreen(){
         <View style={{ marginTop: 8 }}>
           <SkillsEditor value={skills} onChange={setSkills} max={3} />
         </View>
+        {skillsError && (
+          <Text style={{ fontSize:12, color:'#DC2626', marginTop:4 }}>{skillsError}</Text>
+        )}
 
         <Button onPress={handleCreate} disabled={!canSubmit || saving} style={{ width: 310, height: 44, borderRadius: 12, alignSelf:'center', marginTop: 16, backgroundColor: !canSubmit ? '#b7c4da' : '#173663' }}>
           <ButtonText style={{ fontSize:18, lineHeight:25, fontFamily:'Nunito-Bold' }}>{saving ? 'Criando...' : 'Criar Demanda'}</ButtonText>

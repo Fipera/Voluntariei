@@ -26,24 +26,28 @@ function AppRoutes() {
     const segments = useSegments();
     const router = useRouter();
 
+    // Só chama push notifications se estiver logado E fora do grupo (auth)
+    const inAuthGroup = segments[0] === "(auth)";
+    const shouldEnablePushNotifications = token && type && !inAuthGroup;
     
-    usePushNotifications(token, type);
+    usePushNotifications(
+        shouldEnablePushNotifications ? token : null,
+        shouldEnablePushNotifications ? type : null
+    );
 
     useEffect(() => {
         if (isLoading) return;
+        const first = segments[0] as string | undefined;
+        const inInstitutionGroup = first === "(institution)";
+        const inVoluntaryGroup = first === "(voluntary)";
+        const inPublicPage = first === "policies" || first === "support";
 
-        const inAuthGroup = segments[0] === "(auth)";
-        const inInstitutionGroup = segments[0] === "(institution)";
-        const inVoluntaryGroup = segments[0] === "(voluntary)";
-
-        if (!token && !inAuthGroup) {
-            
+        // Não força redirect se estiver em páginas públicas (policies/support)
+        if (!token && !inAuthGroup && !inPublicPage) {
             router.replace("/(auth)/home");
-        } else if (token && type === "INSTITUTION" && !inInstitutionGroup) {
-            
+        } else if (token && type === "INSTITUTION" && !inInstitutionGroup && !inPublicPage) {
             router.replace("/(institution)");
-        } else if (token && type === "VOLUNTARY" && !inVoluntaryGroup) {
-            
+        } else if (token && type === "VOLUNTARY" && !inVoluntaryGroup && !inPublicPage) {
             router.replace("/(voluntary)");
         }
     }, [isLoading, token, type, segments]);
@@ -60,6 +64,8 @@ function AppRoutes() {
                 options={{ headerShown: false }}
             />
             <Stack.Screen name="(voluntary)" options={{ headerShown: false }} />
+            <Stack.Screen name="policies" options={{ headerShown: false }} />
+            <Stack.Screen name="support" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
         </Stack>
     );

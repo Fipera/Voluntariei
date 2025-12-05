@@ -249,7 +249,7 @@ export default function VoluntaryHubScreen() {
                               )}
                             </VStack>
                             <HStack style={{ alignItems:'center', justifyContent:'space-between' }}>
-                              <Text style={{ fontSize:10, fontFamily:'Nunito-Light', color:'#000000', lineHeight:14 }}>{participantsCount}/{c.maxVolunteers} Demandas</Text>
+                              <Text style={{ fontSize:10, fontFamily:'Nunito-Light', color:'#000000', lineHeight:14 }}>{participantsCount}/{c.maxVolunteers} vagas</Text>
                               <View style={{ backgroundColor:'#173663', paddingVertical:10, paddingHorizontal:10, borderRadius:12, justifyContent:'center', alignItems:'center' }}>
                                 <Text style={{ color:'#FFFFFF', fontSize:12, fontFamily:'Nunito-Bold', lineHeight:16 }}>Ver mais</Text>
                               </View>
@@ -311,7 +311,7 @@ export default function VoluntaryHubScreen() {
                             </HStack>
                             <HStack style={{ alignItems:'center', justifyContent:'space-between' }}>
                               <Text style={{ fontSize:10, fontFamily:'Nunito-Bold', color:'#173663', lineHeight:14 }}>
-                                {remainingSlots} {remainingSlots === 1 ? 'demanda restante' : 'demandas restantes'}
+                                {remainingSlots} {remainingSlots === 1 ? 'demanda restante' : 'vagas restantes'}
                               </Text>
                               <View style={{ backgroundColor:'#173663', paddingVertical:10, paddingHorizontal:10, borderRadius:12, justifyContent:'center', alignItems:'center' }}>
                                 <Text style={{ color:'#FFFFFF', fontSize:12, fontFamily:'Nunito-Bold', lineHeight:16 }}>Ver mais</Text>

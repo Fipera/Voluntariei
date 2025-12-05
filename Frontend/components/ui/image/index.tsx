@@ -39,11 +39,7 @@ const Image = React.forwardRef<
       {...props}
       ref={ref}
       
-      style={
-        Platform.OS === 'web'
-          ? { height: 'revert-layer', width: 'revert-layer' }
-          : undefined
-      }
+  style={undefined}
     />
   );
 });

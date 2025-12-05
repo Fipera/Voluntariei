@@ -416,7 +416,7 @@ export default function VoluntaryOpportunityDetail(){
                 gap: 8
               }}
             >
-              <Text style={{ color:'#DC2626', fontFamily:'Nunito-Bold', fontSize:16 }}>Demandas esgotadas</Text>
+              <Text style={{ color:'#DC2626', fontFamily:'Nunito-Bold', fontSize:16 }}>Vagas esgotadas</Text>
             </HStack>
           ) : (
             

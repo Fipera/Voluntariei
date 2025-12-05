@@ -7,7 +7,7 @@ import {
     FormControlErrorText,
 } from "@/components/ui/form-control";
 import { HStack } from "@/components/ui/hstack";
-import { AddIcon, Icon } from "@/components/ui/icon";
+import { AddIcon, Icon, CheckIcon } from "@/components/ui/icon";
 
 import { Input, InputField, InputIcon } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
@@ -31,6 +31,7 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
+    Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Checkbox, CheckboxIndicator, CheckboxIcon } from "@/components/ui/checkbox";
@@ -88,17 +89,38 @@ export function SignupVoluntaryThirdStage() {
             return;
         }
 
-        const fullData = { ...data, ...formData };
+        const { passwordConfirm, ...formDataWithoutConfirm } = formData;
+        const sanitized = {
+            email: String(formDataWithoutConfirm.email || '').trim(),
+            password: String(formDataWithoutConfirm.password || ''),
+            name: String(data?.name || '').trim(),
+            phoneNumber: String(data?.phoneNumber || '').replace(/\D/g, ''),
+            cep: String(data?.cep || '').replace(/\D/g, ''),
+            city: String(data?.city || '').trim(),
+            state: String(data?.state || '').trim(),
+            skills: Array.isArray(data?.skills) ? (data!.skills as string[]) : [],
+        };
+
+        if (!sanitized.name || !sanitized.phoneNumber || !sanitized.cep || !sanitized.city || !sanitized.state || !sanitized.skills.length) {
+            setErrorMessage('Complete as etapas anteriores antes de finalizar o cadastro.');
+            setIsLoading(false);
+            return;
+        }
 
         try {
             setIsLoading(true);
-            const response = await api.post("/voluntary", fullData);
+            const response = await api.post("/voluntary", sanitized);
 
             setIsLoading(false);
             clearData();
             router.push("/(voluntary)");
-        } catch (error) {
-            console.log("Erro completo:", error);
+        } catch (error: any) {
+            // Surface backend 400 details if available
+            // Note: api instance wraps errors in AppError, but during dev builds
+            // we still try to peek original response if axios error leaks
+            // (helps confirm which field is invalid)
+            // eslint-disable-next-line no-console
+            console.log("Erro completo:", error?.response?.data || error);
             setIsLoading(false);
 
             const isAppError = error instanceof AppError;
@@ -180,11 +202,11 @@ export function SignupVoluntaryThirdStage() {
                             <HStack style={{ width: 312, alignSelf: 'center', marginTop: 12 }}>
                                 <Checkbox value="terms" isChecked={termsAccepted} onChange={() => setTermsAccepted(!termsAccepted)} aria-label="terms">
                                     <CheckboxIndicator style={{ width: 16, height: 16 }}>
-                                        <CheckboxIcon />
+                                        <CheckboxIcon as={CheckIcon} />
                                     </CheckboxIndicator>
                                 </Checkbox>
                                 <Text style={{ marginLeft: 12, flex: 1, fontFamily: 'Nunito-Regular', fontSize: 14, lineHeight: 20, color: '#000' }}>
-                                    Li e aceito os <Text style={{ color: '#173663', textDecorationLine: 'underline', fontFamily: 'Nunito-Bold' }}>Termos de Uso</Text> e a <Text style={{ color: '#173663', textDecorationLine: 'underline', fontFamily: 'Nunito-Bold' }}>Política de Privacidade</Text>
+                                    Li e aceito os <Text onPress={() => router.push('/policies' as any)} style={{ color: '#173663', textDecorationLine: 'underline', fontFamily: 'Nunito-Bold' }}>Termos de Uso</Text> e a <Text onPress={() => router.push('/policies' as any)} style={{ color: '#173663', textDecorationLine: 'underline', fontFamily: 'Nunito-Bold' }}>Política de Privacidade</Text>
                                 </Text>
                             </HStack>
                             <Button onPress={handleSubmit(onSubmit)} disabled={isLoading || !termsAccepted} style={{ width: 310, height: 44, borderRadius: 12, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: 10, marginTop: 16, alignSelf: 'center', backgroundColor: !termsAccepted ? '#b7c4da' : '#173663' }}>

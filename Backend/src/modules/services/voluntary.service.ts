@@ -12,7 +12,10 @@ export async function createVoluntary(input: createVoluntaryInput) {
             ...rest,
             password: hashedPassword,
             skills: {
-                connect: skills.map((name) => ({ name })),
+                connectOrCreate: skills.map((name) => ({
+                    where: { name },
+                    create: { name },
+                })),
             },
         },
         include: {
