@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: bitnami/postgresql:latest
+    image: soldevelo/postgresql:latest
     ports:
       - '5433:5432'
     environment:
@@ -11,7 +11,7 @@ services:
       - voluntariei_pg_data:/bitnami/postgresql
 
   redis:
-    image: bitnami/redis:latest
+    image: soldevelo/redis:latest
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
